@@ -34,6 +34,7 @@ $ git clone https://github.com/StanJulia/ROSStanPluto.jl # Or the Github site op
 $ cd ROSStanPluto.jl # Move to the downloaded directory
 $ julia --project=ROSStanPluto # Available from Julia-1.7 onwards.
 (ROSStanPluto) pkg> activate .
+(ROSStanPluto) pkg> instantiate     # Only the first time
 ```
 
 Still in the Julia REPL, start a Pluto notebook server.

@@ -1,5 +1,12 @@
 # ROSStanPluto.jl
 
+![Lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)<!--
+![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)
+![Lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)
+![Lifecycle](https://img.shields.io/badge/lifecycle-retired-orange.svg)
+![Lifecycle](https://img.shields.io/badge/lifecycle-archived-red.svg)
+![Lifecycle](https://img.shields.io/badge/lifecycle-dormant-blue.svg) -->
+
 ## Purpose
 
 This project will contain (work is in early stages of progress!!) a set of Pluto notebooks that contain Julia versions of the examples in the R project `ROS-Examples` based on the book ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
@@ -17,7 +24,7 @@ To complete below steps and run the notebooks you need:
 5. Access to some development tools, e.g. git and a C++ toolchain.
 6. A Julia base environment containing `Pkg`, `DrWatson`, `Pluto` and `PlutoUI`.
 
-## Setup the Pluto based ROS notebooks
+## Setup the Pluto based ROSStanPluto notebooks
 
 To (locally) use this project, do the following:
 

@@ -1,22 +1,45 @@
-# ROSStanPluto
+# ROSStanPluto.jl
 
-This code base is using the Julia Language and [DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/)
-to make a reproducible scientific project named
-> ROSStanPluto
+## Purpose
 
-It is authored by Rob J Goedman.
+This project is a set of Pluto notebooks that contain Julia versions of the examples in the R project `ROS-Examples` based on the book ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
 
-To (locally) reproduce this project, do the following:
+These notebooks are intended to be used in conjunction with above book.
 
-0. Download this code base. Notice that raw data are typically not included in the
-   git-history and may need to be downloaded independently.
-1. Open a Julia console and do:
-   ```
-   julia> using Pkg
-   julia> Pkg.add("DrWatson") # install globally, for using `quickactivate`
-   julia> Pkg.activate("path/to/this/project")
-   julia> Pkg.instantiate()
-   ```
+## Prerequisites
 
-This will install all necessary packages for you to be able to run the scripts and
-everything should work out of the box, including correctly finding local paths.
+To complete below steps and run the notebooks you need:
+
+1. A functioning [cmdstan](https://mc-stan.org/users/interfaces/cmdstan.html).
+2. A functioning [Julia](https://julialang.org/downloads/).
+3. A downloaded version of [ROS-Examples](https://github.com/avehtari/ROS-Examples).
+4. Setup an environment variable JULIA_ROS_HOME pointing to the ROS-Examples directory.
+5. Access to some development tools, e.g. git and a C++ toolchain.
+6. A Julia base environment containing `Pkg`, `DrWatson`, `Pluto` and `PlutoUI`.
+
+## Setup the Pluto based ROS notebooks
+
+To (locally) use this project, do the following:
+
+Select and download ROS.jl from [StanJulia on Github](https://github.com/StanJulia/) .e.g.:
+```Julia
+$ git clone https://github.com/StanJulia/ROS.jl # Or the Github site options.
+$ cd ROS.jl # Move to the downloaded directory
+$ julia --project=ros # Available from Julia-1.7 onwards.
+```
+
+Still in the Julia REPL, start a Pluto notebook server.
+```Julia
+julia> using Pluto
+julia> Pluto.run()
+```
+
+A Pluto page should open in a browser. See [this page](https://www.juliafordatascience.com/first-steps-5-pluto/) for a quick Pluto introduction.
+
+## Usage
+
+Select a notebook in the `open a file` entry box, e.g. type `./` and step to e.g. `./notebooks/01/02/hibbs.jl`, the first notebook from the book.
+
+The code examples are organized in subdirectories according to  chapter/section/example, e.g. `01/02/hibbs.jl`.
+
+See [TIPS](https://github.com/StanJulia/ROS.jl/blob/master/TIPS.md) for some more details or file an [issue](https://github.com/StanJulia/ROS.jl/issues) if any difficulties are encountered with above steps.

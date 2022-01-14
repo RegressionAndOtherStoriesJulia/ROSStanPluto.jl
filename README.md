@@ -21,11 +21,12 @@ To complete below steps and run the notebooks you need:
 
 To (locally) use this project, do the following:
 
-Select and download ROS.jl from [StanJulia on Github](https://github.com/StanJulia/) .e.g.:
+Select and download ROSStanPluto.jl from [StanJulia on Github](https://github.com/StanJulia/) .e.g.:
 ```Julia
-$ git clone https://github.com/StanJulia/ROS.jl # Or the Github site options.
-$ cd ROS.jl # Move to the downloaded directory
-$ julia --project=ros # Available from Julia-1.7 onwards.
+$ git clone https://github.com/StanJulia/ROSStanPluto.jl # Or the Github site options.
+$ cd ROSStanPluto.jl # Move to the downloaded directory
+$ julia --project=ROSStanPluto # Available from Julia-1.7 onwards.
+(ROSStanPluto) pkg> activate .
 ```
 
 Still in the Julia REPL, start a Pluto notebook server.
@@ -42,4 +43,4 @@ Select a notebook in the `open a file` entry box, e.g. type `./` and step to e.g
 
 The code examples are organized in subdirectories according to  chapter/section/example, e.g. `01/02/hibbs.jl`.
 
-See [TIPS](https://github.com/StanJulia/ROS.jl/blob/master/TIPS.md) for some more details or file an [issue](https://github.com/StanJulia/ROS.jl/issues) if any difficulties are encountered with above steps.
+See [TIPS](https://github.com/StanJulia/ROSStanPluto.jl/blob/master/TIPS.md) for some more details or file an [issue](https://github.com/StanJulia/ROSStanPluto.jl/issues) if any difficulties are encountered with above steps.

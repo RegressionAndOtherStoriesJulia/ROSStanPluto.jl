@@ -9,7 +9,7 @@
 
 ## Purpose
 
-This project will contain (work is in early stages of progress!!) a set of Pluto notebooks that contain Julia versions of the examples in the R project `ROS-Examples` based on the book ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
+This project will contain (work is in very early stages of progress!!!) a set of Pluto notebooks that contain Julia versions of the examples in the R project `ROS-Examples` based on the book ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
 
 These notebooks are intended to be used in conjunction with above book.
 
@@ -28,7 +28,7 @@ To complete below steps and run the notebooks you need:
 
 To (locally) use this project, do the following:
 
-Select and download ROSStanPluto.jl from [StanJulia on Github](https://github.com/StanJulia/), e.g.:
+Select and download ROSStanPluto.jl from [StanJulia on Github](https://github.com/StanJulia/), e.g. to clone it to the `~/.julia/dev/ROSStanPluto` directory:
 ```Julia
 $ git clone https://github.com/StanJulia/ROSStanPluto.jl ~/.julia/dev/ROSStanPluto
 $ cd ROSStanPluto.jl # Move to the downloaded directory

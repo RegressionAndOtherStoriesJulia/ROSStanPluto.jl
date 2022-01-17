@@ -28,9 +28,9 @@ To complete below steps and run the notebooks you need:
 
 To (locally) use this project, do the following:
 
-Select and download ROSStanPluto.jl from [StanJulia on Github](https://github.com/StanJulia/) .e.g.:
+Select and download ROSStanPluto.jl from [StanJulia on Github](https://github.com/StanJulia/), e.g.:
 ```Julia
-$ git clone https://github.com/StanJulia/ROSStanPluto.jl # Or the Github site options.
+$ git clone https://github.com/StanJulia/ROSStanPluto.jl ~/.julia/dev/ROSStanPluto
 $ cd ROSStanPluto.jl # Move to the downloaded directory
 $ julia --project=ROSStanPluto # Available from Julia-1.7 onwards.
 (ROSStanPluto) pkg> activate .

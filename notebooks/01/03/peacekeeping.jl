@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.5
+# v0.17.7
 
 using Markdown
 using InteractiveUtils
@@ -105,21 +105,18 @@ median(peace[peace.peacekeepers .== 0 .&& peace.censored .== 0, :delay])
 
 # ╔═╡ 1f5a8287-2aa5-4d0b-a002-c9f014edf8ed
 let
-	figs = Plots.Plot{Plots.GRBackend}[]
 	pks = peace[peace.peacekeepers .== 1 .&& peace.censored .== 0, :delay]
 	nopks = peace[peace.peacekeepers .== 0 .&& peace.censored .== 0, :delay]
 
-	f1 = histogram(pks; bin=16, xlim=(-1,8), title="peacekeepers", titlefontsize=8,
-		xlab="Years until return to war", ylab="Frequency", guidefontsize=9,
-		leg=false, left_margin=[10mm 0mm])
-	append!(figs, [f1])
+	f1 = histogram(pks; bin=16, xlim=(-1,8), title="peacekeepers",
+		titlefontsize=8, xlab="Years until return to war",
+		ylab="Frequency", guidefontsize=9, leg=false, left_margin=[10mm 0mm])
 
 	f2 = histogram(nopks; bin=16, xlim=(-1,8), title="nopeacekeepers",
 		titlefontsize=8, xlab="Years until return to war",
 		ylab="Frequency", guidefontsize=9,leg=false, left_margin=[10mm 0mm])
-	append!(figs, [f2])
 	
-	plot(figs...; layout=(2, 1), plot_title="Fig-1.3", titlefontsize=9)
+	plot(f1, f2; layout=(2, 1), plot_title="Fig-1.3", titlefontsize=9)
 end
 
 # ╔═╡ 8cd107e4-fbd0-4a53-ae0c-eede5363a4e0
@@ -134,8 +131,6 @@ Censored means conflict had not returned until end of observation period (2004).
 
 # ╔═╡ be8ef59e-ba27-4432-8eed-99834498c5f3
 let
-	figs = Plots.Plot{Plots.GRBackend}[]
-	
 	# Delays until return to war for uncensored, peacekeeper cases
 	pks_uc = pb[pb.peacekeepers .== 1 .&& pb.censored .== 0, :delay]
 	# Delays until return to war for censored, peacekeeper cases
@@ -148,8 +143,10 @@ let
 	# Crude measure (:badness) used for assessing situation
 	badness_pks_uc = pb[pb.peacekeepers .== 1 .&& pb.censored .== 0, :badness]
 	badness_pks_c = pb[pb.peacekeepers .== 1 .&& pb.censored .== 1, :badness]
-	badness_nopks_uc = pb[pb.peacekeepers .== 0 .&& pb.censored .== 0, :badness]
-	badness_nopks_c = pb[pb.peacekeepers .== 0 .&& pb.censored .== 1, :badness]
+	badness_nopks_uc = pb[pb.peacekeepers .== 0 .&& pb.censored .== 0, 
+		:badness]
+	badness_nopks_c = pb[pb.peacekeepers .== 0 .&& pb.censored .== 1, 
+		:badness]
 
 	f1 = plot(;	xlim=(-13, -2),
 		title="With UN peacekeepers", titlefontsize=8,
@@ -158,7 +155,6 @@ let
 
 	scatter!(badness_pks_uc, pks_uc; lab="Uncensored") 
 	scatter!(badness_pks_c, pks_c; lab="Censored")
-	append!(figs, [f1])
 
 	f2 = plot(;	xlim=(-13, -2),
 		title="No UN peacekeepers", titlefontsize=8,
@@ -167,9 +163,8 @@ let
 
 	scatter!(badness_nopks_uc, pks_uc; lab="Uncensored") 
 	scatter!(badness_nopks_c, pks_c; lab="Censored")
-	append!(figs, [f2])
 	
-	plot(figs...; layout=(2, 1), plot_title="Fig 1.4", titlefontsize=9)
+	plot(f1, f2; layout=(2, 1), plot_title="Fig 1.4", titlefontsize=9)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -198,8 +193,9 @@ StatsPlots = "~0.14.28"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.1"
+julia_version = "1.8.0-DEV.1405"
 manifest_format = "2.0"
+project_hash = "a44f20aeebd3ea31a367e9bd1a9f5ca3fdc8c0d9"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -215,6 +211,7 @@ version = "3.3.1"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.1"
 
 [[deps.Arpack]]
 deps = ["Arpack_jll", "Libdl", "LinearAlgebra"]
@@ -309,6 +306,7 @@ version = "3.40.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "0.5.0+0"
 
 [[deps.Contour]]
 deps = ["StaticArrays"]
@@ -386,8 +384,9 @@ uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.8.6"
 
 [[deps.Downloads]]
-deps = ["ArgTools", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
 
 [[deps.DrWatson]]
 deps = ["Dates", "FileIO", "JLD2", "LibGit2", "MacroTools", "Pkg", "Random", "Requires", "Scratch", "UnPack"]
@@ -442,6 +441,9 @@ deps = ["Dates", "Mmap", "Printf", "Test", "UUIDs"]
 git-tree-sha1 = "618835ab81e4a40acf215c98768978d82abc5d97"
 uuid = "48062228-2e41-5def-b9a4-89aafe57970f"
 version = "0.9.16"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
@@ -656,10 +658,12 @@ uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.3"
 
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "7.73.0+4"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -668,6 +672,7 @@ uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.9.1+2"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -758,6 +763,7 @@ version = "1.0.3"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.24.0+2"
 
 [[deps.Measures]]
 git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
@@ -775,6 +781,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2020.7.22"
 
 [[deps.MultivariateStats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "Statistics", "StatsBase"]
@@ -795,6 +802,7 @@ version = "0.4.9"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
 
 [[deps.Observables]]
 git-tree-sha1 = "fe29afdef3d0c4a8286128d4e45cc50621b1e43d"
@@ -816,10 +824,12 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.17+2"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
+version = "0.8.1+0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -871,6 +881,7 @@ version = "0.40.1+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.8.0"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Requires", "Statistics"]
@@ -974,6 +985,7 @@ version = "0.3.0+0"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
 
 [[deps.Scratch]]
 deps = ["Dates"]
@@ -1065,6 +1077,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.0"
 
 [[deps.TableOperations]]
 deps = ["SentinelArrays", "Tables", "Test"]
@@ -1087,6 +1100,7 @@ version = "1.6.0"
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.0"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -1292,6 +1306,7 @@ version = "1.4.0+3"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.12+1"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1308,6 +1323,7 @@ version = "0.15.1+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "4.0.0+0"
 
 [[deps.libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1323,17 +1339,19 @@ version = "1.6.38+0"
 
 [[deps.libvorbis_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Ogg_jll", "Pkg"]
-git-tree-sha1 = "c45f4e40e7aafe9d086379e5578947ec8b95a8fb"
+git-tree-sha1 = "b910cb81ef3fe6e78bf6acee440bda86fd6ae00c"
 uuid = "f27f6e37-5d2b-51aa-960f-b287f2bc3b7a"
-version = "1.3.7+0"
+version = "1.3.7+1"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.41.0+1"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "16.2.1+1"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]

@@ -13,6 +13,14 @@ This project will contain (work is in very early stages of progress!!!) a set of
 
 These notebooks are intended to be used in conjunction with above book.
 
+## Personal note
+
+This project will take quite a while to complete, I expect at least a year. But it has a special meaning to me: When I started in 2011 to work on Julia interfaces for Stan's cmdstan binary, I did that to work through the ["ARM" book](http://www.stat.columbia.edu/~gelman/arm/). The ["ROS" book](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview) in a sense the successor to the ARM book.
+
+I will document the progress in the table of content (TOC.md).
+
+In addition to continued work on [Statistical Rethinking](https://github.com/StatisticalRethinkingJulia), at some point I would also like to proceed with [Causal Inference](https://github.com/StanJulia/CIStanPluto.jl).
+
 ## Prerequisites
 
 To complete below steps and run the notebooks you need:

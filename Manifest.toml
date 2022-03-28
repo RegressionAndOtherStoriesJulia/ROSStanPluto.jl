@@ -2,7 +2,7 @@
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "97e3c8de5a764dace4495390a6990a38d8b4681d"
+project_hash = "22e7efa3f3f7976a9befa7f107427c48106489e3"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -160,10 +160,10 @@ uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.4.1"
 
 [[deps.CPUSummary]]
-deps = ["Hwloc", "IfElse", "Preferences", "Static"]
-git-tree-sha1 = "7f5830799ee4f40a143f40d6943d421ce985ed88"
+deps = ["IfElse", "Static"]
+git-tree-sha1 = "48e01b22ef077b07541309652f697595f8decf25"
 uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
-version = "0.1.17"
+version = "0.1.18"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
@@ -1357,12 +1357,6 @@ version = "0.8.3"
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
-
-[[deps.ROSBase]]
-deps = ["CSV", "CategoricalArrays", "DataFrames", "DelimitedFiles", "Reexport", "Statistics", "StatsBase", "Unicode"]
-path = "/Users/rob/.julia/dev/ROSBase"
-uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.1.0"
 
 [[deps.Random]]
 deps = ["SHA", "Serialization"]

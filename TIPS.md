@@ -19,7 +19,7 @@ Pre Julia-1.7, `julia --project=ROSStanPluto` is not available, use:
 julia> ]                               # Actvate Pkg mode
 (@v1.7) pkg> activate .                # Activate pkg in .
 (ROSStanPluto) pkg> instantiate        # Install in pkg environment
-(ROSStanPluto) pkg> <delete>                    # Exit package mode
+(ROSStanPluto) pkg> <delete>           # Exit package mode
 julia>
 ```
 

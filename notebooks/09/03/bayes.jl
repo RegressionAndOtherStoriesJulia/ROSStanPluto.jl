@@ -9,11 +9,19 @@ using Pkg, DrWatson
 
 # ╔═╡ f71640c9-3918-475e-b32b-c85424bbcf5e
 begin
-    using CSV, DelimitedFiles, Unicode
-    using Distributions
-	using DataFrames
+	# Common data files and functions (Once registered)
+	using RegressionAndOtherStories
+	
+	# Specific to this notebook
+    using GLM
+
+	# Specific to ROSStanPluto
     using StanSample
-    using StatsPlots
+	
+	# Graphics related
+    using AlgebraOfGraphics, GLMakie
+    using AlgebraOfGraphics: density, linear, smooth, frequency
+	set_aog_theme!()
 end
 
 # ╔═╡ 0391fc17-09b7-47d7-b799-6dc6de13e82b
@@ -21,14 +29,6 @@ md"### Bayesian information aggregation calculations."
 
 # ╔═╡ 17034ac2-d8da-40a4-a899-5c4e10877945
 md"##### See Chapter 9 in Regression and Other Stories."
-
-# ╔═╡ 049ac802-8c0c-4f3d-9610-b517459d7dcf
-begin
-	src_path = ENV["JULIA_ROS_HOME"]
-	ros_path(parts...) = normpath(joinpath(src_path, parts...))
-	ros_data(dataset, parts...) = normpath(joinpath(src_path, dataset, "data",
-		parts...))
-end;
 
 # ╔═╡ 32d7fdff-2e2e-485d-bab5-09d2358a446e
 md"##### Prior based on a previously-fitted model using economic and political condition."

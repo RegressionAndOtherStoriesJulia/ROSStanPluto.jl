@@ -92,7 +92,6 @@ let
 	current_figure()
 end
 
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -116,7 +115,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "e13e2422d08da7ddb611eae282034a8c780bdb38"
+project_hash = "43186254718f5ab5045a6416cb6ae77c0552d6a1"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"

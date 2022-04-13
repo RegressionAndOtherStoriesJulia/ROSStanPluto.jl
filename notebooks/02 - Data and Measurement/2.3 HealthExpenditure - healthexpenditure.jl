@@ -48,16 +48,26 @@ md"###### A typical set of Julia packages to include in notebooks."
 
 # ╔═╡ 0b023c5e-a5e0-47d1-8602-9711f661bb5c
 begin
-	health = CSV.read(joinpath("/Users", "rob", ".julia", "dev", "RegressionAndOtherStories", "data", "HealthExpenditure", "healthdata.txt"), DataFrame; missingstring="NA", pool=false)
+	health = CSV.read(ros_datadir("HealthExpenditure", "healthdata.csv"), DataFrame; missingstring="NA", pool=false)
 end
+
+# ╔═╡ 82444a23-2bda-4d40-9856-b7603832d3a1
+begin
+	exp = lm(@formula(lifespan ~ spending), health)
+end
+
+# ╔═╡ 10eea085-202f-418c-a907-2c8fccb6ca08
+â, b̂ = coef(exp)
 
 # ╔═╡ 94512c96-2ede-4dc6-9e11-e6c5a1799259
 let
+	x = 0:8000
 	f = Figure()
 	ax = Axis(f[1, 1], title = "Health expenditure of 30 `western` countries",
 		xlabel = "Spending [PPP US\$]", ylabel = "Life expectancy [years]")
 	limits!(ax, 0, 8100, 73, 83)
-	sca1 = scatter!(health.spending, health.lifespan)
+	sca = scatter!(health.spending, health.lifespan; color=:darkred)
+	lin = lines!(x, â .+ b̂ * x; color=:darkblue)
 	for i in 1:nrow(health)
 		if health.country[i] == "UK"
 			annotations!(health.country[i], position = (health.spending[i]+40, health.lifespan[i]-0.25), textsize=8)
@@ -94,9 +104,9 @@ StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
 AlgebraOfGraphics = "~0.6.5"
-GLM = "~1.6.2"
+GLM = "~1.7.0"
 GLMakie = "~0.5.5"
-RegressionAndOtherStories = "~0.1.2"
+RegressionAndOtherStories = "~0.1.4"
 StanSample = "~6.4.0"
 """
 
@@ -106,7 +116,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "f219e38a279e47923a825252c1106bbb273b0859"
+project_hash = "e13e2422d08da7ddb611eae282034a8c780bdb38"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -271,9 +281,9 @@ version = "1.0.2"
 
 [[deps.Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "96b0bc6c52df76506efc8a441c6cf1adcb1babc4"
+git-tree-sha1 = "b153278a25dd42c65abbf4e62344f9d22e59191b"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.42.0"
+version = "3.43.0"
 
 [[deps.CompatHelperLocal]]
 deps = ["DocStringExtensions", "Pkg", "UUIDs"]
@@ -335,9 +345,9 @@ version = "0.4.0"
 
 [[deps.Dictionaries]]
 deps = ["Indexing", "Random"]
-git-tree-sha1 = "7e73a524c6c282e341de2b046e481abedbabd073"
+git-tree-sha1 = "0340cee29e3456a7de968736ceeb705d591875a2"
 uuid = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
-version = "0.3.19"
+version = "0.3.20"
 
 [[deps.Distances]]
 deps = ["LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI"]
@@ -495,9 +505,9 @@ version = "3.3.6+0"
 
 [[deps.GLM]]
 deps = ["Distributions", "LinearAlgebra", "Printf", "Reexport", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "StatsModels"]
-git-tree-sha1 = "609115155b0dc532fa5130de65ed086efd27bfbd"
+git-tree-sha1 = "92b8d38886445d6d06e5f13201e57d018c4ff880"
 uuid = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
-version = "1.6.2"
+version = "1.7.0"
 
 [[deps.GLMakie]]
 deps = ["ColorTypes", "Colors", "FileIO", "FixedPointNumbers", "FreeTypeAbstraction", "GLFW", "GeometryBasics", "LinearAlgebra", "Makie", "Markdown", "MeshIO", "ModernGL", "Observables", "Printf", "Serialization", "ShaderAbstractions", "StaticArrays"]
@@ -813,9 +823,9 @@ version = "0.5.4"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
-git-tree-sha1 = "58f25e56b706f95125dcb796f39e1fb01d913a71"
+git-tree-sha1 = "a970d55c2ad8084ca317a4658ba6ce99b7523571"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.3.10"
+version = "0.3.12"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -1135,9 +1145,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
-git-tree-sha1 = "6cbfc20f44776778474198647fefe075f83fab6b"
+git-tree-sha1 = "d43a48d4cbbd524a0c39664396dda6f153a6d03d"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.1.2"
+version = "0.1.4"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1298,9 +1308,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "c3d8ba7f3fa0625b062b82853a7d5229cb728b6b"
+git-tree-sha1 = "8d7530a38dbd2c397be7ddd01a424e4f411dcc41"
 uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
-version = "1.2.1"
+version = "1.2.2"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
@@ -1583,6 +1593,8 @@ version = "3.5.0+0"
 # ╟─9eea4fe3-7bb2-4981-a33d-14fa54b632d3
 # ╠═b8649ce5-9954-4856-b7b1-3595d78b2aca
 # ╠═0b023c5e-a5e0-47d1-8602-9711f661bb5c
+# ╠═82444a23-2bda-4d40-9856-b7603832d3a1
+# ╠═10eea085-202f-418c-a907-2c8fccb6ca08
 # ╠═94512c96-2ede-4dc6-9e11-e6c5a1799259
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

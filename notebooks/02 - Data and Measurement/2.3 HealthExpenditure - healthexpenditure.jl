@@ -16,11 +16,8 @@ begin
     using StanSample
 	
 	# Graphics related
-    using AlgebraOfGraphics, GLMakie
-    using AlgebraOfGraphics: density, linear, smooth, frequency
-	set_aog_theme!()
+    using GLMakie
 end
-
 
 # ╔═╡ a1c176ba-b917-11ec-067d-6b68664e26b8
 md" ### HealthExpenditure - healthexpenditure.jl"
@@ -95,17 +92,15 @@ end
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
 GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
-AlgebraOfGraphics = "~0.6.5"
 GLM = "~1.7.0"
 GLMakie = "~0.5.5"
-RegressionAndOtherStories = "~0.1.4"
+RegressionAndOtherStories = "~0.1.5"
 StanSample = "~6.4.0"
 """
 
@@ -115,7 +110,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "43186254718f5ab5045a6416cb6ae77c0552d6a1"
+project_hash = "02895810d3a8d8ee915d48cd8e8ad4a836a541ee"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -138,12 +133,6 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "af92965fb30777147966f58acb05da51c5616b5f"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 version = "3.3.3"
-
-[[deps.AlgebraOfGraphics]]
-deps = ["Colors", "Dates", "Dictionaries", "FileIO", "GLM", "GeoInterface", "GeometryBasics", "GridLayoutBase", "KernelDensity", "Loess", "Makie", "PlotUtils", "PooledArrays", "RelocatableFolders", "StatsBase", "StructArrays", "Tables"]
-git-tree-sha1 = "032144cbb772cf0aef2954dfe5cc2c0bebeaaadd"
-uuid = "cbdf2221-f076-402e-a563-3d30da359d67"
-version = "0.6.5"
 
 [[deps.Animations]]
 deps = ["Colors"]
@@ -202,10 +191,10 @@ uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.4.1"
 
 [[deps.CPUSummary]]
-deps = ["IfElse", "Static"]
-git-tree-sha1 = "48e01b22ef077b07541309652f697595f8decf25"
+deps = ["CpuId", "IfElse", "Static"]
+git-tree-sha1 = "913b28a04929053e4310d0a4915f1efe195c0ce6"
 uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
-version = "0.1.18"
+version = "0.1.19"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
@@ -301,6 +290,12 @@ git-tree-sha1 = "9f02045d934dc030edad45944ea80dbd1f0ebea7"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.5.7"
 
+[[deps.CpuId]]
+deps = ["Markdown"]
+git-tree-sha1 = "32d125af0fb8ec3f8935896122c5e345709909e5"
+uuid = "adafc99b-e345-5852-983c-f28acb93d879"
+version = "0.3.0"
+
 [[deps.Crayons]]
 git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
 uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
@@ -313,9 +308,9 @@ version = "1.9.0"
 
 [[deps.DataFrames]]
 deps = ["Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrettyTables", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "ae02104e835f219b8930c7664b8012c93475c340"
+git-tree-sha1 = "6c19003824cbebd804a51211fd3bbd81bf1ecad5"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "1.3.2"
+version = "1.3.3"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -341,18 +336,6 @@ deps = ["InverseFunctions", "Test"]
 git-tree-sha1 = "80c3e8639e3353e5d2912fb3a1916b8455e2494b"
 uuid = "b429d917-457f-4dbc-8f4c-0cc954292b1d"
 version = "0.4.0"
-
-[[deps.Dictionaries]]
-deps = ["Indexing", "Random"]
-git-tree-sha1 = "0340cee29e3456a7de968736ceeb705d591875a2"
-uuid = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
-version = "0.3.20"
-
-[[deps.Distances]]
-deps = ["LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "3258d0659f812acde79e8a74b11f17ac06d0ca04"
-uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.7"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -514,12 +497,6 @@ git-tree-sha1 = "422e49882f347c095b85afef79d3a059a98fd081"
 uuid = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 version = "0.5.5"
 
-[[deps.GeoInterface]]
-deps = ["RecipesBase"]
-git-tree-sha1 = "6b1a29c757f56e0ae01a35918a2c39260e2c4b98"
-uuid = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
-version = "0.5.7"
-
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
 git-tree-sha1 = "83ea630384a13fc4f002b77690bc0afeb4255ac9"
@@ -613,11 +590,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "87f7662e03a649cffa2e05bf19c303e168732d3e"
 uuid = "905a6f67-0a94-5f89-b386-d35d92009cd1"
 version = "3.1.2+0"
-
-[[deps.Indexing]]
-git-tree-sha1 = "ce1566720fd6b19ff3411404d4b977acd4814f9f"
-uuid = "313cdc1a-70c2-5d6a-ae34-0150d3930a38"
-version = "1.1.1"
 
 [[deps.IndirectArrays]]
 git-tree-sha1 = "012e604e1c7458645cb8b436f8fba789a51b257f"
@@ -813,12 +785,6 @@ version = "2.36.0+0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-
-[[deps.Loess]]
-deps = ["Distances", "LinearAlgebra", "Statistics"]
-git-tree-sha1 = "46efcea75c890e5d820e670516dc156689851722"
-uuid = "4345ca2d-374a-55d4-8d30-97f9976e7612"
-version = "0.5.4"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
@@ -1144,9 +1110,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
-git-tree-sha1 = "d43a48d4cbbd524a0c39664396dda6f153a6d03d"
+git-tree-sha1 = "01b9c87eec6563dc9faca30e5dcb1ba4ca93eb23"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.1.4"
+version = "0.1.5"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1188,9 +1154,9 @@ version = "0.1.0"
 
 [[deps.SLEEFPirates]]
 deps = ["IfElse", "Static", "VectorizationBase"]
-git-tree-sha1 = "d4c366b135fc2e1af7a000473e08edc5afd94819"
+git-tree-sha1 = "ac399b5b163b9140f9c310dfe9e9aaa225617ff6"
 uuid = "476501e8-09a2-5ece-8869-fb82de89a1fa"
-version = "0.6.31"
+version = "0.6.32"
 
 [[deps.ScanByte]]
 deps = ["Libdl", "SIMD"]

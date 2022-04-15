@@ -19,8 +19,8 @@ begin
     using StanSample
 	
 	# Graphics related
-    using AlgebraOfGraphics, GLMakie
-    using AlgebraOfGraphics: density, linear, smooth, frequency
+	using GLMakie
+    using AlgebraOfGraphics
 	set_aog_theme!()
 end
 
@@ -116,7 +116,7 @@ let
 	end
 	
 	let
-		plt = data(post1_2s_df) * mapping(:a; color=:chain) * density()
+		plt = data(post1_2s_df) * mapping(:a; color=:chain) * AlgebraOfGraphics.density()
 		axis = (; title="Density a")
 		draw!(fig[1, 2], plt; axis)
 	end
@@ -128,7 +128,7 @@ let
 	end
 	
 	let
-		plt = data(post1_2s_df) * mapping(:b; color=:chain) * density()
+		plt = data(post1_2s_df) * mapping(:b; color=:chain) * AlgebraOfGraphics.density()
 		axis = (; title="Density b")
 		draw!(fig[2, 2], plt; axis)
 	end
@@ -140,7 +140,7 @@ let
 	end
 	
 	let
-		plt = data(post1_2s_df) * mapping(:c; color=:chain) * density()
+		plt = data(post1_2s_df) * mapping(:c; color=:chain) * AlgebraOfGraphics.density()
 		axis = (; title="Density c")
 		draw!(fig[3, 2], plt; axis)
 	end
@@ -160,7 +160,7 @@ let
 	end
 	
 	let
-		plt = data(post1_2s_df) * mapping(:sigma; color=:chain) * density()
+		plt = data(post1_2s_df) * mapping(:sigma; color=:chain) * AlgebraOfGraphics.density()
 		axis = (; title="Density sigma")
 		draw!(fig[1, 2], plt; axis)
 	end

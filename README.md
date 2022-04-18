@@ -21,30 +21,25 @@ This project will take quite a while to complete, I expect at least a year.
 
 But it has a special meaning to me: When I started to work on Julia interfaces for Stan's cmdstan binary in 2011, I did that to work through the ["ARM" book](http://www.stat.columbia.edu/~gelman/arm/). The ["ROS" book](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview) in a sense the successor to the ARM book.
 
-I will document the progress in the table of content (TOC.md).
-
 ## Prerequisites
 
 To complete below steps and run the notebooks you need:
 
 1. A functioning [cmdstan](https://mc-stan.org/users/interfaces/cmdstan.html).
 2. A functioning [Julia](https://julialang.org/downloads/).
-3. A downloaded version of [ROS-Examples](https://github.com/avehtari/ROS-Examples).
-4. Setup an environment variable JULIA_ROS_HOME pointing to the ROS-Examples directory.
-5. Access to some development tools, e.g. git and a C++ toolchain.
-6. A Julia base environment containing `Pkg`, `DrWatson`, `Pluto` and `PlutoUI`.
+3. A Julia base environment containing `Pkg`, `DrWatson`, `Pluto` and `PlutoUI`.
 
 ## Setup the Pluto based ROSStanPluto notebooks
 
 To (locally) use this project, do the following:
 
-Select and download ROSStanPluto.jl from [StanJulia on Github](https://github.com/StanJulia/), e.g. to clone it to the `~/.julia/dev/ROSStanPluto` directory:
+Select and download ROSStanPluto.jl from [RegressionAndOtherStoriesJulia](https://github.com/RegressionAndOtherStoriesJulia/), e.g. to clone it to the `~/.julia/dev/ROSStanPluto` directory:
+
 ```Julia
-$ git clone https://github.com/StanJulia/ROSStanPluto.jl ~/.julia/dev/ROSStanPluto
-$ cd ROSStanPluto.jl # Move to the downloaded directory
-$ julia --project=ROSStanPluto # Available from Julia-1.7 onwards.
-(ROSStanPluto) pkg> activate .
-(ROSStanPluto) pkg> instantiate     # Only the first time
+$ cd ~/.julia/dev
+$ git clone https://github.com/StanJulia/ROSStanPluto.jl ROSStanPluto
+$ cd ROSStanPluto/notebooks # Move to the downloaded notebooks directory
+$ julia # Start the Julia REPL
 ```
 
 Still in the Julia REPL, start a Pluto notebook server.
@@ -57,8 +52,4 @@ A Pluto page should open in a browser. See [this page](https://www.juliafordatas
 
 ## Usage
 
-Select a notebook in the `open a file` entry box, e.g. type `./` and step to e.g. `./notebooks/01/02/hibbs.jl`, the first notebook from the book.
-
-The code examples are organized in subdirectories according to  chapter/section/example, e.g. `01/02/hibbs.jl`.
-
-See [TIPS](https://github.com/StanJulia/ROSStanPluto.jl/blob/master/TIPS.md) for some more details or file an [issue](https://github.com/StanJulia/ROSStanPluto.jl/issues) if any difficulties are encountered with above steps.
+Select a chapter in the `open a file` entry box, e.g. type `./` and select a chapter. Type '/' after selecting a chapter to see the notebooks in the chapter. Select the notebook and press `open`..

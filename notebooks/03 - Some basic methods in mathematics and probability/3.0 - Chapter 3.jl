@@ -4,10 +4,10 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ cd9c287c-24b8-40e4-a31a-785ede946f3b
-using Pkg
+# ╔═╡ 3ec83660-c767-49a4-ab27-923ea3443c98
+using Pkg, DrWatson
 
-# ╔═╡ f71640c9-3918-475e-b32b-c85424bbcf5e
+# ╔═╡ 44233635-6129-4ccd-8bad-bbafa5287112
 begin
 	# Common data files and functions (Once registered)
 	using RegressionAndOtherStories
@@ -24,10 +24,7 @@ begin
 	set_aog_theme!()
 end
 
-# ╔═╡ 0391fc17-09b7-47d7-b799-6dc6de13e82b
-md"## Distributions"
-
-# ╔═╡ 8c20b500-26a5-4437-9d84-ea333fb7ee5b
+# ╔═╡ e6974166-80e9-4903-b4bd-3f4cc3651823
 html"""
 <style>
 	main {
@@ -39,13 +36,29 @@ html"""
 </style>
 """
 
-# ╔═╡ 4755dab0-d228-41d3-934a-56f2863a5652
-md"###### A typical set of Julia packages to include in notebooks."
+# ╔═╡ d09f8d14-7c72-11ec-1481-976ff33e65af
+md" ### Weighted averages"
 
-# ╔═╡ 6c2043f4-dcbd-4535-a5ae-61c109519879
-hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
+# ╔═╡ af4f1bd4-ad6c-4f9f-a719-29ab5579b001
+pop = DataFrame(stratum=1:3, country=["United States", "Mexico", "Canada"],
+	population=Int[310e6, 112e6, 34e6], average_age=[36.8, 26.7, 40.7])
 
-# ╔═╡ 4472dfc3-e8bd-46ad-b262-9296fff47ea0
+# ╔═╡ 900d5990-a4a6-4213-8965-86bf723050b6
+mean(pop.average_age, weights(pop.population))
+
+# ╔═╡ bed5f962-d1c0-4ce0-a158-665227846c0b
+weights(pop.population)/sum(pop.population)
+
+# ╔═╡ 2696411e-44fe-4fd9-8235-60c90ff61abf
+describe(pop)
+
+# ╔═╡ e4257130-e617-4c66-81a9-55f7c2d7e721
+md" ### Vectors"
+
+# ╔═╡ fdf62f24-f0f4-46e1-b11a-cceb959bc4e8
+md" ### Distributions"
+
+# ╔═╡ 01d8d8b0-82cc-4067-af1e-ca72062e72a2
 begin
 	N = 100000
 	heights = DataFrame()
@@ -57,7 +70,7 @@ begin
 	heights
 end
 
-# ╔═╡ 56d73fa0-c4b7-4886-9c54-a7944a446084
+# ╔═╡ 382060b9-7a6f-48df-871a-75fe5f163556
 begin
 	womenHeights = heights[heights.sex .== "female", :height]
 	(mean=mean(womenHeights), var=var(womenHeights), 
@@ -65,8 +78,8 @@ begin
 		mad_sd=mad(womenHeights))
 end
 
-# ╔═╡ 9a946776-1501-44c8-ac69-41fb7894f692
-	let
+# ╔═╡ 65d3b481-8c53-4bb2-a9b8-12d9afdfe6c4
+let
 		fig = Figure()
 		plt = data(heights) * mapping(:height; color=:sex) * AlgebraOfGraphics.density()
 		axis = (; title="Density heights")
@@ -74,20 +87,19 @@ end
 		fig
 	end
 
-
-# ╔═╡ 1e56d757-a16b-4bc4-8d33-649a7355a47d
+# ╔═╡ 4066ca52-f609-4d7b-aa08-42210ff7ec7e
 begin
 	wdf = Normal(63.65, 2.68)
 	cdf(wdf, 63.65 + 0.67 * 2.68) - cdf(wdf, 63.65 - 0.67 * 2.68)
 end
 
-# ╔═╡ 9ca4b070-3d00-4647-aee2-75f5b842a99e
+# ╔═╡ cd48724d-5a75-4eb1-a5b3-860aee4f16a9
 cdf(wdf, 63.65 + 2.68) - cdf(wdf, 63.65 - 2.68)
 
-# ╔═╡ 7de2fa0b-171d-4efb-a541-048ce8f619ac
+# ╔═╡ 72b07373-b294-486d-83a7-9c34b56c85c2
 cdf(wdf, 63.65+2*2.68) - cdf(wdf, 63.65-2*2.68)
 
-# ╔═╡ 1c81b1b8-3b4e-4e28-9980-8c4284a54e01
+# ╔═╡ 2271ca22-6d77-4d5c-b501-d8aa21abc66d
 let
 	wdf = Normal(63.65, 2.68)
 	x = range(55.0, 72.5 ; length=100)
@@ -130,25 +142,22 @@ let
 	current_figure()
 end
 
-# ╔═╡ acc50268-2a71-46af-a56d-783f0b35039c
+# ╔═╡ 52e90f79-ae39-4446-a972-db84a7a1c351
 let
 	n = 20; p = 0.3
 	y = rand(Binomial(n, p), 10000)
 	(m̂ = mean(y), m = 20 * 0.3, σ̂ = std(y), σ = sqrt(n * p * (1 - p)))
 end
 
-# ╔═╡ c082fe26-03c9-40d7-bd6a-e1c2d9ee6660
+# ╔═╡ 356b24fb-d060-4914-8b2b-5bf3572d3f2b
 let
 	n = 20; p = 0.3
 	y = rand(Bernoulli(p), 10000)
 	(m̂ = mean(y), m = 0.3)
 end
 
-# ╔═╡ 915a0d27-b503-48cb-a34f-04ff1d53e3c6
-md" #### Stents"
-
-# ╔═╡ 6546a690-d41f-45a2-af53-c158a9de0367
-
+# ╔═╡ 381b7b38-4f06-4758-832f-83f561da1287
+md" ### Stents"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -162,11 +171,11 @@ RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
-AlgebraOfGraphics = "~0.6.5"
+AlgebraOfGraphics = "~0.6.6"
 DrWatson = "~2.9.1"
 GLM = "~1.7.0"
 GLMakie = "~0.5.5"
-RegressionAndOtherStories = "~0.1.5"
+RegressionAndOtherStories = "~0.1.8"
 StanSample = "~6.4.0"
 """
 
@@ -202,9 +211,9 @@ version = "3.3.3"
 
 [[deps.AlgebraOfGraphics]]
 deps = ["Colors", "Dates", "Dictionaries", "FileIO", "GLM", "GeoInterface", "GeometryBasics", "GridLayoutBase", "KernelDensity", "Loess", "Makie", "PlotUtils", "PooledArrays", "RelocatableFolders", "StatsBase", "StructArrays", "Tables"]
-git-tree-sha1 = "032144cbb772cf0aef2954dfe5cc2c0bebeaaadd"
+git-tree-sha1 = "f47c39e2a2d08a6e221dfc639791c6b5c08a9f7a"
 uuid = "cbdf2221-f076-402e-a563-3d30da359d67"
-version = "0.6.5"
+version = "0.6.6"
 
 [[deps.Animations]]
 deps = ["Colors"]
@@ -264,9 +273,9 @@ version = "0.4.1"
 
 [[deps.CPUSummary]]
 deps = ["CpuId", "IfElse", "Static"]
-git-tree-sha1 = "913b28a04929053e4310d0a4915f1efe195c0ce6"
+git-tree-sha1 = "80f3d536df634cabed8b98ad3f0cea3a715fd254"
 uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
-version = "0.1.19"
+version = "0.1.20"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
@@ -720,9 +729,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[deps.Interpolations]]
 deps = ["AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
-git-tree-sha1 = "b15fc0a95c564ca2e0a7ae12c1f095ca848ceb31"
+git-tree-sha1 = "b7bc05649af456efc75d178846f47006c2c4c3c7"
 uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-version = "0.13.5"
+version = "0.13.6"
 
 [[deps.IntervalSets]]
 deps = ["Dates", "EllipsisNotation", "Statistics"]
@@ -1222,10 +1231,10 @@ uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
-deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
-git-tree-sha1 = "01b9c87eec6563dc9faca30e5dcb1ba4ca93eb23"
+deps = ["AlgebraOfGraphics", "CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "LaTeXStrings", "LinearAlgebra", "Makie", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
+git-tree-sha1 = "3d35e59985d0cb0711c32746ee71dc78aa784098"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.1.5"
+version = "0.1.8"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1664,22 +1673,25 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─0391fc17-09b7-47d7-b799-6dc6de13e82b
-# ╠═8c20b500-26a5-4437-9d84-ea333fb7ee5b
-# ╠═cd9c287c-24b8-40e4-a31a-785ede946f3b
-# ╟─4755dab0-d228-41d3-934a-56f2863a5652
-# ╠═f71640c9-3918-475e-b32b-c85424bbcf5e
-# ╠═6c2043f4-dcbd-4535-a5ae-61c109519879
-# ╠═4472dfc3-e8bd-46ad-b262-9296fff47ea0
-# ╠═56d73fa0-c4b7-4886-9c54-a7944a446084
-# ╠═9a946776-1501-44c8-ac69-41fb7894f692
-# ╠═1e56d757-a16b-4bc4-8d33-649a7355a47d
-# ╠═9ca4b070-3d00-4647-aee2-75f5b842a99e
-# ╠═7de2fa0b-171d-4efb-a541-048ce8f619ac
-# ╠═1c81b1b8-3b4e-4e28-9980-8c4284a54e01
-# ╠═acc50268-2a71-46af-a56d-783f0b35039c
-# ╠═c082fe26-03c9-40d7-bd6a-e1c2d9ee6660
-# ╟─915a0d27-b503-48cb-a34f-04ff1d53e3c6
-# ╠═6546a690-d41f-45a2-af53-c158a9de0367
+# ╠═e6974166-80e9-4903-b4bd-3f4cc3651823
+# ╠═3ec83660-c767-49a4-ab27-923ea3443c98
+# ╠═44233635-6129-4ccd-8bad-bbafa5287112
+# ╟─d09f8d14-7c72-11ec-1481-976ff33e65af
+# ╠═af4f1bd4-ad6c-4f9f-a719-29ab5579b001
+# ╠═900d5990-a4a6-4213-8965-86bf723050b6
+# ╠═bed5f962-d1c0-4ce0-a158-665227846c0b
+# ╠═2696411e-44fe-4fd9-8235-60c90ff61abf
+# ╟─e4257130-e617-4c66-81a9-55f7c2d7e721
+# ╟─fdf62f24-f0f4-46e1-b11a-cceb959bc4e8
+# ╠═01d8d8b0-82cc-4067-af1e-ca72062e72a2
+# ╠═382060b9-7a6f-48df-871a-75fe5f163556
+# ╠═65d3b481-8c53-4bb2-a9b8-12d9afdfe6c4
+# ╠═4066ca52-f609-4d7b-aa08-42210ff7ec7e
+# ╠═cd48724d-5a75-4eb1-a5b3-860aee4f16a9
+# ╠═72b07373-b294-486d-83a7-9c34b56c85c2
+# ╠═2271ca22-6d77-4d5c-b501-d8aa21abc66d
+# ╠═52e90f79-ae39-4446-a972-db84a7a1c351
+# ╠═356b24fb-d060-4914-8b2b-5bf3572d3f2b
+# ╟─381b7b38-4f06-4758-832f-83f561da1287
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

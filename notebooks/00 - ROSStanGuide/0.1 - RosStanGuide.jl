@@ -4,10 +4,10 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 2162bca3-8222-4b50-9878-860ad1f01bf9
-using Pkg
+# ╔═╡ 5084b8f0-65ac-4704-b1fc-2a9008132bd7
+using Pkg, DrWatson
 
-# ╔═╡ 40b09db3-0544-4272-9b8d-80ee92e51ead
+# ╔═╡ 550371ad-d411-4e66-9d63-7329322c6ea1
 begin
 	# Include basic packages
 	using RegressionAndOtherStories
@@ -21,15 +21,32 @@ begin
 	# Graphics related
     using GLMakie
     using AlgebraOfGraphics
+	set_aog_theme!()
 end
 
-# ╔═╡ 49401674-6fbb-4809-a1df-7af29130acad
-md"## ElectionsEconomy: hibbs.csv"
+# ╔═╡ 2580c05d-0b53-44d4-a137-45354270e899
+md"#### In `Regression and Other Stories`, mcmc is _just_ a tool. Hence whether one uses Stan or Turing is not the main focus of the book. This notebook uses `ElectionsEconomy: hibbs.csv` to illustrate how Stan and other tools are used in the Julia _project_ ROSStanPluto.jl."
 
-# ╔═╡ 8ac9e44a-13f3-46ca-98f6-1d5583ae4626
-md"##### See Chapter 1.2 in Regression and Other Stories."
+# ╔═╡ 62150db9-7078-4ab9-b193-63ec2a721dd2
+md" ##### Over time I will expand below the list of topics:
 
-# ╔═╡ ae26d12a-ee2f-41e3-8183-d99bc6a1ee66
+1. Stan (StanSample.jl, ...)
+2. Using median and mad to summarize a posterior distribution.
+3. ...
+4. Model comparison (TBD)
+5. DAGs (TBD)
+6. Graphs (TBD)
+7. ...
+
+"
+
+# ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
+md"##### See Chapter 1.2, Figure 1.1 in Regression and Other Stories."
+
+# ╔═╡ cf39df58-3371-4535-88e4-f3f6c0404500
+md" ##### Widen the cells."
+
+# ╔═╡ 0616ece8-ccf8-4281-bfed-9c1192edf88e
 html"""
 <style>
 	main {
@@ -41,28 +58,44 @@ html"""
 </style>
 """
 
-# ╔═╡ d97ba54f-bc06-4855-9baa-afd93405bc10
+# ╔═╡ 4755dab0-d228-41d3-934a-56f2863a5652
 md"###### A typical set of Julia packages to include in notebooks."
 
-# ╔═╡ cd431fc8-9cf0-44aa-be5d-9d7eada7c555
+# ╔═╡ 5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
+md"
+!!! note
+
+All data files are available (as .csv files) in the data subdirectory of package RegressionAndOtherStories.jl.
+"
+
+# ╔═╡ 100e2ea9-17e5-4eef-b880-823311f5d496
+ros_datadir()
+
+# ╔═╡ bb6149fe-a599-40d2-bfb1-03c738dd7571
+md"
+!!! note
+
+After evaluating above cell, use `ros_datadir(\"ElectionsEconomy\", \"hibbs.dat\")` to obtain data."
+
+# ╔═╡ d830f41c-0fb6-4bff-9fe0-0bd51f444779
 hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
 
-# ╔═╡ e81fc5a6-2537-4f9c-9f28-b4e37966aa28
+# ╔═╡ 35bee056-5cd8-48ee-b9c0-74a8b53229bd
 hibbs_lm = lm(@formula(vote ~ growth), hibbs)
 
-# ╔═╡ de116884-8b92-4177-b63b-e21c9a3248d9
+# ╔═╡ 3c4672aa-d17e-4681-9863-9ee026fefee6
 residuals(hibbs_lm)
 
-# ╔═╡ 259c78dc-54f8-4736-8dcc-54d71adaf26b
+# ╔═╡ a9970ef7-1e0e-4976-b8c9-1db4dd3a222b
 mad(residuals(hibbs_lm))
 
-# ╔═╡ 973e838e-883c-41f6-937c-7394b808ed30
+# ╔═╡ f48df50b-5450-4998-8dab-014c8b9d42a2
 std(residuals(hibbs_lm))
 
-# ╔═╡ 4b5b6bfa-7d65-494b-8711-b6c71fb385be
+# ╔═╡ be41c745-c87d-4f3a-ab4e-a8ae3b9ae091
 coef(hibbs_lm)
 
-# ╔═╡ d08df16c-6eb8-42a9-ac6b-247d147512ef
+# ╔═╡ 06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
 let
 	fig = Figure()
 	hibbs.label = string.(hibbs.year)
@@ -88,10 +121,10 @@ let
 	fig
 end
 
-# ╔═╡ 43915bc7-4848-4242-9eaa-597b8b9c8531
+# ╔═╡ ea9f97c9-7179-4e0d-97dc-c294a4df9638
 md" #### Below some additional cells demonstrating the use of Stan."
 
-# ╔═╡ cb57b738-e762-43b9-bf5f-972111a59b0c
+# ╔═╡ 274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
 stan1_1 = "
 functions {
 }
@@ -118,10 +151,10 @@ model {
 	vote ~ normal(mu, sigma);
 }";
 
-# ╔═╡ 55953198-e65b-434e-8b75-0d9abb36e25d
+# ╔═╡ df07541f-13ec-4192-acde-82c02ab6bcf6
 md" #### Priors used in `stan_1_1` above."
 
-# ╔═╡ 61524c4b-f198-449f-b72c-530d0975cf19
+# ╔═╡ 1786b700-0d99-4541-87d4-b6308a2331bc
 let
 	N = 10000
 	nt = (
@@ -139,69 +172,26 @@ let
 	fig
 end
 
-# ╔═╡ 19b3db02-480f-4643-ac23-92bf0fff7061
-data1_1s = (N=16, vote=hibbs.vote, growth=hibbs.growth);
-
-# ╔═╡ aba732de-ce72-41ba-8c44-3320a645e8a9
+# ╔═╡ 953eea61-f05f-4233-86aa-d5af3b47b41e
 begin
+	data1_1 = (N=16, vote=hibbs.vote, growth=hibbs.growth)
 	m1_1s = SampleModel("hibbs", stan1_1)
-	rc = stan_sample(m1_1s; data=data1_1s)
+	rc = stan_sample(m1_1s; data=data1_1)
 end;
 
-# ╔═╡ 87576038-b19e-4ed9-9b0b-6c37b0dddfa8
+# ╔═╡ 9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
 if success(rc)
 	sdf = read_summary(m1_1s)
 	post1_1s_df = read_samples(m1_1s, :dataframe)
 	post1_1s_df[!, :chain] = repeat(collect(1:m1_1s.num_chains);
 		inner=m1_1s.num_samples)
 	post1_1s_df[!, :chain] = categorical(post1_1s_df.chain)
-
 end;
 
-# ╔═╡ f8ccdb03-38d5-41c4-938c-febad03b7050
-let
-	fig = Figure()
-	
-	let
-		plt = data(post1_1s_df) * visual(Lines) * mapping(:a; color=:chain)
-		axis = (; ylabel="a", xlabel="Iteration", title="Traces")
-  		draw!(fig[1, 1], plt; axis)
-	end
-	
-	let
-		plt = data(post1_1s_df) * mapping(:a; color=:chain) * AlgebraOfGraphics.density()
-		axis = (; title="Density a")
-		draw!(fig[1, 2], plt; axis)
-	end
-	
-	let
-		plt = data(post1_1s_df) * visual(Lines) * mapping(:b; color=:chain)
-		axis = (; ylabel="b", xlabel="Iteration", title="Traces")
-  		draw!(fig[2, 1], plt; axis)
-	end
-	
-	let
-		plt = data(post1_1s_df) * mapping(:b; color=:chain) * AlgebraOfGraphics.density()
-		axis = (; title="Density b")
-		draw!(fig[2, 2], plt; axis)
-	end
-	
-	let
-		plt = data(post1_1s_df) * visual(Lines) * mapping(:sigma;
-			color=:chain)
-		axis = (; ylabel="sigma", xlabel="Iteration", title="Traces")
-  		draw!(fig[3, 1], plt; axis)
-	end
-	
-	let
-		plt = data(post1_1s_df) * mapping(:sigma; color=:chain) * AlgebraOfGraphics.density()
-		axis = (; title="Density sigma")
-		draw!(fig[3, 2], plt; axis)
-	end
-	fig
-end
+# ╔═╡ 9842ce96-98f9-4a87-9208-d32d16418c15
+plot_chains(post1_1s_df, [:a, :b, :sigma])
 
-# ╔═╡ 6519371a-b973-4e07-8fae-8d7107092d36
+# ╔═╡ 8abccff4-2015-467e-92d6-067bd8db4e10
 let
 	N = 100
 	x = LinRange(-1, 4, N)
@@ -235,7 +225,7 @@ let
 	fig
 end
 
-# ╔═╡ a89055c1-e01e-4610-af02-c4b24142475d
+# ╔═╡ 99259579-97fa-46f5-93b4-710b3180ded2
 begin
 	fig = Figure()
 	hibbs.label = string.(hibbs.year)
@@ -275,22 +265,19 @@ begin
 	fig
 end
 
-# ╔═╡ 7a2155bc-b963-4e06-bc40-73290bcc014b
-begin
-	post1_1s = read_samples(m1_1s, :dataframe)
-	describe(post1_1s)
-end
+# ╔═╡ f3863e01-deae-4e9d-b044-5515c5a19ab4
+describe(post1_1s_df)
 
-# ╔═╡ 33ab4950-c2b2-48cf-8f3d-fe818de00db1
-post1_1s
+# ╔═╡ 5efb6ee3-8f20-42e3-a8af-cbfbb9acd075
+post1_1s_df
 
-# ╔═╡ b3ed71f2-7300-4fef-ba60-9b913f93158f
+# ╔═╡ 750a66c1-47bc-466c-a7f1-567640e2e2bb
 let
 	N = 10000
 	nt = (
-		a = post1_1s.a,
-		b = post1_1s.b,
-		σ = post1_1s.sigma,
+		a = post1_1s_df.a,
+		b = post1_1s_df.b,
+		σ = post1_1s_df.sigma,
 	)
 
 	fig = Figure()
@@ -302,78 +289,61 @@ let
 	fig
 end
 
-# ╔═╡ d1b7fc8a-d60a-4382-b089-7b3717642d59
+# ╔═╡ 95cdfe9f-a06f-49f3-888f-34e47025c810
 md"#### Compute median and mad."
 
-# ╔═╡ 9143df6d-2621-4d8b-9752-190e644299c8
-function model_summary(model, pars; digits=2)
-	parameters = Pair{Symbol, Int}[]
-	estimates = zeros(length(pars), 4)
-	for (indx, par) in enumerate(pars)
-		append!(parameters, [par => indx])
-		vals = model[:, par]
-		estimates[indx, :] = [median(vals), mad(vals), mean(vals), std(vals)]
-	end
+# ╔═╡ 063c9089-fc58-4038-9fe8-ce9b90b1a843
+mod_sum = model_summary(post1_1s_df, [:a, :b, :sigma])
 
-	NamedArray(
-		round.(estimates; digits=digits), 
-		(OrderedDict(parameters...), 
-		OrderedDict(:median=>1, :mad_sd=>2, :mean=>3, :std=>4)),
-               ("Parameter", "Value")
-	)
-end
+# ╔═╡ f544db54-86e2-4694-9cac-fc42e2c00e50
+mod_sum[:a, :median]
 
-# ╔═╡ 29cdca5d-9254-48ce-87ba-ca463eb66440
-names(post1_1s)
-
-# ╔═╡ 46534d73-a14d-4b67-9b98-8ab2adc3454e
-model_summary(post1_1s, [:a, :b, :sigma])
-
-# ╔═╡ e6344f8a-d7f1-4acb-bea8-da2d4f0ec1db
+# ╔═╡ 10b925db-5f9c-4603-b49a-bd9b9a2e64d0
 md" ##### Alternative computation of mad()."
 
-# ╔═╡ b241924a-11fc-4c83-b3db-08d08cbd9349
+# ╔═╡ 14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
 let
-	1.483 .* [median(abs.(post1_1s.a .- median(post1_1s.a))),
-	median(abs.(post1_1s.b .- median(post1_1s.b))),
-	median(abs.(post1_1s.sigma .- median(post1_1s.sigma)))]
+	1.483 .* [median(abs.(post1_1s_df.a .- median(post1_1s_df.a))),
+	median(abs.(post1_1s_df.b .- median(post1_1s_df.b))),
+	median(abs.(post1_1s_df.sigma .- median(post1_1s_df.sigma)))]
 end
 
-# ╔═╡ 6702ec0e-7756-47a0-b4bb-4423d5a8d1c4
+# ╔═╡ f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
 md" ##### Quick simulation with median, mad, mean and std of Normal observations."
 
-# ╔═╡ 43a85d67-a01c-4c1d-a098-f15701218381
+# ╔═╡ 1f44495d-50cf-4e92-97b2-d19a82c46c78
 nt = (x=rand(Normal(5, 2), 10000),)
 
-# ╔═╡ ee964c0f-8d11-4d06-a12d-d596f2b16ce0
+# ╔═╡ a72ca80f-b42e-4638-8ffd-f23dc70c7bc0
 [median(nt.x), mad(nt.x), mean(nt.x), std(nt.x)]
 
-# ╔═╡ c39aa6de-150c-4d9d-b15f-6b18cac1b118
+# ╔═╡ 4db28bae-8901-44fe-a479-3272342413c6
 sd_mean = round(mad(nt.x)/√10000; digits=2)
 
-# ╔═╡ 93b53194-65d5-4f3f-949a-c6f3516f17b6
+# ╔═╡ 0b711521-5b96-429e-8e73-e2d68d94c0ce
 median(abs.(nt.x .- median(nt.x)))
 
-# ╔═╡ a63d0512-e17d-4c64-b9b8-b5bffcf214d0
+# ╔═╡ e193199a-188b-4fa9-ae51-0fce401872e0
 1.483 * median(abs.(nt.x .- median(nt.x)))
 
-# ╔═╡ a3e7360e-d9f2-475f-9275-b2ee7f31462d
+# ╔═╡ be3898d3-af87-4808-a1a7-4e2e76583ee2
 let
 	plt = data(nt) * mapping(:x) * AlgebraOfGraphics.density()
 	axis = (; title="Density x")
 	draw(plt; axis)
 end
 
-# ╔═╡ 76f20ab7-81cd-40ef-845f-a7f4b885b908
+# ╔═╡ a2be1bd7-6897-438c-928f-787e36134ec7
 quantile(nt.x, [0.025, 0.975])
 
-# ╔═╡ ebe67471-4ce2-4108-bc1f-6081f6012b60
+# ╔═╡ 6ce605aa-9504-4ebc-bfdf-c4c54c048647
 quantile(nt.x, [0.25, 0.75])
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
+DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
@@ -381,10 +351,11 @@ RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
-AlgebraOfGraphics = "~0.6.5"
+AlgebraOfGraphics = "~0.6.6"
+DrWatson = "~2.9.1"
 GLM = "~1.7.0"
 GLMakie = "~0.5.5"
-RegressionAndOtherStories = "~0.1.5"
+RegressionAndOtherStories = "~0.1.8"
 StanSample = "~6.4.0"
 """
 
@@ -394,7 +365,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "8a7a5d896909048c4c3b0c4dbc19b0e2aaff6d46"
+project_hash = "6df99aff4ad41928049649212034a6078b374beb"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -420,9 +391,9 @@ version = "3.3.3"
 
 [[deps.AlgebraOfGraphics]]
 deps = ["Colors", "Dates", "Dictionaries", "FileIO", "GLM", "GeoInterface", "GeometryBasics", "GridLayoutBase", "KernelDensity", "Loess", "Makie", "PlotUtils", "PooledArrays", "RelocatableFolders", "StatsBase", "StructArrays", "Tables"]
-git-tree-sha1 = "032144cbb772cf0aef2954dfe5cc2c0bebeaaadd"
+git-tree-sha1 = "f47c39e2a2d08a6e221dfc639791c6b5c08a9f7a"
 uuid = "cbdf2221-f076-402e-a563-3d30da359d67"
-version = "0.6.5"
+version = "0.6.6"
 
 [[deps.Animations]]
 deps = ["Colors"]
@@ -482,9 +453,9 @@ version = "0.4.1"
 
 [[deps.CPUSummary]]
 deps = ["CpuId", "IfElse", "Static"]
-git-tree-sha1 = "913b28a04929053e4310d0a4915f1efe195c0ce6"
+git-tree-sha1 = "80f3d536df634cabed8b98ad3f0cea3a715fd254"
 uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
-version = "0.1.19"
+version = "0.1.20"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
@@ -665,6 +636,12 @@ version = "0.27.15"
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
+
+[[deps.DrWatson]]
+deps = ["Dates", "FileIO", "JLD2", "LibGit2", "MacroTools", "Pkg", "Random", "Requires", "Scratch", "UnPack"]
+git-tree-sha1 = "67e9001646db6e45006643bf37716ecd831d37d2"
+uuid = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
+version = "2.9.1"
 
 [[deps.EarCut_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -932,9 +909,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[deps.Interpolations]]
 deps = ["AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
-git-tree-sha1 = "b15fc0a95c564ca2e0a7ae12c1f095ca848ceb31"
+git-tree-sha1 = "b7bc05649af456efc75d178846f47006c2c4c3c7"
 uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-version = "0.13.5"
+version = "0.13.6"
 
 [[deps.IntervalSets]]
 deps = ["Dates", "EllipsisNotation", "Statistics"]
@@ -973,6 +950,12 @@ version = "1.4.0"
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
+
+[[deps.JLD2]]
+deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "Pkg", "Printf", "Reexport", "TranscodingStreams", "UUIDs"]
+git-tree-sha1 = "81b9477b49402b47fbe7f7ae0b252077f53e4a08"
+uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+version = "0.4.22"
 
 [[deps.JLLWrappers]]
 deps = ["Preferences"]
@@ -1428,10 +1411,10 @@ uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
-deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
-git-tree-sha1 = "01b9c87eec6563dc9faca30e5dcb1ba4ca93eb23"
+deps = ["AlgebraOfGraphics", "CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "LaTeXStrings", "LinearAlgebra", "Makie", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
+git-tree-sha1 = "3d35e59985d0cb0711c32746ee71dc78aa784098"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.1.5"
+version = "0.1.8"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1870,46 +1853,49 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─49401674-6fbb-4809-a1df-7af29130acad
-# ╟─8ac9e44a-13f3-46ca-98f6-1d5583ae4626
-# ╠═ae26d12a-ee2f-41e3-8183-d99bc6a1ee66
-# ╟─d97ba54f-bc06-4855-9baa-afd93405bc10
-# ╠═2162bca3-8222-4b50-9878-860ad1f01bf9
-# ╠═40b09db3-0544-4272-9b8d-80ee92e51ead
-# ╠═cd431fc8-9cf0-44aa-be5d-9d7eada7c555
-# ╠═e81fc5a6-2537-4f9c-9f28-b4e37966aa28
-# ╠═de116884-8b92-4177-b63b-e21c9a3248d9
-# ╠═259c78dc-54f8-4736-8dcc-54d71adaf26b
-# ╠═973e838e-883c-41f6-937c-7394b808ed30
-# ╠═4b5b6bfa-7d65-494b-8711-b6c71fb385be
-# ╠═d08df16c-6eb8-42a9-ac6b-247d147512ef
-# ╟─43915bc7-4848-4242-9eaa-597b8b9c8531
-# ╠═cb57b738-e762-43b9-bf5f-972111a59b0c
-# ╟─55953198-e65b-434e-8b75-0d9abb36e25d
-# ╠═61524c4b-f198-449f-b72c-530d0975cf19
-# ╠═19b3db02-480f-4643-ac23-92bf0fff7061
-# ╠═aba732de-ce72-41ba-8c44-3320a645e8a9
-# ╠═87576038-b19e-4ed9-9b0b-6c37b0dddfa8
-# ╠═f8ccdb03-38d5-41c4-938c-febad03b7050
-# ╠═6519371a-b973-4e07-8fae-8d7107092d36
-# ╠═a89055c1-e01e-4610-af02-c4b24142475d
-# ╠═7a2155bc-b963-4e06-bc40-73290bcc014b
-# ╠═33ab4950-c2b2-48cf-8f3d-fe818de00db1
-# ╠═b3ed71f2-7300-4fef-ba60-9b913f93158f
-# ╟─d1b7fc8a-d60a-4382-b089-7b3717642d59
-# ╠═9143df6d-2621-4d8b-9752-190e644299c8
-# ╠═29cdca5d-9254-48ce-87ba-ca463eb66440
-# ╠═46534d73-a14d-4b67-9b98-8ab2adc3454e
-# ╟─e6344f8a-d7f1-4acb-bea8-da2d4f0ec1db
-# ╠═b241924a-11fc-4c83-b3db-08d08cbd9349
-# ╟─6702ec0e-7756-47a0-b4bb-4423d5a8d1c4
-# ╠═43a85d67-a01c-4c1d-a098-f15701218381
-# ╠═ee964c0f-8d11-4d06-a12d-d596f2b16ce0
-# ╠═c39aa6de-150c-4d9d-b15f-6b18cac1b118
-# ╠═93b53194-65d5-4f3f-949a-c6f3516f17b6
-# ╠═a63d0512-e17d-4c64-b9b8-b5bffcf214d0
-# ╠═a3e7360e-d9f2-475f-9275-b2ee7f31462d
-# ╠═76f20ab7-81cd-40ef-845f-a7f4b885b908
-# ╠═ebe67471-4ce2-4108-bc1f-6081f6012b60
+# ╟─2580c05d-0b53-44d4-a137-45354270e899
+# ╟─62150db9-7078-4ab9-b193-63ec2a721dd2
+# ╟─eb7ea04a-da52-4e69-ac3e-87dc7f014652
+# ╟─cf39df58-3371-4535-88e4-f3f6c0404500
+# ╠═0616ece8-ccf8-4281-bfed-9c1192edf88e
+# ╟─4755dab0-d228-41d3-934a-56f2863a5652
+# ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
+# ╠═550371ad-d411-4e66-9d63-7329322c6ea1
+# ╟─5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
+# ╠═100e2ea9-17e5-4eef-b880-823311f5d496
+# ╟─bb6149fe-a599-40d2-bfb1-03c738dd7571
+# ╠═d830f41c-0fb6-4bff-9fe0-0bd51f444779
+# ╠═35bee056-5cd8-48ee-b9c0-74a8b53229bd
+# ╠═3c4672aa-d17e-4681-9863-9ee026fefee6
+# ╠═a9970ef7-1e0e-4976-b8c9-1db4dd3a222b
+# ╠═f48df50b-5450-4998-8dab-014c8b9d42a2
+# ╠═be41c745-c87d-4f3a-ab4e-a8ae3b9ae091
+# ╠═06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
+# ╟─ea9f97c9-7179-4e0d-97dc-c294a4df9638
+# ╠═274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
+# ╟─df07541f-13ec-4192-acde-82c02ab6bcf6
+# ╠═1786b700-0d99-4541-87d4-b6308a2331bc
+# ╠═953eea61-f05f-4233-86aa-d5af3b47b41e
+# ╠═9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
+# ╠═9842ce96-98f9-4a87-9208-d32d16418c15
+# ╠═8abccff4-2015-467e-92d6-067bd8db4e10
+# ╠═99259579-97fa-46f5-93b4-710b3180ded2
+# ╠═f3863e01-deae-4e9d-b044-5515c5a19ab4
+# ╠═5efb6ee3-8f20-42e3-a8af-cbfbb9acd075
+# ╠═750a66c1-47bc-466c-a7f1-567640e2e2bb
+# ╟─95cdfe9f-a06f-49f3-888f-34e47025c810
+# ╠═063c9089-fc58-4038-9fe8-ce9b90b1a843
+# ╠═f544db54-86e2-4694-9cac-fc42e2c00e50
+# ╟─10b925db-5f9c-4603-b49a-bd9b9a2e64d0
+# ╠═14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
+# ╟─f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
+# ╠═1f44495d-50cf-4e92-97b2-d19a82c46c78
+# ╠═a72ca80f-b42e-4638-8ffd-f23dc70c7bc0
+# ╠═4db28bae-8901-44fe-a479-3272342413c6
+# ╠═0b711521-5b96-429e-8e73-e2d68d94c0ce
+# ╠═e193199a-188b-4fa9-ae51-0fce401872e0
+# ╠═be3898d3-af87-4808-a1a7-4e2e76583ee2
+# ╠═a2be1bd7-6897-438c-928f-787e36134ec7
+# ╠═6ce605aa-9504-4ebc-bfdf-c4c54c048647
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

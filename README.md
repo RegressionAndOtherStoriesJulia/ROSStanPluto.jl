@@ -27,7 +27,7 @@ To complete below steps and run the notebooks you need:
 
 1. A functioning [cmdstan](https://mc-stan.org/users/interfaces/cmdstan.html).
 2. A functioning [Julia](https://julialang.org/downloads/).
-3. A Julia base environment containing `Pkg`, `DrWatson`, `Pluto` and `PlutoUI`.
+3. A Julia base environment containing `Pkg` and `Pluto`.
 
 ## Setup the Pluto based ROSStanPluto notebooks
 

@@ -6,7 +6,7 @@ using InteractiveUtils
 
 # ╔═╡ b8649ce5-9954-4856-b7b1-3595d78b2aca
 begin
-	# Common data files and functions (Once registered)
+	# Common data files and functions
 	using RegressionAndOtherStories
 	
 	# Graphics related

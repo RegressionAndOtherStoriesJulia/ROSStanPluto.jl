@@ -28,7 +28,7 @@ end
 md"## Helicopters: helicopters.jl"
 
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"##### See Chapter 2.3 in Regression and Other Stories."
+md"##### See Chapter 1.8 in Regression and Other Stories."
 
 # ╔═╡ b95f0107-fdc3-4e90-95ef-b4ccb9bbf5b7
 html"""

@@ -9,7 +9,7 @@ using Pkg, DrWatson
 
 # ╔═╡ f71640c9-3918-475e-b32b-c85424bbcf5e
 begin
-	# Common data files and functions (Once registered)
+	# Common data files and functions
 	using RegressionAndOtherStories
 	
 	# Specific to this notebook
@@ -227,7 +227,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "9b56050ed08d1e370c880af1c89b1218439c27c7"
+project_hash = "573443514cf4a92adeb605dccb04c7712a0d3bad"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"

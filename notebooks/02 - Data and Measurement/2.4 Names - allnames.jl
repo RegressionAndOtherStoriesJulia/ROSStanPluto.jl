@@ -40,7 +40,7 @@ html"""
 md"###### A typical set of Julia packages to include in notebooks."
 
 # ╔═╡ 011b3870-cc26-4d10-8ea1-5c1acdadc47c
-cleannames = CSV.read(joinpath("/Users", "rob", ".julia", "dev", "ROSStanPluto", "data", "Names", "allnames_clean.csv"), DataFrame)
+cleannames = CSV.read(ros_datadir("Names", "allnames_clean.csv"), DataFrame)
 
 # ╔═╡ d3875ea5-5bab-4174-8dcd-7936125e47c6
 size(cleannames)
@@ -137,7 +137,7 @@ RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 [compat]
 AlgebraOfGraphics = "~0.6.6"
 GLMakie = "~0.5.5"
-RegressionAndOtherStories = "~0.2.0"
+RegressionAndOtherStories = "~0.2.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -146,7 +146,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "442401481298e069c40576df894fcd6d93a447cb"
+project_hash = "e4e920bf49822f92a3df7c6542b1a4ff9c2e3849"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
@@ -212,9 +212,9 @@ uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.8+0"
 
 [[deps.CEnum]]
-git-tree-sha1 = "215a9aa4a1f23fbd05b92769fdd62559488d70e9"
+git-tree-sha1 = "eb4cb44a499229b3b8426dcfb5dd85333951ff90"
 uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
-version = "0.4.1"
+version = "0.4.2"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
@@ -990,9 +990,9 @@ version = "0.5.11"
 
 [[deps.Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "621f4f3b4977325b9128d5fae7a8b4829a0c2222"
+git-tree-sha1 = "3b429f37de37f1fc603cc1de4a799dc7fbe4c0b6"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.2.4"
+version = "2.3.0"
 
 [[deps.Pixman_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1088,9 +1088,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["AlgebraOfGraphics", "CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "LaTeXStrings", "LinearAlgebra", "Makie", "NamedArrays", "NamedTupleTools", "Reexport", "Statistics", "StatsBase", "Unicode"]
-git-tree-sha1 = "6bb975bdf12622480b2368290d72dd1d5f540d01"
+git-tree-sha1 = "c9483a8fc3207d42437a746245587046eb8957fb"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1212,9 +1212,9 @@ version = "0.6.0"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "4f6ec5d99a28e1a749559ef7dd518663c5eca3d5"
+git-tree-sha1 = "cd56bf18ed715e8b09f06ef8c6b781e6cdc49911"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.4.3"
+version = "1.4.4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -1222,9 +1222,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "8d7530a38dbd2c397be7ddd01a424e4f411dcc41"
+git-tree-sha1 = "c82aaa13b44ea00134f8c9c89819477bd3986ecd"
 uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
-version = "1.2.2"
+version = "1.3.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]

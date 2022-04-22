@@ -13,7 +13,7 @@ This project will contain (work is in very early stages of progress!!!) a set of
 
 These notebooks are intended to be used in conjunction with above book.
 
-The notebooks will follow [this](https://avehtari.github.io/ROS-Examples/examples.html) sequence.
+The notebooks will follow [this](https://avehtari.github.io/ROS-Examples/examples.html#Examples_by_chapters) sequence.
 
 ## Personal note
 

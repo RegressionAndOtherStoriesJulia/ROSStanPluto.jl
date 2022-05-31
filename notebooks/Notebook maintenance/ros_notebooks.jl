@@ -27,10 +27,10 @@ md" ##### If a project has many Pluto notebooks, upgrading the Project and Manif
 md" ##### For 20 substantial notebooks (as used in RegressionAndOtherStories and StatisticalRethinking derived projects) this can take 15-30 minutes!"
 
 # ╔═╡ 8aa98ee4-c2fa-45d4-b78e-1905dc65a1c1
-md" ##### Using the `update_notebooks!()` and `reset_notebooks!()` functions allows you to select which notebooks you would like to be updated the next time when it is opened."
+md" ##### Using the `update_ros_notebooks()` functions allows you to select which notebooks you would like to be updated the next time when it is opened."
 
 # ╔═╡ 41868a6e-d959-4695-a533-9247168a83a0
-md" ##### Example of the use of the `reset_notebooks!()` function:"
+md" ##### Example of the use of the `update_ros_notebooks()` function:"
 
 # ╔═╡ 80249915-cc1c-4b6a-8740-5806cb527f01
 md" ##### Change to the correct directory."
@@ -47,35 +47,29 @@ md" ##### Read the content of the notebooks subdirectory."
 # ╔═╡ c03d53aa-a38f-4344-b476-dd0ba76bcfe2
 md" ##### All notebooks in below directories can be reset as follows:"
 
-# ╔═╡ 855ceb8d-bbe5-4445-92c2-1a27e01846ee
-readdir("./notebooks/")
-
-# ╔═╡ c9ed7234-6f99-42ed-8274-911989c4b1da
-ros_df
-
-# ╔═╡ 89c2a628-8d68-4cb0-81b8-485eca556bc3
-reset_notebooks!()
-
 # ╔═╡ 8baeb9bc-416c-49bb-8649-b1df05d2933c
-update_notebooks!()
-
-# ╔═╡ 9a720c36-89fd-4b76-bfd1-911abc300b24
-md" ##### Show the updated ros_df:"
-
-# ╔═╡ ba92ef81-7daf-4e9a-898c-fec6c1dfe31d
-ros_df
-
-# ╔═╡ da14d8de-e81a-4c6c-b601-719e17943ccd
-reset_notebooks!()
-
-# ╔═╡ 7ddb41af-47d2-45bc-8507-ae7e611880ce
-pwd()
+ros_notebooks = create_ros_notebooks()
 
 # ╔═╡ 013740dd-2310-4cd1-b762-e4db2998d05d
-md" ##### The function `reset_notebooks!()` temporarily sets all ros_df.reset entries to true."
+md" ##### Set some ros_df.reset entries to true:"
 
 # ╔═╡ f28c46d7-a458-46f3-910a-44a09d923f4b
-ros_df
+ros_notebooks[[1, 4, 5], :reset] .= true;
+
+# ╔═╡ bb2c63f3-e94b-4053-a057-2f1a0f403158
+ros_notebooks
+
+# ╔═╡ 1bb688de-5c59-43c3-a2c9-e9440497c7fc
+md" #### Or set all `reset` velues to true:"
+
+# ╔═╡ 7986493f-4071-4482-86ad-364ce065851d
+ros_notebooks.reset .= true;
+
+# ╔═╡ e669984e-14f0-4a76-8208-1783664c58e9
+ros_notebooks
+
+# ╔═╡ 762a1d96-021c-480d-aa0c-8969f2b60efb
+update_ros_notebooks(ros_notebooks);
 
 # ╔═╡ c3a97659-089f-40cb-853b-e2e19668d1b7
 md" ##### All of these notebooks are now without Project and Manifest sections."
@@ -87,7 +81,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 
 [compat]
-RegressionAndOtherStories = "~0.3.5"
+RegressionAndOtherStories = "~0.3.8"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -96,7 +90,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "febe74c53c037aa4a2b33ffdedd29a96e1a34157"
+project_hash = "b6b8b162b0e3447205499f28228b84a87f667844"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -208,9 +202,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "d29d8faf1a0ca59167f04edd4d0eb971a6ae009c"
+git-tree-sha1 = "0ec161f87bf4ab164ff96dfacf4be8ffff2375fd"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.59"
+version = "0.25.62"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -310,7 +304,7 @@ version = "0.6.3"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "7.81.0+0"
+version = "7.83.1+1"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -466,9 +460,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "393b0e8b3d197dfdf4c945e186da297d76125c3d"
+git-tree-sha1 = "33fa2dd025b242285a9f1a3faf6815c4c424aa4f"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.3.5"
+version = "0.3.8"
 
 [[deps.Requires]]
 deps = ["UUIDs"]
@@ -494,9 +488,9 @@ version = "0.7.0"
 
 [[deps.SentinelArrays]]
 deps = ["Dates", "Random"]
-git-tree-sha1 = "6a2f7d70512d205ca8c7ee31bfa9f142fe74310c"
+git-tree-sha1 = "db8481cf5d6278a121184809e9eb1628943c7704"
 uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
-version = "1.3.12"
+version = "1.3.13"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -635,16 +629,14 @@ version = "17.4.0+0"
 # ╠═a75b71ae-8766-4354-b71b-a6f084513645
 # ╟─6cc2b195-efc5-41d7-8f86-9926623bc64c
 # ╟─c03d53aa-a38f-4344-b476-dd0ba76bcfe2
-# ╠═855ceb8d-bbe5-4445-92c2-1a27e01846ee
-# ╠═c9ed7234-6f99-42ed-8274-911989c4b1da
-# ╠═89c2a628-8d68-4cb0-81b8-485eca556bc3
 # ╠═8baeb9bc-416c-49bb-8649-b1df05d2933c
-# ╟─9a720c36-89fd-4b76-bfd1-911abc300b24
-# ╠═ba92ef81-7daf-4e9a-898c-fec6c1dfe31d
-# ╠═da14d8de-e81a-4c6c-b601-719e17943ccd
-# ╠═7ddb41af-47d2-45bc-8507-ae7e611880ce
-# ╟─013740dd-2310-4cd1-b762-e4db2998d05d
+# ╠═013740dd-2310-4cd1-b762-e4db2998d05d
 # ╠═f28c46d7-a458-46f3-910a-44a09d923f4b
+# ╠═bb2c63f3-e94b-4053-a057-2f1a0f403158
+# ╟─1bb688de-5c59-43c3-a2c9-e9440497c7fc
+# ╠═7986493f-4071-4482-86ad-364ce065851d
+# ╠═e669984e-14f0-4a76-8208-1783664c58e9
+# ╠═762a1d96-021c-480d-aa0c-8969f2b60efb
 # ╟─c3a97659-089f-40cb-853b-e2e19668d1b7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

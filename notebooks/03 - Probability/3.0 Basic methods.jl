@@ -266,9 +266,9 @@ let
 	menw = rand(LogNormal(5.13, 0.17), 10000)
 	menwl = log.(menw)
 	f = Figure()
-	ax = Axis(f[1, 1]; title="weights of men")
+	ax = Axis(f[1, 1]; title="log weights of men")
 	density!(menwl)
-	ax = Axis(f[1, 2]; title="log weights of men")
+	ax = Axis(f[1, 2]; title="weights of men")
 	density!(menw)
 	current_figure()
 end

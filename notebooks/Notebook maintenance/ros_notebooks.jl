@@ -10,6 +10,19 @@ using Pkg
 # ╔═╡ bcee8b60-3ece-4343-a88b-5bd1e00a32e2
 using RegressionAndOtherStories
 
+# ╔═╡ 67ca5484-540a-46be-8320-4bd4cf017438
+html"""
+<style>
+	main {
+		margin: 0 auto;
+		max-width: 2000px;
+    	padding-left: max(160px, 10%);
+    	padding-right: max(160px, 10%);
+	}
+</style>
+"""
+
+
 # ╔═╡ 8c7f80e6-dc4e-11ec-3976-435b141eaf54
 md" ### Using the maintenance functions."
 
@@ -60,7 +73,7 @@ ros_notebooks[[1, 4, 5], :reset] .= true;
 ros_notebooks
 
 # ╔═╡ 1bb688de-5c59-43c3-a2c9-e9440497c7fc
-md" #### Or set all `reset` velues to true:"
+md" #### Or set all `reset` values to true:"
 
 # ╔═╡ 7986493f-4071-4482-86ad-364ce065851d
 ros_notebooks.reset .= true;
@@ -81,7 +94,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 
 [compat]
-RegressionAndOtherStories = "~0.3.8"
+RegressionAndOtherStories = "~0.3.10"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -90,7 +103,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "b6b8b162b0e3447205499f28228b84a87f667844"
+project_hash = "febe74c53c037aa4a2b33ffdedd29a96e1a34157"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -396,9 +409,9 @@ version = "1.4.1"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "027185efff6be268abbaf30cfd53ca9b59e3c857"
+git-tree-sha1 = "3411935b2904d5ad3917dee58c03f0d9e6ca5355"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.10"
+version = "0.11.11"
 
 [[deps.Parameters]]
 deps = ["OrderedCollections", "UnPack"]
@@ -460,9 +473,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "33fa2dd025b242285a9f1a3faf6815c4c424aa4f"
+git-tree-sha1 = "ccf0e72e7d069fabaa0e3ede48fbd405b57bbd85"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.3.8"
+version = "0.3.10"
 
 [[deps.Requires]]
 deps = ["UUIDs"]
@@ -616,6 +629,7 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
+# ╠═67ca5484-540a-46be-8320-4bd4cf017438
 # ╟─8c7f80e6-dc4e-11ec-3976-435b141eaf54
 # ╟─978ec8d1-e0c2-48b9-8a9e-feb9c9d2a465
 # ╟─1bb6461a-d309-4750-82b6-f9246cd21c2e

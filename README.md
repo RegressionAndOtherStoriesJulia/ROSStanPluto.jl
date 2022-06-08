@@ -37,7 +37,7 @@ Download ROSStanPluto.jl from [RegressionAndOtherStoriesJulia](https://github.co
 
 ```Julia
 $ cd ~/.julia/dev
-$ git clone https://github.com/StanJulia/ROSStanPluto.jl ROSStanPluto
+$ git clone https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl ROSStanPluto
 $ cd ROSStanPluto/notebooks # Move to the downloaded notebooks directory
 $ julia # Start the Julia REPL
 ```

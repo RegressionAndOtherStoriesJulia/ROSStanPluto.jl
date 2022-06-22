@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.8
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -152,16 +152,6 @@ let
 	f
 end
 
-# ╔═╡ 1523996d-f20b-4c81-8f18-7a1587c3b556
-let
-	f = Figure()
-	axis = (; width = 150, height = 150)
-	el = data(electric) * mapping(:post_test, col=:grade, color=:treatment)
-	plt = el * histogram(;bins=15) * mapping(row=:treatment)
-	draw!(f[1, 1], plt; axis)
-	f
-end
-
 # ╔═╡ 093c1e47-00be-407e-83a4-0ac96be3262c
 let
 	plt = data(electric) * visual(Violin) * mapping(:grade, :post_test, dodge=:treatment, color=:treatment)
@@ -310,7 +300,7 @@ end
 md" ### 1.4 SimpleCausal"
 
 # ╔═╡ df82425a-4cf6-4b6d-9421-f8a5b59c4230
-stan1_2 = "
+stan1_4_1 = "
 data {
 	int N;
 	vector[N] x;
@@ -350,24 +340,44 @@ begin
 end;
 
 # ╔═╡ 3fb34dce-1b9d-4bdf-b94e-03a13fd09d30
-begin
-	data1_2 = (N = n, x = x, x_binary = x_binary, y = y)
-	m1_2s = SampleModel("m1.2s", stan1_2);
-	rc1_2 = stan_sample(m1_2s; data=data1_2)
+let
+	data = (N = n, x = x, x_binary = x_binary, y = y)
+	global m1_4_1s = SampleModel("m1_4_1s", stan1_4_1);
+	global rc1_4_1s = stan_sample(m1_4_1s; data)
 end;
 
-# ╔═╡ 7798b760-eeab-406a-820e-bf1019395a12
-if success(rc1_2)
-	post1_2s = read_samples(m1_2s, :dataframe)
-	mod_sum = model_summary(post1_2s, Symbol.(names(post1_2s)))
+# ╔═╡ 3ca17b14-5c31-490a-9647-946d5470f755
+md" ###### If Stan parameters are vectors, cmdstan returns those using '.' notation, e.g. a.1, a.2, ..."
+
+# ╔═╡ 44f382fc-dd10-4c2e-8e5d-cd688b3af340
+if success(rc1_4_1s)
+	post1_4_1s = read_samples(m1_4_1s, :dataframe)
 end
+
+# ╔═╡ c7396fad-aaa7-4fe6-8cb8-403f0b8e52c3
+md" ###### In those cases I prefer to not to use Symbols for the parameters but use Strings instead:"
+
+# ╔═╡ 896c63c5-2d8a-4f9d-bad0-068352533dff
+success(rc1_4_1s) && model_summary(post1_4_1s, Symbol.(names(post1_4_1s)))
+
+# ╔═╡ 7798b760-eeab-406a-820e-bf1019395a12
+ms1_4_1s = success(rc1_4_1s) && model_summary(post1_4_1s, names(post1_4_1s))
+
+# ╔═╡ efc0e0d6-5d4a-43af-8077-d793caf3a4b4
+md" ###### Note there is a slightly different version of `model_summary()` if called directly on the SampleModel:"
+
+# ╔═╡ 9bb61c6a-296e-4753-ac83-34d968f164d8
+model_summary(m1_4_1s, ["a[1]", "a[2]", "b{1}", "b[2]", "sigma[1]", "sigma[2]"])
+
+# ╔═╡ 0360be23-0251-46e8-b936-1f77422f8944
+md" ###### This version shows important columns like `n_eff` and `r_hat`."
 
 # ╔═╡ e5f22961-b531-4519-bfb0-a8196d77ba6c
 let
 	x1 = 1.0:0.01:5.0
 	f = Figure()
-	medians = mod_sum[:, :median]
-	ax = Axis(f[1, 1], title = "Regression with continuous treatment",
+	medians = ms1_4_1s[:, "median"]
+	ax = Axis(f[1, 1], title = "Regression on continuous treatment",
 		xlabel = "Treatment", ylabel = "Outcome")
 	sca1 = scatter!(x, y)
 	annotations!("Slope of fitted line = $(round(medians[3], digits=2))",
@@ -375,7 +385,7 @@ let
 	lin1 = lines!(x1, medians[1] .+ medians[3] * x1)
 
 	x2 = 0.0:0.01:1.0
-	ax = Axis(f[2, 1], title="Regression with binary treatment",
+	ax = Axis(f[2, 1], title="Regression on binary treatment",
 		xlabel = "Treatment", ylabel = "Outcome")
 	sca1 = scatter!(x_binary, y)
 	lin1 = lines!(x2, medians[2] .+ medians[4] * x2)
@@ -384,8 +394,14 @@ let
 	f
 end
 
+# ╔═╡ df2896d5-2820-4115-b8fa-bc10ed79f953
+md" ###### Again, with vector parameters `read_samples()` can create a nested DataFrame:" 
+
+# ╔═╡ 057a873c-53f9-488a-afde-4444d1ee8f72
+nd1_4_1s = read_samples(m1_4_1s, :nesteddataframe)
+
 # ╔═╡ 7d7feaf5-1b91-4293-a03d-2598168d0439
-stan1_3 = "
+stan1_4_2 = "
 data {
 	int N;
 	vector[N] x;
@@ -413,27 +429,41 @@ model {
 ";
 
 # ╔═╡ 615aa9cb-e138-4ef5-917a-ceb3ab6235c1
-begin
+let
 	#Random.seed!(1533)
 	n1 = 50
 	x1 = rand(Uniform(1, 5), n1)
 	y1 = [rand(Normal(5 + 30exp(-x1[i]), 2), 1)[1] for i in 1:n]
-	data1_3 = (N = n1, x = x1, y = y1)
-	m1_3s = SampleModel("m1.3s", stan1_3);
-	rc1_3 = stan_sample(m1_3s; data=data1_3)
+	data = (N = n1, x = x1, y = y1)
+	global m1_4_2s = SampleModel("m1.4_2s", stan1_4_2);
+	global rc1_4_2s = stan_sample(m1_4_2s; data)
 end;
 
 # ╔═╡ 9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
-if success(rc1_3)
-	df1_3s = read_samples(m1_3s, :dataframe)
+if success(rc1_4_2s)
+	post1_4_2s = read_samples(m1_4_2s, :dataframe)
 end
 
+# ╔═╡ 67f0dd34-459f-4eb7-bfbd-eb794a375127
+nd1_4_2s = read_samples(m1_4_2s, :nesteddataframe)
+
+# ╔═╡ d2606260-d82f-43ba-9dc0-63b916421440
+ms1_4_2s = model_summary(post1_4_2s, ["a.1", "a.2", "b", "b_exp", "sigma.1", "sigma.2"])
+
 # ╔═╡ eaed7d4a-f897-4008-ba9e-c61353c28410
-â₁, â₂, b̂, b̂ₑₓₚ, σ̂₁, σ̂₂ = median(Array(df1_3s); dims=1)
+â₁, â₂, b̂, b̂ₑₓₚ, σ̂₁, σ̂₂ = ms1_4_2s[:, "median"];
+
+# ╔═╡ 10e61721-da24-444e-b668-a910d4faff8a
+â₂
+
+# ╔═╡ 023e1a1e-30a4-4cf3-93af-cef5f5084ac5
+model_summary(m1_4_2s, ["a[1]", "a[2]", "b", "b_exp", "sigma[1]", "sigma[2]"])
 
 # ╔═╡ a772d1be-e8b8-40bb-be95-1ed053dc67de
 let
-	x1 = 1.0:0.1:5.9
+	x1 = LinRange(1, 6, 50)
+	y1 = [rand(Normal(5 + 30exp(-x1[i]), 2), 1)[1] for i in 1:length(x1)]
+	
 	f = Figure()
 	ax = Axis(f[1, 1], title = "Linear regression",
 		xlabel = "Treatments", ylabel = "Outcomes")
@@ -472,7 +502,7 @@ lm1_8_1 = lm(@formula(yy ~ xx), df1_8[df1_8.z .== 1, :])
 let
 	â₁, b̂₁ = coef(lm1_8_0)
 	â₂, b̂₂ = coef(lm1_8_1)
-	x = range(0, maximum(df1_8.xx), length=40)
+	x = LinRange(0, maximum(df1_8.xx), 40)
 	
 	f = Figure()
 	ax = Axis(f[1, 1]; title="Figure 1.8")
@@ -501,7 +531,7 @@ begin
 end
 
 # ╔═╡ 82becf62-2701-4af6-87e6-4ee0a0c91eac
-stan1_4 = "
+stan1_5 = "
 data {
 	int N;
 	vector[N] w;
@@ -529,42 +559,48 @@ model {
 ";
 
 # ╔═╡ 12588d28-10dc-4551-84f2-ecf82a09aef0
-begin
-	data1_4 = (N = nrow(helis), y = helis.time_sec, w = helis.width_cm, l = helis.length_cm)
-	m1_4s = SampleModel("m1.4s", stan1_4);
-	rc1_4 = stan_sample(m1_4s; data=data1_4)
+let
+	data = (N = nrow(helis), y = helis.time_sec, w = helis.width_cm, l = helis.length_cm)
+	global m1_5s = SampleModel("m1.5s", stan1_5);
+	global rc1_5 = stan_sample(m1_5s; data)
 end;
 
 # ╔═╡ fbb2e703-fbff-4dd4-a58c-3b2f5b6f49e1
-if success(rc1_4)
-	post1_4s_df = read_samples(m1_4s, :dataframe)
-	post1_4s_df[!, :chain] = repeat(collect(1:m1_4s.num_chains);
-		inner=m1_4s.num_samples)
-	post1_4s_df[!, :chain] = categorical(post1_4s_df.chain)
-	post1_4s_df
+if success(rc1_5)
+	post1_5s = read_samples(m1_5s, :dataframe)
+	model_summary(post1_5s, [:a, :b, :c, :sigma])
 end
 
-# ╔═╡ e1942cd4-87ee-44d3-86ff-519ed75adbc0
-means = mean(Array(post1_4s_df); dims=1)
+# ╔═╡ 3350621b-893b-40f3-90c7-fafad978e84b
+model_summary(m1_5s, names(post1_5s))
 
 # ╔═╡ f7ba1202-2fe8-4289-8905-96e9849a513d
-plot_chains(post1_4s_df, [:a, :b, :c])
+plot_chains(post1_5s, [:a, :b, :c])
 
 # ╔═╡ 50588b61-75b1-42b6-9870-43641811d0ad
-plot_chains(post1_4s_df, [:sigma])
+plot_chains(post1_5s, [:sigma])
 
 # ╔═╡ 790839f9-0b49-4da2-8dc1-00bab883e3af
 let
-	w = 1.0:0.01:8.0
-	l = 6.0:0.01:15.0
+	w_range = LinRange(1.0, 8.0, 100)
+	w_times = mean.(link(post1_5s, (r, w) -> r.a + r.c + r.b * w, w_range))
+	l_range = LinRange(6.0, 15.0, 100)
+	l_times = mean.(link(post1_5s, (r, l) -> r.a + r.b + r.c * l, l_range))
+	
 	f = Figure()
-	ax = Axis(f[1, 1], title = "Time on width or width",
+	ax = Axis(f[1, 1], title = "Time in the air on width and length",
 		xlabel = "Width/Length", ylabel = "Time in the air")
-	lines!(w, mean(post1_4s_df.a) .+ mean(post1_4s_df.b) .* w .+ mean(post1_4s_df.c))
-	lines!(l, mean(post1_4s_df.a) .+ mean(post1_4s_df.c) .* l .+ mean(post1_4s_df.b))
+	
+	lines!(w_range, w_times; label="Width")
+	lines!(l_range, l_times; label="Length")
 
+	f[1, 2] = Legend(f, ax, "Regression lines", framevisible = false)
+	
 	current_figure()
 end
+
+# ╔═╡ 7200f437-e573-42f0-9bd0-246d51373647
+read_samples(m1_5s, :nesteddataframe)
 
 # ╔═╡ Cell order:
 # ╟─eb7ea04a-da52-4e69-ac3e-87dc7f014652
@@ -592,12 +628,11 @@ end
 # ╠═3c03311f-bdb8-4c06-a870-3e70a628f684
 # ╟─fb1e8fd3-7217-4955-83bd-551693f1507b
 # ╠═30b7e449-bcc7-4dbe-aef3-a50b85048f03
-# ╠═1523996d-f20b-4c81-8f18-7a1587c3b556
 # ╠═093c1e47-00be-407e-83a4-0ac96be3262c
 # ╟─35307905-cee1-4f35-a149-cdaaf7fc1294
 # ╠═f4b870c6-240d-4a46-98c8-1a0dbe7dfc6b
 # ╠═00f43b7d-2594-4433-a18f-92d9899fb014
-# ╠═0eb862b2-d3be-4626-a4e6-3a6bb736c960
+# ╟─0eb862b2-d3be-4626-a4e6-3a6bb736c960
 # ╠═baa075dd-18cc-4fac-93ca-5b2011e54c26
 # ╠═bf4e1ded-1e5e-4e8e-a027-106cc6836ed2
 # ╠═76e1793f-ad85-4714-9dde-4347f47a60fc
@@ -623,12 +658,25 @@ end
 # ╟─20771b96-adb5-4fc9-9679-0a8d42f8f09a
 # ╠═675edafd-145c-43ac-aa3b-2c830b3645e1
 # ╠═3fb34dce-1b9d-4bdf-b94e-03a13fd09d30
+# ╟─3ca17b14-5c31-490a-9647-946d5470f755
+# ╠═44f382fc-dd10-4c2e-8e5d-cd688b3af340
+# ╟─c7396fad-aaa7-4fe6-8cb8-403f0b8e52c3
+# ╠═896c63c5-2d8a-4f9d-bad0-068352533dff
 # ╠═7798b760-eeab-406a-820e-bf1019395a12
+# ╟─efc0e0d6-5d4a-43af-8077-d793caf3a4b4
+# ╠═9bb61c6a-296e-4753-ac83-34d968f164d8
+# ╟─0360be23-0251-46e8-b936-1f77422f8944
 # ╠═e5f22961-b531-4519-bfb0-a8196d77ba6c
+# ╟─df2896d5-2820-4115-b8fa-bc10ed79f953
+# ╠═057a873c-53f9-488a-afde-4444d1ee8f72
 # ╠═7d7feaf5-1b91-4293-a03d-2598168d0439
 # ╠═615aa9cb-e138-4ef5-917a-ceb3ab6235c1
 # ╠═9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
+# ╠═67f0dd34-459f-4eb7-bfbd-eb794a375127
+# ╠═d2606260-d82f-43ba-9dc0-63b916421440
 # ╠═eaed7d4a-f897-4008-ba9e-c61353c28410
+# ╠═10e61721-da24-444e-b668-a910d4faff8a
+# ╠═023e1a1e-30a4-4cf3-93af-cef5f5084ac5
 # ╠═a772d1be-e8b8-40bb-be95-1ed053dc67de
 # ╠═c4799717-da18-45cb-b544-ac989184d6f4
 # ╠═86fce3c6-654d-4a3f-8540-2ec57b3395f3
@@ -642,7 +690,8 @@ end
 # ╠═82becf62-2701-4af6-87e6-4ee0a0c91eac
 # ╠═12588d28-10dc-4551-84f2-ecf82a09aef0
 # ╠═fbb2e703-fbff-4dd4-a58c-3b2f5b6f49e1
-# ╠═e1942cd4-87ee-44d3-86ff-519ed75adbc0
+# ╠═3350621b-893b-40f3-90c7-fafad978e84b
 # ╠═f7ba1202-2fe8-4289-8905-96e9849a513d
 # ╠═50588b61-75b1-42b6-9870-43641811d0ad
 # ╠═790839f9-0b49-4da2-8dc1-00bab883e3af
+# ╠═7200f437-e573-42f0-9bd0-246d51373647

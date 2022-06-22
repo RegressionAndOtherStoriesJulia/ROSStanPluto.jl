@@ -107,7 +107,7 @@ let
 	lines!(x, y)
 	â = round(ms6_1s[:a, "mean"]; digits=2)
 	b̂ = round(ms6_1s[:b, "mean"]; digits=2)
-	annotations!("y = $(â) + $(b̂) * x + ϵ"; position=(10, 	1))
+	annotations!("y = $(â) + $(b̂) * x + ϵ"; position=(5, 0.8))
 	
 	ax = Axis(f[1, 2]; title="Regression of fake data.", subtitle="(using the link() function)",
 		xlabel="fake.x", ylabel="fake.y")
@@ -115,7 +115,7 @@ let
 	xrange = LinRange(1, 20, 200)
 	y = mean.(link(post6_1s, (r,x) -> r.a + x * r.b, xrange))
 	lines!(xrange, y)
-	annotations!("y = $(â) + $(b̂) * x + ϵ"; position=(10, 1))
+	annotations!("y = $(â) + $(b̂) * x + ϵ"; position=(5, 0.8))
 	
 	current_figure()
 end
@@ -128,9 +128,7 @@ md" ### 6.3 Interpret coefficients as comparisons, not effects."
 
 # ╔═╡ 6e6c65b3-f7ad-4a7f-91fd-f065e7bd7ffe
 begin
-	#earnings = CSV.read(ros_datadir("Earnings", "earnings.csv"), DataFrame)
-	earnings = CSV.read(joinpath(expanduser("~"), ".julia", "dev", "RegressionAndOtherStories", "data", "Earnings", 
-		"earnings.csv"), DataFrame)
+	earnings = CSV.read(ros_datadir("Earnings", "earnings.csv"), DataFrame)
 	earnings[:, [:earnk, :height, :male]]
 end
 
@@ -208,11 +206,7 @@ R2 = 1 - ms6_2s[:sigma, "mean"]^2 / std(earnings.earnk)^2
 md" ### 6.4 Historical origins of regression."
 
 # ╔═╡ b8bc2ebf-681b-4dc6-bebd-bd8dde7f1d7f
-begin
-	#heights = CSV.read(ros_datadir("PearsonLee", "heights.csv"), DataFrame)
-	heights = CSV.read(joinpath(expanduser("~"), ".julia", "dev", "RegressionAndOtherStories", "data", "PearsonLee", 
-		"heights.csv"), DataFrame)
-end
+heights = CSV.read(ros_datadir("PearsonLee", "heights.csv"), DataFrame)
 
 # ╔═╡ 444766e8-86b9-496b-8b11-979b08fa842e
 let
@@ -226,8 +220,8 @@ let
 	d̄ = mean(heights.daughter_height)
 	scatter!([m̄], [d̄]; markersize=20, color=:gray)
 	lines!(xrange, y)
-	vlines!(ax, [m̄]; ymax=[0.55], color=:grey)
-	hlines!(ax, [d̄]; xmax=[0.58], color=:grey)
+	vlines!(ax, m̄; ymax=0.55, color=:grey)
+	hlines!(ax, d̄; xmax=0.58, color=:grey)
 	annotations!("y = 30 + 0.54 * mother's height", position=(49, 55), textsize=15)
 	annotations!("or: y = 63.9 + 0.54 * (mother's height - 62.5)", position=(49, 54), textsize=15)
 	f
@@ -265,6 +259,7 @@ parameters {
 model {
 	vector[N] mu;
 	a ~ normal(25, 3);
+	b ~ normal(0, 0.5);
 	sigma ~ exponential(1);
 	mu = a + b * m;
 	d ~ normal(mu, sigma);
@@ -340,6 +335,41 @@ ms6_5s
 # ╔═╡ 381d3341-e789-4ca4-98ab-7f980cbd6745
 model_summary(post6_5s, [:a, :b, :sigma])
 
+# ╔═╡ c0aeefbd-db6f-4359-80c1-9ff6ef5bb6f3
+df_poll = CSV.read(ros_datadir("Death", "polls.csv"), DataFrame)
+
+# ╔═╡ d3ae1909-f6a3-437a-9d19-5b4a6e6baab3
+begin
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Deat penalty opinions", xlabel="Year", ylabel="Percentage support for the death penalty")
+	scatter!(df_poll.year, df_poll.support .* 100)
+	err_lims = [100(sqrt(df_poll.support[i]*(1-df_poll.support[i])/1000)) for i in 1:nrow(df_poll)]
+	errorbars!(df_poll.year, df_poll.support .* 100, err_lims, color = :red)
+	f
+end
+
+# ╔═╡ 0f567e25-2ce1-407d-8525-185e584de86a
+begin
+	death_raw=CSV.read(joinpath(expanduser("~"), ".julia", "dev", "RegressionAndOtherStories", "data", "Death", 
+		"dataforandy.csv"), DataFrame; missingstring="NA")
+	death = death_raw[completecases(death_raw), :]
+end
+
+# ╔═╡ 0a7444c8-29ef-43e2-be65-3a6979d8315b
+let
+	st_abbr = death[:, 1]
+	ex_rate = death[:, 8] ./ 100
+	err_rate = death[:, 7] ./ 100
+	hom_rate = death[:, 5] ./ 100000
+	ds_per_homicide = death[:, 3] ./ 1000
+	ds = death[:, 2]
+	hom = ds ./ ds_per_homicide
+	ex = ex_rate .* ds
+	err = err_rate .* ds
+	pop = hom ./ hom_rate
+	std_err_rate = sqrt.( (err .+ 1) .* (ds .+ 1 .- err) ./ ((ds .+ 2).^2 .* (ds .+ 3)) )
+end;
+
 # ╔═╡ Cell order:
 # ╟─a0fa3631-557c-4bb4-8862-cd21e24655e1
 # ╟─5a68738d-8f8f-44b1-af3c-f3ceed14d82b
@@ -379,3 +409,7 @@ model_summary(post6_5s, [:a, :b, :sigma])
 # ╠═6fd56eba-a6a6-4696-90d8-030502ab0f4a
 # ╠═2069cd1f-758b-4ace-8454-54f4d2f08afb
 # ╠═381d3341-e789-4ca4-98ab-7f980cbd6745
+# ╠═c0aeefbd-db6f-4359-80c1-9ff6ef5bb6f3
+# ╠═d3ae1909-f6a3-437a-9d19-5b4a6e6baab3
+# ╠═0f567e25-2ce1-407d-8525-185e584de86a
+# ╠═0a7444c8-29ef-43e2-be65-3a6979d8315b

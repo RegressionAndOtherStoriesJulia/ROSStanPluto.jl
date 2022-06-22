@@ -145,10 +145,9 @@ let
 	ax.xticks = b̂ - 3σ̂ : σ̂ : b̂ + 3σ̂
 	ax.xtickformat = xs -> ["$(i) s.e." for i in -3:3]
 	lines!(x, y)
-	vlines!(ax, [b̂]; ymax=[maximum(y)/(maximum(y) + 1.0)], color=:grey)
-	vlines!(ax, [b̂-σ̂, b̂+σ̂];
-		ymax=[pdf.(Normal(b̂, σ̂), b̂-σ̂)/(maximum(y) + 1.0), pdf.(Normal(b̂, σ̂), b̂+σ̂)/(maximum(y) + 1.0)],
-		color=:grey)
+	vlines!(ax, b̂; ymax=maximum(y)/(maximum(y) + 1.0), color=:grey)
+	vlines!(ax, b̂-σ̂; ymax=pdf.(Normal(b̂, σ̂), b̂-σ̂)/(maximum(y) + 1.0), color=:grey)
+	vlines!(ax, b̂+σ̂; ymax=pdf.(Normal(b̂, σ̂), b̂+σ̂)/(maximum(y) + 1.0), color=:grey)
 	annotations!("b ±  1 s.e.", position=(b̂-0.008, 7.5), textsize=20)
 	x1 = range(b̂ - σ̂ , b̂ + σ̂; length=60)
 	band!(x1, fill(0, length(x1)), pdf.(Normal(b̂, σ̂), x1); color = (:blue, 0.25))
@@ -203,6 +202,19 @@ let
 	(estimate = est, se = se, int_50 = int_50, int_95 = int_95)
 end
 
+# ╔═╡ 4be6f3e8-1391-4f3a-9b13-0f8537b92a34
+df_poll = CSV.read(ros_datadir("Death", "polls.csv"), DataFrame)
+
+# ╔═╡ 886c48b5-c6ee-4a2e-b156-ba33217cc39d
+begin
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Death penalty opinions", xlabel="Year", ylabel="Percentage support for the death penalty")
+	scatter!(df_poll.year, df_poll.support .* 100)
+	err_lims = [100(sqrt(df_poll.support[i]*(1-df_poll.support[i])/1000)) for i in 1:nrow(df_poll)]
+	errorbars!(df_poll.year, df_poll.support .* 100, err_lims, color = :red)
+	f
+end
+
 # ╔═╡ Cell order:
 # ╟─6d0bb5ac-efc0-445a-aded-ec69fee95019
 # ╟─c0658351-3395-46a4-b711-98fd5988893f
@@ -224,3 +236,5 @@ end
 # ╠═47c24a34-c8fb-4909-8de6-f46c36fbda56
 # ╠═0890feea-2432-4472-b36e-54a36b2c02f9
 # ╠═3d2b0416-8510-463d-9ed0-a598085d9918
+# ╠═4be6f3e8-1391-4f3a-9b13-0f8537b92a34
+# ╠═886c48b5-c6ee-4a2e-b156-ba33217cc39d

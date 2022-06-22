@@ -28,6 +28,7 @@ begin
 	# Graphics related
     using GLMakie
     using Makie
+    using AlgebraOfGraphics
 
 	# Common data files and functions
 	using RegressionAndOtherStories

@@ -74,12 +74,6 @@ All data files are available (as .csv files) in the data subdirectory of package
 # ╔═╡ 100e2ea9-17e5-4eef-b880-823311f5d496
 ros_datadir()
 
-# ╔═╡ bb6149fe-a599-40d2-bfb1-03c738dd7571
-md"
-!!! note
-
-After evaluating above cell, use `ros_datadir(\"ElectionsEconomy\", \"hibbs.dat\")` to obtain data."
-
 # ╔═╡ d830f41c-0fb6-4bff-9fe0-0bd51f444779
 hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
 
@@ -124,8 +118,61 @@ let
 	fig
 end
 
-# ╔═╡ ea9f97c9-7179-4e0d-97dc-c294a4df9638
-md" #### Below some additional cells demonstrating the use of Stan."
+# ╔═╡ df07541f-13ec-4192-acde-82c02ab6bcf6
+md" #### Priors used in the Stan model."
+
+# ╔═╡ f11b4bdc-3ad4-467d-b75c-37da5e9dcb2c
+stan1_0 = "
+parameters {
+	real b;              // Coefficient independent variable
+	real a;              // Intercept
+	real<lower=0> sigma; // dispersion parameter
+}
+model {
+	// priors including constants
+	a ~ normal(50, 20);
+	b ~ normal(2, 10);
+  	sigma ~ exponential(1);
+}";
+
+# ╔═╡ 14a5dddc-9280-48d5-864a-58b7453775e1
+begin
+	m1_0s = SampleModel("hibbs", stan1_0)
+	rc1_0s = stan_sample(m1_0s)
+	if success(rc1_0s)
+		post1_0s = read_samples(m1_0s, :dataframe)
+	end
+end
+
+# ╔═╡ 10395123-f9c9-441d-a497-cb7be9fa7b18
+let
+	fig = Figure()
+	xlabel = "Average growth personal income [%]"
+	ylabel="Incumbent's party vote share"
+	ax = Axis(fig[1, 1]; title="Lines based on prior samples", 
+		xlabel, ylabel)
+	ylims!(ax, 40, 65)
+	xrange = LinRange(-1, 4, 200)
+	for i = 1:100
+		lines!(xrange, post1_0s.a[i] .+ post1_0s.b[i] .* xrange, color = :grey)
+	end
+	fig
+end
+
+# ╔═╡ 1786b700-0d99-4541-87d4-b6308a2331bc
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Density :a")
+	density!(f[1, 1], post1_0s.a)
+	ax = Axis(f[1, 2]; title="Density :b")
+	density!(f[1, 2], post1_0s.b)
+	ax = Axis(f[1, 3]; title="Density :sigma")
+	density!(f[1, 3], post1_0s.sigma)
+	f
+end
+
+# ╔═╡ 261c1e49-13be-4950-b211-29c35e0da5e8
+md" #### Conditioning based on the available data."
 
 # ╔═╡ 274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
 stan1_1 = "
@@ -154,32 +201,11 @@ model {
 	vote ~ normal(mu, sigma);
 }";
 
-# ╔═╡ df07541f-13ec-4192-acde-82c02ab6bcf6
-md" #### Priors used in `stan_1_1` above."
-
-# ╔═╡ 1786b700-0d99-4541-87d4-b6308a2331bc
-let
-	N = 10000
-	nt = (
-		a = rand(Normal(50, 20), N),
-		b = rand(Normal(2, 10), N),
-		σ = rand(Exponential(1), N),
-	)
-
-	fig = Figure()
-	for (i, k) in enumerate(keys(nt))
-		plt = data(nt) * mapping(k) * AlgebraOfGraphics.density()
-		axis = (; title="Density $k")
-		draw!(fig[1, i], plt; axis)
-	end
-	fig
-end
-
 # ╔═╡ 953eea61-f05f-4233-86aa-d5af3b47b41e
-begin
-	data1_1 = (N=16, vote=hibbs.vote, growth=hibbs.growth)
-	m1_1s = SampleModel("hibbs", stan1_1)
-	rc = stan_sample(m1_1s; data=data1_1)
+let
+	data = (N=16, vote=hibbs.vote, growth=hibbs.growth)
+	global m1_1s = SampleModel("hibbs", stan1_1)
+	global rc1_1s = stan_sample(m1_1s; data)
 end;
 
 # ╔═╡ a95062e7-ede7-4be9-8feb-b8de4a999901
@@ -189,9 +215,10 @@ read_summary(m1_1s)
 read_samples(m1_1s, :dataframe)
 
 # ╔═╡ 9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
-if success(rc)
+if success(rc1_1s)
 	sdf = read_summary(m1_1s)
 	post1_1s_df = read_samples(m1_1s, :dataframe)
+	post1_1s = read_samples(m1_1s, :dataframe)
 	post1_1s_df[!, :chain] = repeat(collect(1:m1_1s.num_chains);
 		inner=m1_1s.num_samples)
 	post1_1s_df[!, :chain] = categorical(post1_1s_df.chain)
@@ -236,6 +263,29 @@ let
 	lines!(fig[1, 2], x, ā .+ b̄ * x, color = :red)
 
 	fig
+end
+
+# ╔═╡ a872c820-57b6-45d5-a7e9-2ab7349c81e7
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Density :a")
+	xlims!(ax, -10, 125)
+	density!(post1_0s.a)
+	ax = Axis(f[1, 2]; title="Density :b")
+	xlims!(ax, -40, 45)
+	density!(post1_0s.b)
+	ax = Axis(f[1, 3]; title="Density :sigma")
+	density!(post1_1s.sigma)
+	
+	ax = Axis(f[2, 1]; title="Density :a")
+	density!(post1_1s.a)
+	xlims!(ax, -10, 125)
+	ax = Axis(f[2, 2]; title="Density :b")
+	xlims!(ax, -40, 45)
+	density!(post1_1s.b)
+	ax = Axis(f[2, 3]; title="Density :sigma")
+	density!(post1_1s.sigma)
+	f
 end
 
 # ╔═╡ 99259579-97fa-46f5-93b4-710b3180ded2
@@ -426,7 +476,6 @@ combine(gpdf, valuecols(gpdf) .=> mad)
 # ╠═c2a838eb-eb08-41e8-9ea7-324c4ddf0e99
 # ╟─5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
 # ╠═100e2ea9-17e5-4eef-b880-823311f5d496
-# ╟─bb6149fe-a599-40d2-bfb1-03c738dd7571
 # ╠═d830f41c-0fb6-4bff-9fe0-0bd51f444779
 # ╠═35bee056-5cd8-48ee-b9c0-74a8b53229bd
 # ╠═3c4672aa-d17e-4681-9863-9ee026fefee6
@@ -434,10 +483,13 @@ combine(gpdf, valuecols(gpdf) .=> mad)
 # ╠═f48df50b-5450-4998-8dab-014c8b9d42a2
 # ╠═be41c745-c87d-4f3a-ab4e-a8ae3b9ae091
 # ╠═06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
-# ╟─ea9f97c9-7179-4e0d-97dc-c294a4df9638
-# ╠═274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
-# ╟─df07541f-13ec-4192-acde-82c02ab6bcf6
+# ╠═df07541f-13ec-4192-acde-82c02ab6bcf6
+# ╠═f11b4bdc-3ad4-467d-b75c-37da5e9dcb2c
+# ╠═14a5dddc-9280-48d5-864a-58b7453775e1
+# ╠═10395123-f9c9-441d-a497-cb7be9fa7b18
 # ╠═1786b700-0d99-4541-87d4-b6308a2331bc
+# ╟─261c1e49-13be-4950-b211-29c35e0da5e8
+# ╠═274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
 # ╠═953eea61-f05f-4233-86aa-d5af3b47b41e
 # ╠═a95062e7-ede7-4be9-8feb-b8de4a999901
 # ╠═77a2a293-e48f-46b5-a104-003772d8a922
@@ -445,6 +497,7 @@ combine(gpdf, valuecols(gpdf) .=> mad)
 # ╠═9842ce96-98f9-4a87-9208-d32d16418c15
 # ╠═3a256571-459c-4346-a511-377a273cbb66
 # ╠═8abccff4-2015-467e-92d6-067bd8db4e10
+# ╠═a872c820-57b6-45d5-a7e9-2ab7349c81e7
 # ╠═99259579-97fa-46f5-93b4-710b3180ded2
 # ╠═f3863e01-deae-4e9d-b044-5515c5a19ab4
 # ╠═5efb6ee3-8f20-42e3-a8af-cbfbb9acd075

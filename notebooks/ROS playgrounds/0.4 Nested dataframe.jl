@@ -106,16 +106,20 @@ model{
 }";
 
 # ╔═╡ d24ea359-a900-453f-bd15-19a073dacc1f
-begin
-	m14_6s = SampleModel("m14_6s", stan14_6)
-	rc14_6s = stan_sample(m14_6s; data)
-end;
-
-# ╔═╡ 6b908e45-0ccd-45bd-a48a-9f0723905dab
-if success(rc14_6s)
-    sdf14_6s = read_summary(m14_6s)
-    sdf14_6s[8:17, [1, 2, 4, 5, 6, 7, 8]]
+# ╠═╡ show_logs = false
+let
+	global m14_6s = SampleModel("m14_6s", stan14_6)
+	global rc14_6s = stan_sample(m14_6s; data)
+	df = success(rc14_6s) && model_summary(m14_6s)
+	df.parameters = String.(df.parameters)
+	df
 end
+
+# ╔═╡ 54753000-d19f-4fa5-9d49-18e2ab052ffd
+md"
+!!! note
+
+In above cell the logs have been hidden!"
 
 # ╔═╡ c0c926ad-715d-4126-8bdd-ce6ea5b158a6
 md"
@@ -162,17 +166,17 @@ nd[3, :Rho]
 matrix(nd, :Sigma)
 
 # ╔═╡ Cell order:
-# ╠═5eaece93-07bf-4550-b393-2a4891cd9b99
+# ╟─5eaece93-07bf-4550-b393-2a4891cd9b99
 # ╠═1d5532f7-cc38-446b-a6da-458a9564afcc
 # ╠═1d6c9e3b-b20d-462d-b633-a808305afdec
-# ╠═f5ccc087-1ad0-42cd-b09a-02eb46cc441a
+# ╟─f5ccc087-1ad0-42cd-b09a-02eb46cc441a
 # ╠═5d720373-d1c8-4947-b29e-9bedb9a63a2c
 # ╠═7c435cd5-769c-477b-bccf-398053bcbd74
 # ╠═d8ca810d-1bb6-4087-a760-ded35b3ea5b5
 # ╠═fd1965c8-a05d-4076-a587-f6506e589422
 # ╠═4a762650-2f97-483c-a2d8-ca9a5e15038e
 # ╠═d24ea359-a900-453f-bd15-19a073dacc1f
-# ╠═6b908e45-0ccd-45bd-a48a-9f0723905dab
+# ╟─54753000-d19f-4fa5-9d49-18e2ab052ffd
 # ╟─c0c926ad-715d-4126-8bdd-ce6ea5b158a6
 # ╠═6e60a2b8-5a3e-4e90-8c48-4e8b9a3d76ed
 # ╠═4b53e73e-97a2-4a6c-a534-11361943c102

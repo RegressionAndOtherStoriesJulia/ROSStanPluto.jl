@@ -23,11 +23,8 @@ begin
 	using RegressionAndOtherStories
 end
 
-# ╔═╡ 0391fc17-09b7-47d7-b799-6dc6de13e82b
-md"### HDI: hdi.csv, votes.csv"
-
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"##### See Chapter 2.1 in Regression and Other Stories."
+md"#### See chapter 2 in Regression and Other Stories."
 
 # ╔═╡ d7543b63-52d3-449b-8ce3-d979c23f8b95
 md" ###### Widen the notebook."
@@ -162,7 +159,8 @@ let
 	data = (N = size(hdivotes2, 1), rank_income = collect(1:size(hdivotes2, 1)), rank_hdi = hdivotes2.rank_hdi)
 	global m2_1s = SampleModel("hdi", stan2_1)
 	global rc2_1s = stan_sample(m2_1s; data)
-end;
+	success(rc2_1s) && model_summary(m2_1s, [:a, :b, :sigma])
+end
 
 # ╔═╡ a96a5658-33c6-4f73-8e5e-bb74b2e7fec1
 if success(rc2_1s)
@@ -198,9 +196,6 @@ let
 	lines!(x, ā .+ b̄ .* x; color=:red)
 	f
 end
-
-# ╔═╡ 50b61653-5f66-4e4c-8687-405ec2cd5c42
-model_summary(m2_1s, [:a, :b, :sigma])
 
 # ╔═╡ b95f75e1-5eb8-4862-9f52-1adebc4ec533
 md" ### 2.2 Validity and reliability."
@@ -402,7 +397,6 @@ md" ### 2.4 Data and adjustment."
 md" #### Not yet done."
 
 # ╔═╡ Cell order:
-# ╟─0391fc17-09b7-47d7-b799-6dc6de13e82b
 # ╟─eb7ea04a-da52-4e69-ac3e-87dc7f014652
 # ╟─d7543b63-52d3-449b-8ce3-d979c23f8b95
 # ╠═ed172871-fa4d-4111-ac0a-341898917948
@@ -420,7 +414,6 @@ md" #### Not yet done."
 # ╠═63641488-f75f-4380-a187-a127dc4a84fb
 # ╠═a96a5658-33c6-4f73-8e5e-bb74b2e7fec1
 # ╠═1bcc7dde-85ef-48b7-b7ff-9d9560bdc16d
-# ╠═50b61653-5f66-4e4c-8687-405ec2cd5c42
 # ╟─b95f75e1-5eb8-4862-9f52-1adebc4ec533
 # ╠═c21d2adf-d210-4f5d-8d1f-6a0c83d8679d
 # ╠═add96785-f500-4981-a552-87cde06677e6

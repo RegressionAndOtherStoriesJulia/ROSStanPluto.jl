@@ -26,7 +26,7 @@ begin
 end
 
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"#### Chapter 1 in Regression and Other Stories."
+md"#### See chapter 1 in Regression and Other Stories."
 
 # ╔═╡ cf39df58-3371-4535-88e4-f3f6c0404500
 md" ###### Widen the cells."
@@ -46,18 +46,27 @@ html"""
 # ╔═╡ 4755dab0-d228-41d3-934a-56f2863a5652
 md"###### A typical set of Julia packages to include in notebooks."
 
-# ╔═╡ 5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
+# ╔═╡ 87902f0e-5919-45b3-89a6-b88a7dab9363
+md" ### 1.1 The three challenges of statistics."
+
+# ╔═╡ 56aa0b49-1e8a-4390-904d-6f7551f849ea
 md"
 !!! note
 
-All data files are available (as .csv files) in the data subdirectory of package RegressionAndOtherStories.jl.
+It is not common for me to copy from the book but this particular section deserves an exception!"
+
+# ╔═╡ 47a6a5f3-0a54-46fe-a581-7414c0d9294a
+md"
+
+The three challenges of statistical inference are:
+1. Generalizing from sample to population, a problem that is associated with survey sampling but actually arises in nearly every application of statistical inference;
+2. Generalizing from treatment to control group, a problem that is associated with causal inference, which is implicitly or explicitly part of the interpretation of most regressions we have seen; and
+3. Generalizing from observed measurements to the underlying constructs of interest, as most of the time our data do not record exactly what we would ideally like to study.
+All three of these challenges can be framed as problems of prediction (for new people or new items that are not in the sample, future outcomes under different potentially assigned treatments, and underlying constructs of interest, if they could be measured exactly).
 "
 
-# ╔═╡ 100e2ea9-17e5-4eef-b880-823311f5d496
-ros_datadir()
-
 # ╔═╡ 0391fc17-09b7-47d7-b799-6dc6de13e82b
-md"### 1.1 ElectionsEconomy: hibbs.csv"
+md"### 1.2 Why learn regression?"
 
 # ╔═╡ d830f41c-0fb6-4bff-9fe0-0bd51f444779
 hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
@@ -104,7 +113,10 @@ let
 end
 
 # ╔═╡ fa2fe95b-fe29-40c8-8dfc-27a35e720f3d
-md" ### 1.2 ElectricCompany"
+md" ### 1.3 Some examples of regression."
+
+# ╔═╡ accfc0d8-968a-4b6c-bc1b-9da1aebe6cde
+md" #### Electric company"
 
 # ╔═╡ 305f0fb9-5e3a-45fd-8f57-edfdf65fb0e8
 begin
@@ -126,6 +138,16 @@ all(completecases(electric)) == true
 
 # ╔═╡ 420b8920-5f2a-4e3b-a32e-622252b84444
 md" ##### Post-test density for each grade conditioned on treatment."
+
+# ╔═╡ 54e3c7b6-c2b0-47d0-890a-5c55a19e42d9
+let
+	f = Figure()
+	axis = (; width = 150, height = 150)
+	el = data(electric) * mapping(:post_test, col=:grade, color=:treatment)
+	plt = el * AlgebraOfGraphics.histogram(;bins=20) * mapping(row=:treatment)
+	draw!(f[1, 1], plt; axis)
+	f
+end
 
 # ╔═╡ 3c03311f-bdb8-4c06-a870-3e70a628f684
 let
@@ -159,7 +181,7 @@ let
 end
 
 # ╔═╡ 35307905-cee1-4f35-a149-cdaaf7fc1294
-md" ### 1.3 Peacekeeping"
+md" #### Peacekeeping"
 
 # ╔═╡ f4b870c6-240d-4a46-98c8-1a0dbe7dfc6b
 peace = CSV.read(ros_datadir("PeaceKeeping", "peacekeeping.csv"), missingstring="NA", DataFrame)
@@ -296,8 +318,17 @@ begin
 	f
 end
 
+# ╔═╡ 63917762-446c-4230-ae22-d42f0752ff36
+md" ### 1.4 Challenges in building, understanding, and interpreting regression."
+
 # ╔═╡ 783df69c-5368-4a9e-aabf-a46895712289
-md" ### 1.4 SimpleCausal"
+md" #### Simple causal"
+
+# ╔═╡ 8f61506c-bccf-4614-b2ae-ce6379f71da7
+md"
+!!! note
+
+In models like below I usually prefer to create 2 separate Stan Language models, one for the continuous case and another for the binary case. But they can be combined in a single model as shown below. I'm using this example to show one way to handle vectors returned from Stan's cmdstan."
 
 # ╔═╡ df82425a-4cf6-4b6d-9421-f8a5b59c4230
 stan1_4_1 = "
@@ -344,18 +375,35 @@ let
 	data = (N = n, x = x, x_binary = x_binary, y = y)
 	global m1_4_1s = SampleModel("m1_4_1s", stan1_4_1);
 	global rc1_4_1s = stan_sample(m1_4_1s; data)
-end;
-
-# ╔═╡ 3ca17b14-5c31-490a-9647-946d5470f755
-md" ###### If Stan parameters are vectors, cmdstan returns those using '.' notation, e.g. a.1, a.2, ..."
-
-# ╔═╡ 44f382fc-dd10-4c2e-8e5d-cd688b3af340
-if success(rc1_4_1s)
-	post1_4_1s = read_samples(m1_4_1s, :dataframe)
+	success(rc1_4_1s) && model_summary(m1_4_1s)
 end
 
+# ╔═╡ adb8c432-07ef-4844-a75f-c48dffc8746f
+md"
+!!! note
+
+This is a good point to take a quick look at Pluto cell metadata: the top left `eye` symbol and the top right `3-dots in a circle` glyph (both only visible when the curser is in the input cell). Both are used quite often in these notebooks. Try them out!"
+
+# ╔═╡ efc0e0d6-5d4a-43af-8077-d793caf3a4b4
+md" ###### The output of above method of the function `model_summary(::SampleModel)`, called directly on a SampleModel, is different from method `model_summary(::DataFrame)`, typically used later on. Above table shows important mcmc diagnostic columns like `n_eff` and `r_hat`." 
+
+# ╔═╡ 3ca17b14-5c31-490a-9647-946d5470f755
+md" ###### If Stan parameters are vectors (as in this example), cmdstan returns those using '.' notation, e.g. a.1, a.2, ..."
+
+# ╔═╡ 942a32ff-1edd-4e84-a1fd-ace09d2b09ec
+if success(rc1_4_1s)
+	post1_4_1s = read_samples(m1_4_1s, :dataframe)
+	model_summary(post1_4_1s, names(post1_4_1s))
+end
+
+# ╔═╡ df2896d5-2820-4115-b8fa-bc10ed79f953
+md" ###### With vector parameters `read_samples()` can create a nested DataFrame:" 
+
+# ╔═╡ 057a873c-53f9-488a-afde-4444d1ee8f72
+nd1_4_1s = read_samples(m1_4_1s, :nesteddataframe)
+
 # ╔═╡ c7396fad-aaa7-4fe6-8cb8-403f0b8e52c3
-md" ###### In those cases I prefer to not to use Symbols for the parameters but use Strings instead:"
+md" ###### With vectored parameters, I prefer to not to use Symbols for the parameters but Strings:"
 
 # ╔═╡ 896c63c5-2d8a-4f9d-bad0-068352533dff
 success(rc1_4_1s) && model_summary(post1_4_1s, Symbol.(names(post1_4_1s)))
@@ -363,42 +411,45 @@ success(rc1_4_1s) && model_summary(post1_4_1s, Symbol.(names(post1_4_1s)))
 # ╔═╡ 7798b760-eeab-406a-820e-bf1019395a12
 ms1_4_1s = success(rc1_4_1s) && model_summary(post1_4_1s, names(post1_4_1s))
 
-# ╔═╡ efc0e0d6-5d4a-43af-8077-d793caf3a4b4
-md" ###### Note there is a slightly different version of `model_summary()` if called directly on the SampleModel:"
+# ╔═╡ 67817631-aa7b-4976-9b50-890e5e87d28f
+md"
+!!! note
 
-# ╔═╡ 9bb61c6a-296e-4753-ac83-34d968f164d8
-model_summary(m1_4_1s, ["a[1]", "a[2]", "b{1}", "b[2]", "sigma[1]", "sigma[2]"])
+By default, in the latter case, both the parameters and the column headers are now of type `String`:"
 
-# ╔═╡ 0360be23-0251-46e8-b936-1f77422f8944
-md" ###### This version shows important columns like `n_eff` and `r_hat`."
+# ╔═╡ 3cb3dc1f-ed9d-47d4-844b-feb5166561dc
+ms1_4_1s["b.2", "mad_sd"]
+
+# ╔═╡ 21cd68c8-4e6b-4030-a42d-f9d14abd60ce
+md" ###### Nested dataframes are handy to obtain a matrix of say the b values:"
+
+# ╔═╡ a76df572-cf7f-451a-84b0-5023b146da0e
+matrix(nd1_4_1s, :b)
+
+# ╔═╡ 55405cd5-9727-4d64-9994-170007f9ad1b
+Array(post1_4_1s[:, ["b.1", "b.2"]])
 
 # ╔═╡ e5f22961-b531-4519-bfb0-a8196d77ba6c
 let
 	x1 = 1.0:0.01:5.0
 	f = Figure()
 	medians = ms1_4_1s[:, "median"]
-	ax = Axis(f[1, 1], title = "Regression on continuous treatment",
-		xlabel = "Treatment", ylabel = "Outcome")
+	ax = Axis(f[1, 2], title = "Regression on continuous treatment",
+		xlabel = "Treatment level", ylabel = "Outcome")
 	sca1 = scatter!(x, y)
 	annotations!("Slope of fitted line = $(round(medians[3], digits=2))",
 		position = (2.8, 10), textsize=15)
 	lin1 = lines!(x1, medians[1] .+ medians[3] * x1)
 
 	x2 = 0.0:0.01:1.0
-	ax = Axis(f[2, 1], title="Regression on binary treatment",
+	ax = Axis(f[1, 1], title="Regression on binary treatment",
 		xlabel = "Treatment", ylabel = "Outcome")
 	sca1 = scatter!(x_binary, y)
 	lin1 = lines!(x2, medians[2] .+ medians[4] * x2)
 	annotations!("Slope of fitted line = $(round(medians[4], digits=2))", 
-		position = (0.4, 12), textsize=15)
+		position = (0.4, 10), textsize=15)
 	f
 end
-
-# ╔═╡ df2896d5-2820-4115-b8fa-bc10ed79f953
-md" ###### Again, with vector parameters `read_samples()` can create a nested DataFrame:" 
-
-# ╔═╡ 057a873c-53f9-488a-afde-4444d1ee8f72
-nd1_4_1s = read_samples(m1_4_1s, :nesteddataframe)
 
 # ╔═╡ 7d7feaf5-1b91-4293-a03d-2598168d0439
 stan1_4_2 = "
@@ -437,7 +488,10 @@ let
 	data = (N = n1, x = x1, y = y1)
 	global m1_4_2s = SampleModel("m1.4_2s", stan1_4_2);
 	global rc1_4_2s = stan_sample(m1_4_2s; data)
-end;
+	df = success(rc1_4_2s) && model_summary(m1_4_2s)
+	df.parameters = string.(df.parameters)
+	df
+end
 
 # ╔═╡ 9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
 if success(rc1_4_2s)
@@ -455,9 +509,6 @@ ms1_4_2s = model_summary(post1_4_2s, ["a.1", "a.2", "b", "b_exp", "sigma.1", "si
 
 # ╔═╡ 10e61721-da24-444e-b668-a910d4faff8a
 â₂
-
-# ╔═╡ 023e1a1e-30a4-4cf3-93af-cef5f5084ac5
-model_summary(m1_4_2s, ["a[1]", "a[2]", "b", "b_exp", "sigma[1]", "sigma[2]"])
 
 # ╔═╡ a772d1be-e8b8-40bb-be95-1ed053dc67de
 let
@@ -514,8 +565,17 @@ let
 	current_figure()
 end
 
+# ╔═╡ 08d695b3-8f77-4079-9106-3d38d9762cc3
+md" ### 1.5 Classical and Bayesian inference."
+
+# ╔═╡ 74b247dc-c058-433b-9881-e1b85dacae84
+md" ### 1.6 Computing least-squares and Bayesian regression."
+
+# ╔═╡ effd481c-a47f-404a-a42f-207528b9b41b
+md" ### 1.8 Exercises."
+
 # ╔═╡ 08710628-ff52-4a95-a4f5-5dfce2fda165
-md" ### 1.5 Helicopters"
+md" #### Helicopters"
 
 # ╔═╡ b2045d0f-afc1-4046-90c5-55f39cf11c84
 helicopters = CSV.read(ros_datadir("Helicopters", "helicopters.csv"), DataFrame)
@@ -562,11 +622,12 @@ model {
 let
 	data = (N = nrow(helis), y = helis.time_sec, w = helis.width_cm, l = helis.length_cm)
 	global m1_5s = SampleModel("m1.5s", stan1_5);
-	global rc1_5 = stan_sample(m1_5s; data)
-end;
+	global rc1_5s = stan_sample(m1_5s; data)
+	success(rc1_5s) && model_summary(m1_5s)
+end
 
 # ╔═╡ fbb2e703-fbff-4dd4-a58c-3b2f5b6f49e1
-if success(rc1_5)
+if success(rc1_5s)
 	post1_5s = read_samples(m1_5s, :dataframe)
 	model_summary(post1_5s, [:a, :b, :c, :sigma])
 end
@@ -609,8 +670,9 @@ read_samples(m1_5s, :nesteddataframe)
 # ╟─4755dab0-d228-41d3-934a-56f2863a5652
 # ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
 # ╠═550371ad-d411-4e66-9d63-7329322c6ea1
-# ╟─5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
-# ╠═100e2ea9-17e5-4eef-b880-823311f5d496
+# ╟─87902f0e-5919-45b3-89a6-b88a7dab9363
+# ╟─56aa0b49-1e8a-4390-904d-6f7551f849ea
+# ╟─47a6a5f3-0a54-46fe-a581-7414c0d9294a
 # ╟─0391fc17-09b7-47d7-b799-6dc6de13e82b
 # ╠═d830f41c-0fb6-4bff-9fe0-0bd51f444779
 # ╠═35bee056-5cd8-48ee-b9c0-74a8b53229bd
@@ -620,11 +682,13 @@ read_samples(m1_5s, :nesteddataframe)
 # ╠═be41c745-c87d-4f3a-ab4e-a8ae3b9ae091
 # ╠═06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
 # ╟─fa2fe95b-fe29-40c8-8dfc-27a35e720f3d
+# ╟─accfc0d8-968a-4b6c-bc1b-9da1aebe6cde
 # ╠═305f0fb9-5e3a-45fd-8f57-edfdf65fb0e8
 # ╟─43e020d2-063c-43da-b7b3-bbc989002e9e
 # ╠═3bc6b063-6f3d-4474-99b2-c9270513778a
 # ╠═82c83206-d5d7-4cc2-b4cd-d43e9c84c68a
 # ╟─420b8920-5f2a-4e3b-a32e-622252b84444
+# ╠═54e3c7b6-c2b0-47d0-890a-5c55a19e42d9
 # ╠═3c03311f-bdb8-4c06-a870-3e70a628f684
 # ╟─fb1e8fd3-7217-4955-83bd-551693f1507b
 # ╠═30b7e449-bcc7-4dbe-aef3-a50b85048f03
@@ -653,22 +717,28 @@ read_samples(m1_5s, :nesteddataframe)
 # ╟─533858b2-0b7e-4f4f-ac3d-a3d49856ef4b
 # ╠═edd2dbf1-ae2b-4453-a5e3-94b4a51be521
 # ╠═2ec2b2b1-f1d2-4cd5-a23f-2b80abc5d4cd
+# ╟─63917762-446c-4230-ae22-d42f0752ff36
 # ╟─783df69c-5368-4a9e-aabf-a46895712289
+# ╟─8f61506c-bccf-4614-b2ae-ce6379f71da7
 # ╠═df82425a-4cf6-4b6d-9421-f8a5b59c4230
 # ╟─20771b96-adb5-4fc9-9679-0a8d42f8f09a
 # ╠═675edafd-145c-43ac-aa3b-2c830b3645e1
 # ╠═3fb34dce-1b9d-4bdf-b94e-03a13fd09d30
+# ╟─adb8c432-07ef-4844-a75f-c48dffc8746f
+# ╟─efc0e0d6-5d4a-43af-8077-d793caf3a4b4
 # ╟─3ca17b14-5c31-490a-9647-946d5470f755
-# ╠═44f382fc-dd10-4c2e-8e5d-cd688b3af340
+# ╠═942a32ff-1edd-4e84-a1fd-ace09d2b09ec
+# ╟─df2896d5-2820-4115-b8fa-bc10ed79f953
+# ╠═057a873c-53f9-488a-afde-4444d1ee8f72
 # ╟─c7396fad-aaa7-4fe6-8cb8-403f0b8e52c3
 # ╠═896c63c5-2d8a-4f9d-bad0-068352533dff
 # ╠═7798b760-eeab-406a-820e-bf1019395a12
-# ╟─efc0e0d6-5d4a-43af-8077-d793caf3a4b4
-# ╠═9bb61c6a-296e-4753-ac83-34d968f164d8
-# ╟─0360be23-0251-46e8-b936-1f77422f8944
+# ╟─67817631-aa7b-4976-9b50-890e5e87d28f
+# ╠═3cb3dc1f-ed9d-47d4-844b-feb5166561dc
+# ╟─21cd68c8-4e6b-4030-a42d-f9d14abd60ce
+# ╠═a76df572-cf7f-451a-84b0-5023b146da0e
+# ╠═55405cd5-9727-4d64-9994-170007f9ad1b
 # ╠═e5f22961-b531-4519-bfb0-a8196d77ba6c
-# ╟─df2896d5-2820-4115-b8fa-bc10ed79f953
-# ╠═057a873c-53f9-488a-afde-4444d1ee8f72
 # ╠═7d7feaf5-1b91-4293-a03d-2598168d0439
 # ╠═615aa9cb-e138-4ef5-917a-ceb3ab6235c1
 # ╠═9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
@@ -676,13 +746,15 @@ read_samples(m1_5s, :nesteddataframe)
 # ╠═d2606260-d82f-43ba-9dc0-63b916421440
 # ╠═eaed7d4a-f897-4008-ba9e-c61353c28410
 # ╠═10e61721-da24-444e-b668-a910d4faff8a
-# ╠═023e1a1e-30a4-4cf3-93af-cef5f5084ac5
 # ╠═a772d1be-e8b8-40bb-be95-1ed053dc67de
 # ╠═c4799717-da18-45cb-b544-ac989184d6f4
 # ╠═86fce3c6-654d-4a3f-8540-2ec57b3395f3
 # ╠═25db1637-e88e-4bc2-92e4-a968be42c626
 # ╠═99ee57e4-52ce-44e2-baea-bc04544d0d31
 # ╠═4d5b73d4-c5a5-4dfd-9354-78db442545b5
+# ╟─08d695b3-8f77-4079-9106-3d38d9762cc3
+# ╟─74b247dc-c058-433b-9881-e1b85dacae84
+# ╟─effd481c-a47f-404a-a42f-207528b9b41b
 # ╟─08710628-ff52-4a95-a4f5-5dfce2fda165
 # ╠═b2045d0f-afc1-4046-90c5-55f39cf11c84
 # ╟─72f0a072-9c65-4a91-98b5-8967f2f6a5f3

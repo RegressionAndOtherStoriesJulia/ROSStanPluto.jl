@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.8
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -45,6 +45,9 @@ html"""
 # ╔═╡ 5356fcee-dada-48dd-b422-bed4b5595470
 md"##### A typical set of Julia packages to include in notebooks."
 
+# ╔═╡ 8dba464a-3eb7-43e5-8324-85b938be6d51
+md" ### 6.1 Regression models."
+
 # ╔═╡ 326e0fc7-978b-42ae-b532-bdafb0a4948a
 md"### 6.2 Fitting a simple regression to fake data."
 
@@ -85,16 +88,14 @@ let
 	data = (N=nrow(fake), x=fake.x, y=fake.y)
 	global m6_1s = SampleModel("m6_1s", stan6_1)
 	global rc6_1s = stan_sample(m6_1s; data)
-end;
+	success(rc6_1s) && model_summary(m6_1s)
+end
 
 # ╔═╡ 1cd81462-2ed3-4b23-90c6-fdb4e3a6f143
 if success(rc6_1s)
 	post6_1s = read_samples(m6_1s, :dataframe)
-	ms6_1s = model_summary(m6_1s, [:a, :b, :sigma])
+	ms6_1s = model_summary(post6_1s, [:a, :b, :sigma])
 end
-
-# ╔═╡ 2491a30e-6ca7-4498-b717-c48345682248
-model_summary(post6_1s)
 
 # ╔═╡ 08be202b-f618-4a7f-a48a-5618b19495f5
 let
@@ -103,10 +104,10 @@ let
 	ax = Axis(f[1, 1]; title="Regression of fake data.", xlabel="fake.x", ylabel="fake.y")
 	scatter!(fake.x, fake.y)
 	x = 1:0.01:20
-	y = ms6_1s[:a, "mean"] .+  ms6_1s[:b, "mean"] .* x
+	y = ms6_1s[:a, :mean] .+  ms6_1s[:b, :mean] .* x
 	lines!(x, y)
-	â = round(ms6_1s[:a, "mean"]; digits=2)
-	b̂ = round(ms6_1s[:b, "mean"]; digits=2)
+	â = round(ms6_1s[:a, :mean]; digits=2)
+	b̂ = round(ms6_1s[:b, :mean]; digits=2)
 	annotations!("y = $(â) + $(b̂) * x + ϵ"; position=(5, 0.8))
 	
 	ax = Axis(f[1, 2]; title="Regression of fake data.", subtitle="(using the link() function)",
@@ -120,8 +121,11 @@ let
 	current_figure()
 end
 
+# ╔═╡ b545d750-789f-470b-badc-33a486cbcb77
+ms6_1s[:, 1:2]
+
 # ╔═╡ 9a2ec98b-6f45-4bc2-8ac0-5d6337cfb644
-hcat(ms6_1s[:, 1:2], [0.2, 0.3, 0.5])
+hcat(Array(ms6_1s[:, 1:2]), [0.2, 0.3, 0.5])
 
 # ╔═╡ bc877661-9aa0-425d-88e0-b82239c2552c
 md" ### 6.3 Interpret coefficients as comparisons, not effects."
@@ -161,22 +165,20 @@ let
 	data = (N=nrow(earnings), height=earnings.height, male=earnings.male, earnk=earnings.earnk)
 	global m6_2s = SampleModel("m6_2s", stan6_2)
 	global rc6_2s = stan_sample(m6_2s; data)
+	success(rc6_2s) && model_summary(m6_2s)
 end;
 
 # ╔═╡ f43ce0c2-a77f-4230-af27-85f46d3f10b7
 if success(rc6_2s)
 	post6_2s = read_samples(m6_2s, :dataframe)
-	ms6_2s = model_summary(m6_2s, [:a, :b, :c, :sigma])
+	ms6_2s = model_summary(post6_2s, [:a, :b, :c, :sigma])
 end
-
-# ╔═╡ df943ffa-30ca-44e0-94e3-e2e5c4dcddc3
-model_summary(post6_2s)
 
 # ╔═╡ 9727012b-1b76-4cde-84ef-bdd7bfa4b025
 let
-	â = round(ms6_2s[:a, "mean"]; digits=2)
-	b̂ = round(ms6_2s[:b, "mean"]; digits=2)
-	ĉ = round(ms6_2s[:c, "mean"]; digits=2)
+	â = round(ms6_2s[:a, :mean]; digits=2)
+	b̂ = round(ms6_2s[:b, :mean]; digits=2)
+	ĉ = round(ms6_2s[:c, :mean]; digits=2)
 
 	fig = Figure()
 	
@@ -200,7 +202,7 @@ let
 end	
 
 # ╔═╡ ec3f566f-278c-4342-a365-db379b7d54aa
-R2 = 1 - ms6_2s[:sigma, "mean"]^2 / std(earnings.earnk)^2
+R2 = 1 - ms6_2s[:sigma, :mean]^2 / std(earnings.earnk)^2
 
 # ╔═╡ c752672e-56de-4498-a85d-e3dffdc254d6
 md" ### 6.4 Historical origins of regression."
@@ -268,16 +270,16 @@ model {
 # ╔═╡ d3da4b65-dbd7-4bd9-9ab9-70b1a33b9728
 let
 	data = (N = nrow(heights), m = heights.mother_height, d = heights.daughter_height)
-	m6_4s = SampleModel("m6_4s", stan6_4)
-	rc6_4s = stan_sample(m6_4s; data)
-	if success(rc6_4s)
-		global post6_4s = read_samples(m6_4s, :dataframe)
-		global ms6_4s = model_summary(m6_4s, [:a, :b, :sigma])
-	end
+	global m6_4s = SampleModel("m6_4s", stan6_4)
+	global rc6_4s = stan_sample(m6_4s; data)
+	success(rc6_4s) && model_summary(m6_4s)
 end
 
-# ╔═╡ 1bc1e8a5-67f4-42e7-836c-e892c986f642
-model_summary(post6_4s, [:a, :b, :sigma])
+# ╔═╡ 4beb91af-f91a-490b-b701-2637c90d1d57
+if success(rc6_4s)
+	post6_4s = read_samples(m6_4s, :dataframe)
+	ms6_4s = model_summary(post6_4s, [:a, :b, :sigma])
+end
 
 # ╔═╡ 1a132ed9-3ff5-42d2-bb63-642958abc5ce
 plot_chains(post6_4s, [:a, :b, :sigma])
@@ -321,19 +323,16 @@ model {
 # ╔═╡ 6fd56eba-a6a6-4696-90d8-030502ab0f4a
 let
 	data = (N=nrow(exams), midterm=exams.midterm, final=exams.final)
-	m6_5s = SampleModel("m6_5s", stan6_5)
-	rc6_5s = stan_sample(m6_5s; data)
-	if success(rc6_5s)
-		global ms6_5s = model_summary(m6_5s, [:a, :b, :sigma])
-		global post6_5s = read_samples(m6_5s, :dataframe)
-	end
+	global m6_5s = SampleModel("m6_5s", stan6_5)
+	global rc6_5s = stan_sample(m6_5s; data)
+	success(rc6_5s) && model_summary(m6_5s)
 end
 
-# ╔═╡ 2069cd1f-758b-4ace-8454-54f4d2f08afb
-ms6_5s
-
 # ╔═╡ 381d3341-e789-4ca4-98ab-7f980cbd6745
-model_summary(post6_5s, [:a, :b, :sigma])
+if success(rc6_5s)
+	post6_5s = read_samples(m6_5s, :dataframe)
+	ms6_5s = model_summary(post6_5s, [:a, :b, :sigma])
+end
 
 # ╔═╡ c0aeefbd-db6f-4359-80c1-9ff6ef5bb6f3
 df_poll = CSV.read(ros_datadir("Death", "polls.csv"), DataFrame)
@@ -341,17 +340,19 @@ df_poll = CSV.read(ros_datadir("Death", "polls.csv"), DataFrame)
 # ╔═╡ d3ae1909-f6a3-437a-9d19-5b4a6e6baab3
 begin
 	f = Figure()
-	ax = Axis(f[1, 1]; title="Deat penalty opinions", xlabel="Year", ylabel="Percentage support for the death penalty")
+	ax = Axis(f[1, 1]; title="Death penalty opinions", xlabel="Year", ylabel="Percentage support for the death penalty")
 	scatter!(df_poll.year, df_poll.support .* 100)
 	err_lims = [100(sqrt(df_poll.support[i]*(1-df_poll.support[i])/1000)) for i in 1:nrow(df_poll)]
 	errorbars!(df_poll.year, df_poll.support .* 100, err_lims, color = :red)
 	f
 end
 
+# ╔═╡ 2c6551c0-65c9-4c79-866c-8c67ba191b43
+md" ###### Used in later notebooks."
+
 # ╔═╡ 0f567e25-2ce1-407d-8525-185e584de86a
 begin
-	death_raw=CSV.read(joinpath(expanduser("~"), ".julia", "dev", "RegressionAndOtherStories", "data", "Death", 
-		"dataforandy.csv"), DataFrame; missingstring="NA")
+	death_raw=CSV.read(ros_datadir("Death", "dataforandy.csv"), DataFrame; missingstring="NA")
 	death = death_raw[completecases(death_raw), :]
 end
 
@@ -377,13 +378,14 @@ end;
 # ╠═1271ba57-93ff-4ef7-bfff-15c39a034b2c
 # ╟─5356fcee-dada-48dd-b422-bed4b5595470
 # ╠═71cd8293-8c62-42b3-a33e-def5f7192160
+# ╟─8dba464a-3eb7-43e5-8324-85b938be6d51
 # ╟─326e0fc7-978b-42ae-b532-bdafb0a4948a
 # ╠═30832e8b-0642-447b-b281-207d7c4d73f4
 # ╠═4c132847-fac0-4547-812a-58b4022d380d
 # ╠═1656a64f-324d-48c4-b8b2-d6e6a81de9c5
 # ╠═1cd81462-2ed3-4b23-90c6-fdb4e3a6f143
-# ╠═2491a30e-6ca7-4498-b717-c48345682248
 # ╠═08be202b-f618-4a7f-a48a-5618b19495f5
+# ╠═b545d750-789f-470b-badc-33a486cbcb77
 # ╠═9a2ec98b-6f45-4bc2-8ac0-5d6337cfb644
 # ╟─bc877661-9aa0-425d-88e0-b82239c2552c
 # ╠═6e6c65b3-f7ad-4a7f-91fd-f065e7bd7ffe
@@ -391,7 +393,6 @@ end;
 # ╠═21eb651a-8914-4217-bdef-f60badd30d9c
 # ╠═eec9a07a-09e0-400b-a0b1-df32d77e54fc
 # ╠═f43ce0c2-a77f-4230-af27-85f46d3f10b7
-# ╠═df943ffa-30ca-44e0-94e3-e2e5c4dcddc3
 # ╠═9727012b-1b76-4cde-84ef-bdd7bfa4b025
 # ╠═ec3f566f-278c-4342-a365-db379b7d54aa
 # ╟─c752672e-56de-4498-a85d-e3dffdc254d6
@@ -400,16 +401,16 @@ end;
 # ╠═ae86b798-1d42-4bf0-8bde-7d4c922a48fd
 # ╠═3ffe7a75-ebd5-4194-ab15-e7827ced581d
 # ╠═d3da4b65-dbd7-4bd9-9ab9-70b1a33b9728
-# ╠═1bc1e8a5-67f4-42e7-836c-e892c986f642
+# ╠═4beb91af-f91a-490b-b701-2637c90d1d57
 # ╠═1a132ed9-3ff5-42d2-bb63-642958abc5ce
 # ╠═aa015e5a-88ca-4699-8f39-d0c54d8679e5
 # ╟─4c04253e-cb54-4f46-817e-af76053eef16
 # ╠═aee6f37f-2a8a-451b-96e4-ec4eeb852b20
 # ╠═f8c21752-1dc5-4a41-90d6-796b83d80848
 # ╠═6fd56eba-a6a6-4696-90d8-030502ab0f4a
-# ╠═2069cd1f-758b-4ace-8454-54f4d2f08afb
 # ╠═381d3341-e789-4ca4-98ab-7f980cbd6745
 # ╠═c0aeefbd-db6f-4359-80c1-9ff6ef5bb6f3
 # ╠═d3ae1909-f6a3-437a-9d19-5b4a6e6baab3
+# ╟─2c6551c0-65c9-4c79-866c-8c67ba191b43
 # ╠═0f567e25-2ce1-407d-8525-185e584de86a
 # ╠═0a7444c8-29ef-43e2-be65-3a6979d8315b

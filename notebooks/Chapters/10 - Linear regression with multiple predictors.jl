@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.6
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -76,19 +76,18 @@ model {
 ";
 
 # ╔═╡ b5c45959-87c3-4a54-b166-e5795509e316
-begin
+let
 	data =(N = nrow(kidiq), mom_hs = kidiq.mom_hs, mom_iq = kidiq.mom_iq, kid_score = kidiq.kid_score)
-	m10_1s = SampleModel("m10.1s", stan10_1)
-	rc10_1s = stan_sample(m10_1s; data)
+	global m10_1s = SampleModel("m10.1s", stan10_1)
+	global rc10_1s = stan_sample(m10_1s; data)
+	success(rc10_1s) && model_summary(m10_1s)
 end;
 
 # ╔═╡ 2e1f291f-8e84-4903-b368-a99279a15fcd
 if success(rc10_1s)
 	post10_1s = read_samples(m10_1s, :dataframe)
+	ms10_1s = model_summary(post10_1s, [:a, :b, :sigma])
 end
-
-# ╔═╡ dba88d36-2fd6-4358-b5ad-7c10d54c7caf
-ms10_1s = model_summary(post10_1s)
 
 # ╔═╡ b77b121b-38d3-485c-a9a2-c9ae87fe3423
 let
@@ -122,10 +121,12 @@ model {
 ";
 
 # ╔═╡ f6129e51-a64d-42ff-812a-bc62152777be
-begin
-	m10_2s = SampleModel("m10.2s", stan10_2)
-	rc10_2s = stan_sample(m10_2s; data)
-end;
+let
+	data =(N = nrow(kidiq), mom_hs = kidiq.mom_hs, mom_iq = kidiq.mom_iq, kid_score = kidiq.kid_score)
+	global m10_2s = SampleModel("m10.2s", stan10_2)
+	global rc10_2s = stan_sample(m10_2s; data)
+	success(rc10_2s) && model_summary(m10_2s)
+end
 
 # ╔═╡ 0ed2981d-f505-4f99-81dd-26d7a4fa3039
 if success(rc10_2s)
@@ -133,7 +134,7 @@ if success(rc10_2s)
 end
 
 # ╔═╡ dbec5dce-5c24-4ee5-ba33-10385d650d41
-ms10_2s = model_summary(post10_2s)
+ms10_2s = success(rc10_2s) && model_summary(post10_2s, [:a, :b, :sigma])
 
 # ╔═╡ 90f0236a-2c5b-4ea8-83cf-490037bf8c15
 let
@@ -172,18 +173,17 @@ model {
 
 # ╔═╡ b1c6c6a5-1784-438a-b930-49ce7aef80ab
 begin
-	m10_3s = SampleModel("m10.3s", stan10_3)
-	rc10_3s = stan_sample(m10_3s; data)
-end;
+	data =(N = nrow(kidiq), mom_hs = kidiq.mom_hs, mom_iq = kidiq.mom_iq, kid_score = kidiq.kid_score)
+	global m10_3s = SampleModel("m10.3s", stan10_3)
+	global rc10_3s = stan_sample(m10_3s; data)
+	success(rc10_3s) && model_summary(m10_3s)
+end
 
 # ╔═╡ b6330c4f-8129-4bbd-aa39-3ddd00c062b5
 post10_3s = read_samples(m10_3s, :dataframe)
 
 # ╔═╡ 710348c0-e52b-461c-b024-ebf566fa2e17
-ms10_3s = model_summary(post10_3s)
-
-# ╔═╡ 5d4b68f1-f589-40ce-b091-51092781230e
-model_summary(m10_3s, [:a, :b, :c, :sigma]; round_estimates=true)
+ms10_3s = model_summary(post10_3s, [:a, :b, :c, :sigma])
 
 # ╔═╡ 6014b70b-c10d-4b91-94f7-79dc291cc92b
 let
@@ -220,7 +220,6 @@ end
 # ╠═d8d8e6b4-6406-43ac-9472-a7afab027aef
 # ╠═b5c45959-87c3-4a54-b166-e5795509e316
 # ╠═2e1f291f-8e84-4903-b368-a99279a15fcd
-# ╠═dba88d36-2fd6-4358-b5ad-7c10d54c7caf
 # ╠═b77b121b-38d3-485c-a9a2-c9ae87fe3423
 # ╠═e348f77e-708f-43ed-863e-795330637846
 # ╠═f6129e51-a64d-42ff-812a-bc62152777be
@@ -231,5 +230,4 @@ end
 # ╠═b1c6c6a5-1784-438a-b930-49ce7aef80ab
 # ╠═b6330c4f-8129-4bbd-aa39-3ddd00c062b5
 # ╠═710348c0-e52b-461c-b024-ebf566fa2e17
-# ╠═5d4b68f1-f589-40ce-b091-51092781230e
 # ╠═6014b70b-c10d-4b91-94f7-79dc291cc92b

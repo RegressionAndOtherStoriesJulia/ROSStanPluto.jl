@@ -126,19 +126,23 @@ let
 	data = (N=nrow(hibbs), vote=hibbs.vote, growth=hibbs.growth)
 	global m7_1s = SampleModel("hibbs", stan7_1)
 	global rc7_1s = stan_sample(m7_1s; data)
-end;
-
-# ╔═╡ 527228aa-3276-47b1-b820-9f7e7be99837
-if success(rc7_1s)
-	post7_1s = read_samples(m7_1s, :dataframe)
-	model_summary(m7_1s, [:a, :b, :sigma])
+	success(rc7_1s) && model_summary(m7_1s)
 end
 
-# ╔═╡ 17cbe671-4c70-49f4-8f80-08218bd9978a
-ms7_1s = model_summary(post7_1s, [:a, :b, :sigma])
+# ╔═╡ 28f6f692-65a1-4b97-825b-62ba6d734244
+md"
+!!! note
+
+Sometimes I hide or show the output logs. To show them, click on the little circle with 3 dots visible in the top right of the input cell if the cursor is in there. Try it!"
+
+# ╔═╡ 527228aa-3276-47b1-b820-9f7e7be99837
+post7_1s = success(rc7_1s) && read_samples(m7_1s, :dataframe)
 
 # ╔═╡ 85766eab-6a2e-488f-a3a7-294465bd81c8
 trankplot(post7_1s, "b")
+
+# ╔═╡ 17cbe671-4c70-49f4-8f80-08218bd9978a
+ms7_1s = success(rc7_1s) && model_summary(post7_1s, [:a, :b, :sigma])
 
 # ╔═╡ 50ce2c67-6b33-4c22-afdc-0459154bd64e
 let
@@ -198,7 +202,8 @@ let
 	data = (N=nrow(fake), vote=fake.y, growth=fake.x)
 	global m7_2s = SampleModel("fake", stan7_1)
 	global rc7_2s = stan_sample(m7_2s; data)
-end;
+	success(rc7_2s) && model_summary(m7_2s)
+end
 
 # ╔═╡ cf4e7277-514a-4338-b1b3-203399627701
 if success(rc7_2s)
@@ -305,14 +310,27 @@ begin
 	(diff=mean(y₁)-mean(y₀), se_0=se_0, se_1=se_1, se=sqrt(se_0^2 + se_1^2))
 end
 
-# ╔═╡ 4b7bd30b-e5a7-48c6-bc2f-16a7e2799c1b
+# ╔═╡ e96dbbf1-0775-44e2-bc7c-95d1bedf4cbb
 # ╠═╡ show_logs = false
-let
-	global m7_3_0s = SampleModel("fake_0", stan7_3)
-	global rc7_3_0s = stan_sample(m7_3_0s; data=data_0)
-	global m7_3_1s = SampleModel("fake_1", stan7_3)
-	global rc7_3_1s = stan_sample(m7_3_1s; data=data_1)
-end;
+begin
+	m7_3_0s = SampleModel("fake_0", stan7_3)
+	rc7_3_0s = stan_sample(m7_3_0s; data=data_0)
+	success(rc7_3_0s) && model_summary(m7_3_0s)
+end
+
+# ╔═╡ 1f1d9ff2-a5ed-4872-a47e-d3d0d1302e3e
+# ╠═╡ show_logs = false
+begin
+	m7_3_1s = SampleModel("fake_1", stan7_3)
+	rc7_3_1s = stan_sample(m7_3_1s; data=data_1)
+	success(rc7_3_1s) && model_summary(m7_3_1s)
+end
+
+# ╔═╡ a1799c25-90f3-48a5-857c-3931b76c920d
+md" 
+!!! note
+
+In above cells, the logs are hidden."
 
 # ╔═╡ 21a222f3-9aaf-429b-8458-bf28623287bd
 if success(rc7_3_0s)
@@ -324,12 +342,6 @@ end
 if success(rc7_3_1s)
 	post7_3_1s = read_samples(m7_3_1s, :dataframe)
 	sm7_3_1s = model_summary(post7_3_1s, [:a, :sigma])
-end
-
-# ╔═╡ b207ab3f-9b1f-4172-a3d5-dcb47138bbaa
-let
-	post7_3_0s = read_samples(m7_3_0s, :dataframe)
-	[mad(post7_3_0s.a), mad(post7_3_0s.a; normalize=false)]
 end
 
 # ╔═╡ 0d5ff413-44b3-420d-807b-43c532c616f7
@@ -361,7 +373,8 @@ let
 	data = (N = n, x = x, y = y)
 	global m7_3_2s = SampleModel("fake_2", stan7_3_2)
 	global rc7_3_2s = stan_sample(m7_3_2s; data)
-end;
+	success(rc7_3_2s) && model_summary(m7_3_2s)
+end
 
 # ╔═╡ 8e4cb62d-8252-4203-a345-00fb8628d9bb
 if success(rc7_3_2s)
@@ -407,9 +420,10 @@ end
 # ╠═0889d614-d08a-4a74-aefd-d60fb6f6cb03
 # ╠═21b35727-bce3-432c-a7bf-30c08be527da
 # ╠═17eea6aa-8993-4c04-be06-80100d6d9be4
+# ╟─28f6f692-65a1-4b97-825b-62ba6d734244
 # ╠═527228aa-3276-47b1-b820-9f7e7be99837
-# ╠═17cbe671-4c70-49f4-8f80-08218bd9978a
 # ╠═85766eab-6a2e-488f-a3a7-294465bd81c8
+# ╠═17cbe671-4c70-49f4-8f80-08218bd9978a
 # ╠═50ce2c67-6b33-4c22-afdc-0459154bd64e
 # ╠═2559d7d6-400c-44ed-afd6-6572ce50ac44
 # ╠═cae9dea3-010e-48f9-b45f-1230b4456031
@@ -426,10 +440,11 @@ end
 # ╠═322e4310-102e-4d1a-8507-f30e69604d8f
 # ╠═21cfb523-a5be-4db9-a03b-0a5d149bff53
 # ╠═8498471e-17d5-424a-aa83-822b59fd097c
-# ╠═4b7bd30b-e5a7-48c6-bc2f-16a7e2799c1b
+# ╠═e96dbbf1-0775-44e2-bc7c-95d1bedf4cbb
+# ╠═1f1d9ff2-a5ed-4872-a47e-d3d0d1302e3e
+# ╟─a1799c25-90f3-48a5-857c-3931b76c920d
 # ╠═21a222f3-9aaf-429b-8458-bf28623287bd
 # ╠═38c38e2f-0c13-4a7b-a379-ddeeffbe6f80
-# ╠═b207ab3f-9b1f-4172-a3d5-dcb47138bbaa
 # ╠═0d5ff413-44b3-420d-807b-43c532c616f7
 # ╠═f364f536-3b00-4892-a0c4-3eaf07bafccd
 # ╠═8e4cb62d-8252-4203-a345-00fb8628d9bb

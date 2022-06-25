@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.8
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -135,14 +135,15 @@ model {
   	sigma ~ exponential(1);
 }";
 
-# ╔═╡ 14a5dddc-9280-48d5-864a-58b7453775e1
+# ╔═╡ db6a5dab-a738-42d3-a97a-4ca60894b9ca
 begin
 	m1_0s = SampleModel("hibbs", stan1_0)
 	rc1_0s = stan_sample(m1_0s)
-	if success(rc1_0s)
-		post1_0s = read_samples(m1_0s, :dataframe)
-	end
+	success(rc1_0s) && model_summary(m1_0s)
 end
+
+# ╔═╡ 9e471ad3-6c48-4f8a-b204-4ee864837898
+post1_0s = read_samples(m1_0s, :dataframe)
 
 # ╔═╡ 10395123-f9c9-441d-a497-cb7be9fa7b18
 let
@@ -206,10 +207,8 @@ let
 	data = (N=16, vote=hibbs.vote, growth=hibbs.growth)
 	global m1_1s = SampleModel("hibbs", stan1_1)
 	global rc1_1s = stan_sample(m1_1s; data)
+	success(rc1_1s) && model_summary(m1_1s)
 end;
-
-# ╔═╡ a95062e7-ede7-4be9-8feb-b8de4a999901
-read_summary(m1_1s)
 
 # ╔═╡ 77a2a293-e48f-46b5-a104-003772d8a922
 read_samples(m1_1s, :dataframe)
@@ -217,18 +216,14 @@ read_samples(m1_1s, :dataframe)
 # ╔═╡ 9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
 if success(rc1_1s)
 	sdf = read_summary(m1_1s)
-	post1_1s_df = read_samples(m1_1s, :dataframe)
 	post1_1s = read_samples(m1_1s, :dataframe)
-	post1_1s_df[!, :chain] = repeat(collect(1:m1_1s.num_chains);
-		inner=m1_1s.num_samples)
-	post1_1s_df[!, :chain] = categorical(post1_1s_df.chain)
-end;
+end
 
 # ╔═╡ 9842ce96-98f9-4a87-9208-d32d16418c15
-plot_chains(post1_1s_df, [:a, :b, :sigma])
+plot_chains(post1_1s, [:a, :b, :sigma])
 
 # ╔═╡ 3a256571-459c-4346-a511-377a273cbb66
-trankplot(post1_1s_df, "b")
+trankplot(post1_1s, "b")
 
 # ╔═╡ 8abccff4-2015-467e-92d6-067bd8db4e10
 let
@@ -246,7 +241,7 @@ let
 	# Maybe could use a `link` function here
 	mat2 = zeros(50, 100)
 	for i in 1:50
-		mat2[i, :] = post1_1s_df.a[i] .+ post1_1s_df.b[i] .* x
+		mat2[i, :] = post1_1s.a[i] .+ post1_1s.b[i] .* x
 	end
 
 	fig = Figure()
@@ -329,18 +324,18 @@ begin
 end
 
 # ╔═╡ f3863e01-deae-4e9d-b044-5515c5a19ab4
-describe(post1_1s_df)
+describe(post1_1s)
 
 # ╔═╡ 5efb6ee3-8f20-42e3-a8af-cbfbb9acd075
-post1_1s_df
+ms1_1s = model_summary(post1_1s, [:a, :b, :sigma])
 
 # ╔═╡ 750a66c1-47bc-466c-a7f1-567640e2e2bb
 let
 	N = 10000
 	nt = (
-		a = post1_1s_df.a,
-		b = post1_1s_df.b,
-		σ = post1_1s_df.sigma,
+		a = post1_1s.a,
+		b = post1_1s.b,
+		σ = post1_1s.sigma,
 	)
 
 	fig = Figure()
@@ -355,21 +350,35 @@ end
 # ╔═╡ 95cdfe9f-a06f-49f3-888f-34e47025c810
 md"#### Compute median and mad."
 
-# ╔═╡ 063c9089-fc58-4038-9fe8-ce9b90b1a843
-mod_sum = model_summary(post1_1s_df, [:a, :b, :sigma])
-
-# ╔═╡ f544db54-86e2-4694-9cac-fc42e2c00e50
-mod_sum[:a, :median]
-
 # ╔═╡ 10b925db-5f9c-4603-b49a-bd9b9a2e64d0
 md" ##### Alternative computation of mad()."
 
 # ╔═╡ 14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
 let
-	1.483 .* [median(abs.(post1_1s_df.a .- median(post1_1s_df.a))),
-	median(abs.(post1_1s_df.b .- median(post1_1s_df.b))),
-	median(abs.(post1_1s_df.sigma .- median(post1_1s_df.sigma)))]
+	1.483 .* [
+		median(abs.(post1_1s.a .- median(post1_1s.a))),
+		median(abs.(post1_1s.b .- median(post1_1s.b))),
+		median(abs.(post1_1s.sigma .- median(post1_1s.sigma)))]
 end
+
+# ╔═╡ f1041467-bd19-4ef5-9359-98e38d272142
+model_summary(post1_1s, [:a, :b, :sigma])
+
+# ╔═╡ 42bfca0d-cf71-4064-bbd6-1466c1267d9a
+model_summary(m1_1s)
+
+# ╔═╡ a8278cde-4b35-4807-bc06-f522b1f8c49d
+md"
+!!! note
+
+There is a difference between `model_summary(::DataFrame, ...)` and `model_summary(::SampleModel)`. The latter I use to get a very quick indication of the validity of the mcmc chains (i.e., the `:ess` and `:r_hat` columns). It returns a Dataframe for better display in Pluto notebooks.
+
+Calling `model_summary(::DataFrame, [vector of parameters])` returns primarily what's used in the Regression And Other Stories book (`:median` and `:mad_sd`). It returns a NamedArray to make it easy the get individual entries.
+
+Typically I don't assign the result of the DataFrame version to a variable, but do so for the NamedArray version. See also the end of this notebook."
+
+# ╔═╡ f544db54-86e2-4694-9cac-fc42e2c00e50
+ms1_1s[:a, :median]
 
 # ╔═╡ f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
 md" ##### Quick simulation with median, mad, mean and std of Normal observations."
@@ -403,66 +412,46 @@ quantile(nt.x, [0.025, 0.975])
 quantile(nt.x, [0.25, 0.75])
 
 # ╔═╡ 86636b94-f945-4bb1-b7b9-90bc5cc0c836
-md" #### A closer look at Stan's summary."
+md" ###### A closer look at Stan's summary. Below the full version:"
 
 # ╔═╡ 45a307ad-4f6a-4cb6-9182-bda870c42679
 sdf
 
 # ╔═╡ 8a04158e-a24d-477f-9cf8-30f062ec29bb
-md" ### Convert to a NamedArray."
+md" ###### Usually I use the abbreviated version:"
 
 # ╔═╡ a3277285-5acb-4117-a567-67fdfd2cd4ba
-if success(rc)
-	sdf1 = model_summary(m1_1s, [:a, :b, :sigma])
+success(rc1_1s) && model_summary(m1_1s)
+
+# ╔═╡ 28640925-0d67-4f07-8ac3-eb4e4960380d
+md" ###### This DataFrame is a different type then above created NamedArray `ms1_1s`."
+
+# ╔═╡ fef949ca-ba53-407c-81db-14aa48e0706c
+let
+	df = model_summary(m1_1s)
+	df[df.parameters .== :a, :ess]
 end
-
-# ╔═╡ 4abb28cb-8a1f-4680-b39e-ee4166d52d43
-md"
-
-!!! note
-
-If parameters are symbols, statistics are strings. If parameters are strings, both are strings."
 
 # ╔═╡ bd15d29b-552e-4f62-bb55-c57dca312b5b
-sdf1[:a, "n_eff"]
-
-# ╔═╡ 13d53efa-c7fe-4841-b90a-e0c486a6addc
-if success(rc)
-	sdf1b = model_summary(m1_1s, ["a", "b", "sigma"])
-end
+ms1_1s
 
 # ╔═╡ 8703f610-71db-46fa-ad6b-d51ccd7b4ff2
 sdf2 = model_summary(m1_1s, [:a, :b])
 
 # ╔═╡ 2d1c65ed-f3e4-42fd-bf3f-f89efc543888
-sdf3a = model_summary(m1_1s, [:lp__, :a, :b])
+sdf3 = model_summary(m1_1s, [:lp__, :a, :b])
+
+# ╔═╡ 29c2e746-a79d-4bef-84d2-2f2172807185
+sdf3[:a, :r_hat]
 
 # ╔═╡ 6ac30593-ce04-4295-af51-2c094596c61e
-sdf3b = model_summary(m1_1s, ["lp__", "a", "b"])
+sdf4 = model_summary(m1_1s, ["lp__", "a", "b"])
 
-# ╔═╡ 01a11658-5678-49fc-8462-f823c8b21fbc
-sdf4 = model_summary(m1_1s, [:lp__, :divergent__, :a, :b]; round_estimates=false)
+# ╔═╡ d7c7f194-2a2b-4150-824c-dca609c5c692
+sdf4["lp__", "std"]
 
-# ╔═╡ 69024eb9-0681-4229-84b8-e28178de68b3
-sdf5 = model_summary(m1_1s, [:lp__, :divergent__, :a, :b])
-
-# ╔═╡ f0fb807a-470f-4279-b77f-516af6fc420b
-md" ### Grouped DataFrames."
-
-# ╔═╡ cd6021e3-6f29-464d-b778-5030ad6bf11e
-gpdf=groupby(post1_1s_df, :chain)
-
-# ╔═╡ 4cbfa904-adea-4e4e-8a1a-adcdaf61e63d
-gpdf[1]
-
-# ╔═╡ e0c715b6-ad06-49fb-b2d1-4b11bf9df63f
-gpdf[[(chain=1,), (chain=3,)]]
-
-# ╔═╡ e2d113fe-18cf-4f77-8d0f-6983a444fc07
-combine(gpdf, valuecols(gpdf) .=> mean)
-
-# ╔═╡ 2a1c72ff-b15c-4fdb-ae86-28d9d067b8f4
-combine(gpdf, valuecols(gpdf) .=> mad)
+# ╔═╡ 31b47c0f-fd45-4a40-a57c-43cfbfe6d721
+md" ###### I use Strings if parameters are Vectors, otherwise I prefer Symbols."
 
 # ╔═╡ Cell order:
 # ╟─2580c05d-0b53-44d4-a137-45354270e899
@@ -485,13 +474,13 @@ combine(gpdf, valuecols(gpdf) .=> mad)
 # ╠═06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
 # ╠═df07541f-13ec-4192-acde-82c02ab6bcf6
 # ╠═f11b4bdc-3ad4-467d-b75c-37da5e9dcb2c
-# ╠═14a5dddc-9280-48d5-864a-58b7453775e1
+# ╠═db6a5dab-a738-42d3-a97a-4ca60894b9ca
+# ╠═9e471ad3-6c48-4f8a-b204-4ee864837898
 # ╠═10395123-f9c9-441d-a497-cb7be9fa7b18
 # ╠═1786b700-0d99-4541-87d4-b6308a2331bc
 # ╟─261c1e49-13be-4950-b211-29c35e0da5e8
 # ╠═274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
 # ╠═953eea61-f05f-4233-86aa-d5af3b47b41e
-# ╠═a95062e7-ede7-4be9-8feb-b8de4a999901
 # ╠═77a2a293-e48f-46b5-a104-003772d8a922
 # ╠═9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
 # ╠═9842ce96-98f9-4a87-9208-d32d16418c15
@@ -503,10 +492,12 @@ combine(gpdf, valuecols(gpdf) .=> mad)
 # ╠═5efb6ee3-8f20-42e3-a8af-cbfbb9acd075
 # ╠═750a66c1-47bc-466c-a7f1-567640e2e2bb
 # ╟─95cdfe9f-a06f-49f3-888f-34e47025c810
-# ╠═063c9089-fc58-4038-9fe8-ce9b90b1a843
-# ╠═f544db54-86e2-4694-9cac-fc42e2c00e50
 # ╟─10b925db-5f9c-4603-b49a-bd9b9a2e64d0
 # ╠═14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
+# ╠═f1041467-bd19-4ef5-9359-98e38d272142
+# ╠═42bfca0d-cf71-4064-bbd6-1466c1267d9a
+# ╟─a8278cde-4b35-4807-bc06-f522b1f8c49d
+# ╠═f544db54-86e2-4694-9cac-fc42e2c00e50
 # ╟─f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
 # ╠═1f44495d-50cf-4e92-97b2-d19a82c46c78
 # ╠═a72ca80f-b42e-4638-8ffd-f23dc70c7bc0
@@ -520,17 +511,12 @@ combine(gpdf, valuecols(gpdf) .=> mad)
 # ╠═45a307ad-4f6a-4cb6-9182-bda870c42679
 # ╟─8a04158e-a24d-477f-9cf8-30f062ec29bb
 # ╠═a3277285-5acb-4117-a567-67fdfd2cd4ba
-# ╟─4abb28cb-8a1f-4680-b39e-ee4166d52d43
+# ╟─28640925-0d67-4f07-8ac3-eb4e4960380d
+# ╠═fef949ca-ba53-407c-81db-14aa48e0706c
 # ╠═bd15d29b-552e-4f62-bb55-c57dca312b5b
-# ╠═13d53efa-c7fe-4841-b90a-e0c486a6addc
 # ╠═8703f610-71db-46fa-ad6b-d51ccd7b4ff2
 # ╠═2d1c65ed-f3e4-42fd-bf3f-f89efc543888
+# ╠═29c2e746-a79d-4bef-84d2-2f2172807185
 # ╠═6ac30593-ce04-4295-af51-2c094596c61e
-# ╠═01a11658-5678-49fc-8462-f823c8b21fbc
-# ╠═69024eb9-0681-4229-84b8-e28178de68b3
-# ╟─f0fb807a-470f-4279-b77f-516af6fc420b
-# ╠═cd6021e3-6f29-464d-b778-5030ad6bf11e
-# ╠═4cbfa904-adea-4e4e-8a1a-adcdaf61e63d
-# ╠═e0c715b6-ad06-49fb-b2d1-4b11bf9df63f
-# ╠═e2d113fe-18cf-4f77-8d0f-6983a444fc07
-# ╠═2a1c72ff-b15c-4fdb-ae86-28d9d067b8f4
+# ╠═d7c7f194-2a2b-4150-824c-dca609c5c692
+# ╟─31b47c0f-fd45-4a40-a57c-43cfbfe6d721

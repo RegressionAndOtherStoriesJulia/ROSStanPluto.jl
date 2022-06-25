@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.8
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -24,7 +24,7 @@ begin
 end
 
 # ╔═╡ 6d0bb5ac-efc0-445a-aded-ec69fee95019
-md"### Chapter 4 in Regression and Other Stories."
+md"### See chapter 4 in Regression and Other Stories."
 
 # ╔═╡ c0658351-3395-46a4-b711-98fd5988893f
 md" ###### Widen the notebook."
@@ -89,20 +89,17 @@ model {
 }";
 
 # ╔═╡ 4b8268e2-9665-402e-b60d-e1465f39e417
-begin
+let
 	data = (N = length(x), x = x, y = y)
-	m4_1s = SampleModel("m4.1s", stan4_1)
-	rc4_1s = stan_sample(m4_1s; data)
-end;
-
-# ╔═╡ 13723997-3932-4aaa-b718-7fb336be72ac
-if success(rc4_1s)
-	ms4_1s = model_summary(m4_1s, [:a, :b, :sigma])
+	global m4_1s = SampleModel("m4.1s", stan4_1)
+	global rc4_1s = stan_sample(m4_1s; data)
+	success(rc4_1s) && model_summary(m4_1s)
 end
 
 # ╔═╡ acafb529-bda5-4814-a56d-5445894a2f19
 if success(rc4_1s)
 	post4_1s = read_samples(m4_1s, :dataframe)
+	ms4_1s = model_summary(post4_1s, [:a, :b, :sigma])
 end
 
 # ╔═╡ 4fd36f4b-28d1-47f2-a803-f8727e078484
@@ -122,10 +119,10 @@ let
 	f = Figure()
 	ax = Axis(f[1, 1]; title="Linear regression")
 	scatter!(x, y)
-	lines!(x, ms4_1s[:a, "mean"] .+ ms4_1s[:b, "mean"] .* x; color=:darkred)
-	mean_a = round(ms4_1s[:a, "mean"]; digits=2)
-	mean_b = round(ms4_1s[:b, "mean"]; digits=2)
-	mean_σ = round(ms4_1s[:sigma, "mean"]; digits=2)
+	lines!(x, ms4_1s[:a, :mean] .+ ms4_1s[:b, :mean] .* x; color=:darkred)
+	mean_a = round(ms4_1s[:a, :mean]; digits=2)
+	mean_b = round(ms4_1s[:b, :mean]; digits=2)
+	mean_σ = round(ms4_1s[:sigma, :mean]; digits=2)
 	annotations!("y = $(mean_a) + $(mean_b) * x + $(mean_σ)", position=(0, -2), textsize=20)
 	current_figure()
 end
@@ -137,8 +134,8 @@ md" #### 4.2 Estimates, standard errors, and confidence intervals."
 let
 	f = Figure()
 	ax = Axis(f[1, 1]; title="Sampling distribution of b (revisited)")
-	b̂ = ms4_1s[:b, "mean"]
-	σ̂ = ms4_1s[:b, "std"]
+	b̂ = ms4_1s[:b, :mean]
+	σ̂ = ms4_1s[:b, :std]
 	x = LinRange(b̂ - 4σ̂ , b̂ + 4σ̂, 100)
 	y = pdf.(Normal(b̂, σ̂), x)
 	ylims!(ax, [0, maximum(y) + 1.0])
@@ -215,6 +212,21 @@ begin
 	f
 end
 
+# ╔═╡ 769e98f4-f771-4084-9805-c93eaf95f934
+md" ### 4.3 Bias and unmodeled uncertaincy."
+
+# ╔═╡ b810964a-deb9-41fd-963e-7e6b21005417
+md" ### 4.4 Statistical significance, hypothesis testing, and statistical erros."
+
+# ╔═╡ a6d4b0bd-acf2-45af-90c9-36c330439179
+md" ### 4.5 Problems with the concept of statistical significance."
+
+# ╔═╡ e96d3afa-6a33-49a4-bd11-8d4a248d4fe5
+md" ### 4.6 Example of hypothesis testing: 55,000 residents need your help!"
+
+# ╔═╡ 6f35948d-963c-43ce-85d2-9450b4416093
+md" ### 4.7 Moving beyond hypothesis testing."
+
 # ╔═╡ Cell order:
 # ╟─6d0bb5ac-efc0-445a-aded-ec69fee95019
 # ╟─c0658351-3395-46a4-b711-98fd5988893f
@@ -227,7 +239,6 @@ end
 # ╠═ac86e192-f1f1-4722-85a6-89d95a8f7265
 # ╠═7301c69b-815c-4b77-83e6-ea561a1364a5
 # ╠═4b8268e2-9665-402e-b60d-e1465f39e417
-# ╠═13723997-3932-4aaa-b718-7fb336be72ac
 # ╠═acafb529-bda5-4814-a56d-5445894a2f19
 # ╠═4fd36f4b-28d1-47f2-a803-f8727e078484
 # ╠═bb7a65ba-0003-4d5c-abe1-19e6f6820f06
@@ -238,3 +249,8 @@ end
 # ╠═3d2b0416-8510-463d-9ed0-a598085d9918
 # ╠═4be6f3e8-1391-4f3a-9b13-0f8537b92a34
 # ╠═886c48b5-c6ee-4a2e-b156-ba33217cc39d
+# ╟─769e98f4-f771-4084-9805-c93eaf95f934
+# ╟─b810964a-deb9-41fd-963e-7e6b21005417
+# ╟─a6d4b0bd-acf2-45af-90c9-36c330439179
+# ╟─e96d3afa-6a33-49a4-bd11-8d4a248d4fe5
+# ╟─6f35948d-963c-43ce-85d2-9450b4416093

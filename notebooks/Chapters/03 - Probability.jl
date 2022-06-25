@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.8
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -144,14 +144,18 @@ model {
 }";
 
 # ╔═╡ 595ce51e-a3ae-4ea2-8dbe-9fd14bc7e153
-begin
+# ╠═╡ show_logs = false
+let
 	data = (N = length(metabolic.body_mass), m = metabolic.body_mass, r = metabolic.rate)
-	m3_1s = SampleModel("m3.1s", stan3_1)
-	rc3_1s = stan_sample(m3_1s; data)
-	if success(rc3_1s)
-		ms = model_summary(m3_1s, [:a, :b, :sigma])
-	end
-	ms
+	global m3_1s = SampleModel("m3.1s", stan3_1)
+	global rc3_1s = stan_sample(m3_1s; data)
+	success(rc3_1s) && model_summary(m3_1s)
+end
+
+# ╔═╡ f160e9a6-08e6-4163-960b-0380a598d9dc
+if success(rc3_1s)
+	post3_1s = read_samples(m3_1s, :dataframe)
+	ms3_1s = model_summary(post3_1s, [:a, :b, :sigma])
 end
 
 # ╔═╡ 5a34151a-9bdd-4401-9dba-71be5bda01ba
@@ -167,7 +171,7 @@ let
 		xlabel="log(body mass [kg])", ylabel="log(metobolic rate [W])")
 	x = LinRange(minimum(metabolic.body_mass), maximum(metabolic.body_mass), 100)
 	scatter!(metabolic.body_mass, metabolic.rate)
-	lines!(x, ms[:a, "mean"] .+ ms[:b, "mean"] * x; color=:darkred)
+	lines!(x, ms3_1s[:a, :mean] .+ ms3_1s[:b, :mean] * x; color=:darkred)
 	current_figure()
 end
 
@@ -301,7 +305,7 @@ md" #### Binomial"
 # ╔═╡ 954d0dc5-e673-4cc1-8b8d-4ac3d21ce70d
 let
 	df = DataFrame(bv = rand(Binomial(20, 0.3), 1000))
-	model_summary(df)
+	model_summary(df, [:bv])
 end
 
 # ╔═╡ 45e693b1-06f1-4f2d-a835-8d0cedb8d998
@@ -346,6 +350,7 @@ md" ### 3.6 - Probability modeling"
 # ╠═4fffa589-79ee-48e5-9a2a-eba3bd361082
 # ╠═99eeda55-dcd3-46cf-bad1-4b7b65621139
 # ╠═595ce51e-a3ae-4ea2-8dbe-9fd14bc7e153
+# ╠═f160e9a6-08e6-4163-960b-0380a598d9dc
 # ╠═5a34151a-9bdd-4401-9dba-71be5bda01ba
 # ╠═af373f88-7500-4c82-adbb-b0eb55c51b74
 # ╠═b2b7e78f-3425-43cc-9795-d881667627cb
@@ -359,7 +364,7 @@ md" ### 3.6 - Probability modeling"
 # ╠═2271ca22-6d77-4d5c-b501-d8aa21abc66d
 # ╠═52e90f79-ae39-4446-a972-db84a7a1c351
 # ╠═356b24fb-d060-4914-8b2b-5bf3572d3f2b
-# ╠═381b7b38-4f06-4758-832f-83f561da1287
+# ╟─381b7b38-4f06-4758-832f-83f561da1287
 # ╠═5d77b830-5aec-40ab-8c7d-6800c6c635cd
 # ╟─34b8a308-1968-4742-8c3a-2d1296c8a12e
 # ╠═954d0dc5-e673-4cc1-8b8d-4ac3d21ce70d

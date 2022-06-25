@@ -15,6 +15,17 @@ These notebooks are intended to be used in conjunction with above book.
 
 The notebooks are by chapter with sections that follow [this](https://avehtari.github.io/ROS-Examples/examples.html#Examples_by_chapters) sequence.
 
+## Table of contents
+
+### Chapters
+
+1. [Introduction](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2001%20-%20Introduction.jl%20—%20Pluto.pdf)
+
+
+### Notebook maintenance
+
+### ROS playgrounds
+
 ## Personal note
 
 This project will take quite a while to complete, I expect at least a year.

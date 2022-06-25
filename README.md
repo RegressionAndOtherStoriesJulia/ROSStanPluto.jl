@@ -46,7 +46,7 @@ The notebooks are by chapter with sections that follow [this](https://avehtari.g
 1. [Stan playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.1%20Stan%20playground.jl%20—%20Pluto.pdf)
 2. [Chains playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.2%20Chains%20playground.jl%20—%20Pluto.pdf)
 3. [DataFrame playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.3%20DataFrame%20playground.jl%20—%20Pluto.pdf)
-4. [Nested dataframes](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.4%20Nested%20playdataframe.jl%20—%20Pluto.pdf)
+4. [Nested dataframes](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.4%20Nested%20dataframe.jl%20—%20Pluto.pdf)
 
 ## Personal note
 

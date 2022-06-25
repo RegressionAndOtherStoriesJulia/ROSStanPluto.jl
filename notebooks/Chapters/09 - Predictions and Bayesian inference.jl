@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.0
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -21,7 +21,7 @@ end
 md"### Bayesian information aggregation calculations."
 
 # ╔═╡ 17034ac2-d8da-40a4-a899-5c4e10877945
-md"##### See Chapter 9 in Regression and Other Stories."
+md"##### See chapter 9 in Regression and Other Stories."
 
 # ╔═╡ 32d7fdff-2e2e-485d-bab5-09d2358a446e
 md"##### Prior based on a previously-fitted model using economic and political condition."
@@ -84,7 +84,7 @@ end
 
 # ╔═╡ Cell order:
 # ╟─0391fc17-09b7-47d7-b799-6dc6de13e82b
-# ╟─17034ac2-d8da-40a4-a899-5c4e10877945
+# ╠═17034ac2-d8da-40a4-a899-5c4e10877945
 # ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
 # ╠═f71640c9-3918-475e-b32b-c85424bbcf5e
 # ╟─32d7fdff-2e2e-485d-bab5-09d2358a446e

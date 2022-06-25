@@ -19,23 +19,34 @@ The notebooks are by chapter with sections that follow [this](https://avehtari.g
 
 #### Chapters
 
-##### Part 1
+##### Part 1: Fundamentals
 
 1. [Introduction](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2001%20-%20Introduction.jl%20—%20Pluto.pdf)
-2. [Data and measurement](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2001%20-%20Data%20and%20measurement.jl%20—%20Pluto.pdf)
-3. [Some basic methods in mathematics and probability]()
-4. [Statistical inference]()
-5. [Simulation]()
+2. [Data and measurement](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2002%20-%20Data%20and%20Measurement.jl%20—%20Pluto.pdf)
+3. [Some basic methods in mathematics and probability](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2003%20-%20Probability.jl%20—%20Pluto.pdf)
+4. [Statistical inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2004%20-%20Statistical%20inference.jl%20—%20Pluto.pdf)
+5. [Simulation](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2005%20-%20Simulation.jl%20—%20Pluto.pdf)
 
-##### Part 2
+##### Part 2: Linear regression
 
-6. [Linear regression]()
+6. [Background on regression]()
 7. [Linear regression with a single predictor]()
 8. [Fitting regression models]()
+9. [Prediction and Bayesian inference]()
+10. [Linear regression with multiple predictors]()
 
 #### Notebook maintenance
 
+1. [ros_functions](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%20ros_functions.jl%20—%20Pluto.pdf)
+2. [ros_notebooks](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%20ros_notebooks.jl%20—%20Pluto.pdf)
+3. [template](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/notebooks/Notebook%20maintenance/template.jl)
+
 #### ROS playgrounds
+
+1. [Stan playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.1%20Stan%20playground.jl%20—%20Pluto.pdf)
+2. [Chains playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.1%20Chains%20playground.jl%20—%20Pluto.pdf)
+3. [DataFrame playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.1%20DataFrame%20playground.jl%20—%20Pluto.pdf)
+4. [Nested dataframes](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.1%20Nested%20playdataframe.jl%20—%20Pluto.pdf)
 
 ## Personal note
 

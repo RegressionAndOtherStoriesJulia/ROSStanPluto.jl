@@ -17,14 +17,25 @@ The notebooks are by chapter with sections that follow [this](https://avehtari.g
 
 ## Table of contents
 
-### Chapters
+#### Chapters
+
+##### Part 1
 
 1. [Introduction](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2001%20-%20Introduction.jl%20—%20Pluto.pdf)
+2. [Data and measurement](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2001%20-%20Data%20and%20measurement.jl%20—%20Pluto.pdf)
+3. [Some basic methods in mathematics and probability]()
+4. [Statistical inference]()
+5. [Simulation]()
 
+##### Part 2
 
-### Notebook maintenance
+6. [Linear regression]()
+7. [Linear regression with a single predictor]()
+8. [Fitting regression models]()
 
-### ROS playgrounds
+#### Notebook maintenance
+
+#### ROS playgrounds
 
 ## Personal note
 

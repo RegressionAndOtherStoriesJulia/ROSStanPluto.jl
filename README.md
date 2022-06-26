@@ -21,7 +21,7 @@ The notebooks are by chapter with sections that follow [this](https://avehtari.g
 
 ##### Part 1: Fundamentals
 
-1. [Introduction](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2001%20-%20Introduction.jl%20—%20Pluto.pdf)
+1. [Introduction](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/pdfs/%2001%20-%20Introduction.jl%20—%20Pluto.pdf)
 2. [Data and measurement](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2002%20-%20Data%20and%20Measurement.jl%20—%20Pluto.pdf)
 3. [Some basic methods in mathematics and probability](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2003%20-%20Probability.jl%20—%20Pluto.pdf)
 4. [Statistical inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%2004%20-%20Statistical%20inference.jl%20—%20Pluto.pdf)
@@ -43,7 +43,7 @@ The notebooks are by chapter with sections that follow [this](https://avehtari.g
 
 #### ROS playgrounds
 
-1. [Stan playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.1%20Stan%20playground.jl%20—%20Pluto.pdf)
+1. [Stan playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/0.1%20Stan%20playground.pdf)
 2. [Chains playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.2%20Chains%20playground.jl%20—%20Pluto.pdf)
 3. [DataFrame playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.3%20DataFrame%20playground.jl%20—%20Pluto.pdf)
 4. [Nested dataframes](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPlutoPdfs/blob/main/pdfs/🎈%200.4%20Nested%20dataframe.jl%20—%20Pluto.pdf)

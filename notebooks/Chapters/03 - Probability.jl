@@ -8,6 +8,7 @@ using InteractiveUtils
 using Pkg, DrWatson
 
 # ╔═╡ 44233635-6129-4ccd-8bad-bbafa5287112
+# ╠═╡ show_logs = false
 begin
 	# Specific to this notebook
     using GLM
@@ -24,7 +25,7 @@ begin
 end
 
 # ╔═╡ c87e36ac-2f7b-474c-9ad6-72c65f4d8e21
-md" ## Chapter 3: Some basic methods in mathematics and probability."
+md" ## See chapter 3 in Regression and Other Stories."
 
 # ╔═╡ 1b86b8b4-6892-4f41-ab89-fa3d1b3b7c0a
 md" #### Widen the notebook"
@@ -331,7 +332,7 @@ md" ### 3.6 - Probability modeling"
 1 / (1000pdf(Normal(0.49, 0.04), 0.5) / 200000)
 
 # ╔═╡ Cell order:
-# ╟─c87e36ac-2f7b-474c-9ad6-72c65f4d8e21
+# ╠═c87e36ac-2f7b-474c-9ad6-72c65f4d8e21
 # ╟─1b86b8b4-6892-4f41-ab89-fa3d1b3b7c0a
 # ╠═e6974166-80e9-4903-b4bd-3f4cc3651823
 # ╠═3ec83660-c767-49a4-ab27-923ea3443c98

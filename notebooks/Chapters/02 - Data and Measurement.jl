@@ -24,7 +24,7 @@ begin
 end
 
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"#### See chapter 2 in Regression and Other Stories."
+md"## See chapter 2 in Regression and Other Stories."
 
 # ╔═╡ d7543b63-52d3-449b-8ce3-d979c23f8b95
 md" ###### Widen the notebook."

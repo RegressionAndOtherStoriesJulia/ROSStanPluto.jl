@@ -1,4 +1,4 @@
-md"#### See Chapter 6 in Regression and Other Stories."
+md"#### See chapter 6 in Regression and Other Stories."
 
 
 md" ##### Widen the notebook."

@@ -25,7 +25,7 @@ begin
 end
 
 # ╔═╡ f39782c5-a0d0-4546-9e0d-bd0ff6eeaa95
-md"#### See chapter 7 in Regression and Other Stories."
+md"## See chapter 7 in Regression and Other Stories."
 
 # ╔═╡ 92ce35e9-ac0a-4f56-a4f8-0649545f4fcf
 md" ##### Widen the notebook."
@@ -136,13 +136,13 @@ md"
 Sometimes I hide or show the output logs. To show them, click on the little circle with 3 dots visible in the top right of the input cell if the cursor is in there. Try it!"
 
 # ╔═╡ 527228aa-3276-47b1-b820-9f7e7be99837
-post7_1s = success(rc7_1s) && read_samples(m7_1s, :dataframe)
+ if success(rc7_1s)
+	 post7_1s = success(rc7_1s) && read_samples(m7_1s, :dataframe)
+	 ms7_1s = model_summary(post7_1s, [:a, :b, :sigma])
+ end
 
 # ╔═╡ 85766eab-6a2e-488f-a3a7-294465bd81c8
 trankplot(post7_1s, "b")
-
-# ╔═╡ 17cbe671-4c70-49f4-8f80-08218bd9978a
-ms7_1s = success(rc7_1s) && model_summary(post7_1s, [:a, :b, :sigma])
 
 # ╔═╡ 50ce2c67-6b33-4c22-afdc-0459154bd64e
 let
@@ -399,6 +399,7 @@ let
 	hlines!(ax, [ȳ₀, ȳ₁]; color=:lightgrey)
 	annotations!("ȳ₀ = $(round(ȳ₀, digits=1))", position=(0.05, 2.4), textsize=15)
 	annotations!("ȳ₁ = $(round(ȳ₁, digits=1))", position=(0.9, 8.2), textsize=15)
+	annotations!("y = $(round(â, digits=1)) + $(round(b̂, digits=1)) * x", position=(0.43, 4.4), textsize=15)
 	f
 end
 
@@ -423,7 +424,6 @@ end
 # ╟─28f6f692-65a1-4b97-825b-62ba6d734244
 # ╠═527228aa-3276-47b1-b820-9f7e7be99837
 # ╠═85766eab-6a2e-488f-a3a7-294465bd81c8
-# ╠═17cbe671-4c70-49f4-8f80-08218bd9978a
 # ╠═50ce2c67-6b33-4c22-afdc-0459154bd64e
 # ╠═2559d7d6-400c-44ed-afd6-6572ce50ac44
 # ╠═cae9dea3-010e-48f9-b45f-1230b4456031

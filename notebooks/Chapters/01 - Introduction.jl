@@ -26,7 +26,7 @@ begin
 end
 
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"#### See chapter 1 in Regression and Other Stories."
+md"## See chapter 1 in Regression and Other Stories."
 
 # ╔═╡ cf39df58-3371-4535-88e4-f3f6c0404500
 md" ###### Widen the cells."
@@ -496,13 +496,11 @@ end
 # ╔═╡ 9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
 if success(rc1_4_2s)
 	post1_4_2s = read_samples(m1_4_2s, :dataframe)
+	ms1_4_2s = model_summary(post1_4_2s, ["a.1", "a.2", "b", "b_exp", "sigma.1", "sigma.2"])
 end
 
 # ╔═╡ 67f0dd34-459f-4eb7-bfbd-eb794a375127
 nd1_4_2s = read_samples(m1_4_2s, :nesteddataframe)
-
-# ╔═╡ d2606260-d82f-43ba-9dc0-63b916421440
-ms1_4_2s = model_summary(post1_4_2s, ["a.1", "a.2", "b", "b_exp", "sigma.1", "sigma.2"])
 
 # ╔═╡ eaed7d4a-f897-4008-ba9e-c61353c28410
 â₁, â₂, b̂, b̂ₑₓₚ, σ̂₁, σ̂₂ = ms1_4_2s[:, "median"];
@@ -660,6 +658,18 @@ let
 	current_figure()
 end
 
+# ╔═╡ b518fea5-298c-46f0-a749-4238ba2af17f
+lnk1_5s = link(post1_5s, (r, l) -> r.a + r.b + r.c * l, [5, 10,12])
+
+# ╔═╡ 7434c4d4-b398-41c3-ab52-1b1b8a4b4f72
+median.(lnk1_5s)
+
+# ╔═╡ 07ea7258-f35d-439a-9c20-71e4b95df808
+mad.(lnk1_5s)
+
+# ╔═╡ b413c2d6-dc44-4437-8123-ee7793863387
+mean.(link(post1_5s, (r, l) -> r.a + r.b + r.c * l, [5, 10,12]))
+
 # ╔═╡ 7200f437-e573-42f0-9bd0-246d51373647
 read_samples(m1_5s, :nesteddataframe)
 
@@ -743,7 +753,6 @@ read_samples(m1_5s, :nesteddataframe)
 # ╠═615aa9cb-e138-4ef5-917a-ceb3ab6235c1
 # ╠═9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
 # ╠═67f0dd34-459f-4eb7-bfbd-eb794a375127
-# ╠═d2606260-d82f-43ba-9dc0-63b916421440
 # ╠═eaed7d4a-f897-4008-ba9e-c61353c28410
 # ╠═10e61721-da24-444e-b668-a910d4faff8a
 # ╠═a772d1be-e8b8-40bb-be95-1ed053dc67de
@@ -766,4 +775,8 @@ read_samples(m1_5s, :nesteddataframe)
 # ╠═f7ba1202-2fe8-4289-8905-96e9849a513d
 # ╠═50588b61-75b1-42b6-9870-43641811d0ad
 # ╠═790839f9-0b49-4da2-8dc1-00bab883e3af
+# ╠═b518fea5-298c-46f0-a749-4238ba2af17f
+# ╠═7434c4d4-b398-41c3-ab52-1b1b8a4b4f72
+# ╠═07ea7258-f35d-439a-9c20-71e4b95df808
+# ╠═b413c2d6-dc44-4437-8123-ee7793863387
 # ╠═7200f437-e573-42f0-9bd0-246d51373647

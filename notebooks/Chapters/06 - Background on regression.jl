@@ -54,11 +54,11 @@ md"### 6.2 Fitting a simple regression to fake data."
 # ╔═╡ 30832e8b-0642-447b-b281-207d7c4d73f4
 let
 	n = 20
-	x = 1:n
+	x = LinRange(1, n, 20)
 	a = 0.2
 	b = 0.3
 	sigma = 0.5
-	y = a .+ b .* x .+ sigma .* rand(Normal(), n)
+	y = a .+ b .* x .+ rand(Normal(0, sigma), n)
 	global fake = DataFrame(x=x, y=y)
 end
 
@@ -76,9 +76,9 @@ parameters {
 }
 model {
 	vector[N] mu;
-	a ~ normal(0, 1);
-	b ~ normal(0, 1);
-	sigma ~ exponential(1);
+	a ~ uniform(-2, 2);
+	b ~ uniform(-2, 2);
+	sigma ~ uniform(0, 10);
 	mu = a + b * x;
 	y ~ normal(mu, sigma);
 }";
@@ -121,11 +121,8 @@ let
 	current_figure()
 end
 
-# ╔═╡ b545d750-789f-470b-badc-33a486cbcb77
-ms6_1s[:, 1:2]
-
 # ╔═╡ 9a2ec98b-6f45-4bc2-8ac0-5d6337cfb644
-hcat(Array(ms6_1s[:, 1:2]), [0.2, 0.3, 0.5])
+DataFrame(parameters = Symbol.(names(post6_1s)), simulated = [0.2, 0.3, 0.5], median = ms6_1s[:, :median], mad_sd = ms6_1s[:, :mad_sd])
 
 # ╔═╡ bc877661-9aa0-425d-88e0-b82239c2552c
 md" ### 6.3 Interpret coefficients as comparisons, not effects."
@@ -166,7 +163,7 @@ let
 	global m6_2s = SampleModel("m6_2s", stan6_2)
 	global rc6_2s = stan_sample(m6_2s; data)
 	success(rc6_2s) && model_summary(m6_2s)
-end;
+end
 
 # ╔═╡ f43ce0c2-a77f-4230-af27-85f46d3f10b7
 if success(rc6_2s)
@@ -204,11 +201,61 @@ end
 # ╔═╡ ec3f566f-278c-4342-a365-db379b7d54aa
 R2 = 1 - ms6_2s[:sigma, :mean]^2 / std(earnings.earnk)^2
 
+# ╔═╡ f5563ff5-1468-4719-aca6-d84c75b9a596
+stan6_3 = "
+data {
+	int N;
+	vector[N] m_height;
+	vector[N] d_height;
+}
+parameters {
+	real a;
+	real b;
+	real<lower=0> sigma;
+}
+model {
+	vector[N] mu;
+	sigma ~ exponential(1);
+	mu = a + b * m_height;
+	d_height ~ normal(mu, sigma);
+}";
+
+# ╔═╡ db99f612-77b4-4639-892b-389a20c0ae83
+heights = CSV.read(ros_datadir("PearsonLee", "heights.csv"), DataFrame)
+
+# ╔═╡ 3288eba1-8ffa-45c2-951b-b4c9cf6fdf02
+let
+	data = (N=nrow(heights), m_height=heights.mother_height, d_height=heights.daughter_height)
+	global m6_3s = SampleModel("m6_3s", stan6_3)
+	global rc6_3s = stan_sample(m6_3s; data)
+	success(rc6_3s) && model_summary(m6_3s)
+end
+
+# ╔═╡ f549f068-87e5-485d-bb9f-58d1cc2e15f4
+if success(rc6_3s)
+	post6_3s = read_samples(m6_3s, :dataframe)
+	ms6_3s = model_summary(post6_3s, [:a, :b, :sigma])
+end
+
+# ╔═╡ 1c5c9353-90d0-4637-b73a-ea510d38a0a9
+function jitter(x, j=0.5)
+	x + rand(Uniform(-j, j))
+end
+
+# ╔═╡ 1e38322c-821f-45a5-aad9-d4c114ae37b7
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Mothers' and daugthers' heights")
+	xlims!(ax, 51, 74)
+	scatter!(jitter.(heights.mother_height), jitter.(heights.daughter_height); markersize=3)
+	x_range = LinRange(51, 74, 100)
+	lines!(x_range, mean.(link(post6_3s, (r, x) -> r.a + r.b * x, x_range)); color=:darkred)
+	scatter!([mean(heights.mother_height)], [mean(heights.daughter_height)]; markersize=20)
+	f
+end
+
 # ╔═╡ c752672e-56de-4498-a85d-e3dffdc254d6
 md" ### 6.4 Historical origins of regression."
-
-# ╔═╡ b8bc2ebf-681b-4dc6-bebd-bd8dde7f1d7f
-heights = CSV.read(ros_datadir("PearsonLee", "heights.csv"), DataFrame)
 
 # ╔═╡ 444766e8-86b9-496b-8b11-979b08fa842e
 let
@@ -286,6 +333,9 @@ plot_chains(post6_4s, [:a, :b, :sigma])
 
 # ╔═╡ aa015e5a-88ca-4699-8f39-d0c54d8679e5
 trankplot(post6_4s, "b")
+
+# ╔═╡ 2bd08619-ccd4-4ade-8d40-955c5fcd3fc2
+md" ###### Above trankplot and the low `ess` numbers a couple of cells earlier do not look healthy."
 
 # ╔═╡ 4c04253e-cb54-4f46-817e-af76053eef16
 md" ### 6.5 The paradox of regression to the mean."
@@ -385,7 +435,6 @@ end;
 # ╠═1656a64f-324d-48c4-b8b2-d6e6a81de9c5
 # ╠═1cd81462-2ed3-4b23-90c6-fdb4e3a6f143
 # ╠═08be202b-f618-4a7f-a48a-5618b19495f5
-# ╠═b545d750-789f-470b-badc-33a486cbcb77
 # ╠═9a2ec98b-6f45-4bc2-8ac0-5d6337cfb644
 # ╟─bc877661-9aa0-425d-88e0-b82239c2552c
 # ╠═6e6c65b3-f7ad-4a7f-91fd-f065e7bd7ffe
@@ -396,7 +445,12 @@ end;
 # ╠═9727012b-1b76-4cde-84ef-bdd7bfa4b025
 # ╠═ec3f566f-278c-4342-a365-db379b7d54aa
 # ╟─c752672e-56de-4498-a85d-e3dffdc254d6
-# ╠═b8bc2ebf-681b-4dc6-bebd-bd8dde7f1d7f
+# ╠═f5563ff5-1468-4719-aca6-d84c75b9a596
+# ╠═db99f612-77b4-4639-892b-389a20c0ae83
+# ╠═3288eba1-8ffa-45c2-951b-b4c9cf6fdf02
+# ╠═f549f068-87e5-485d-bb9f-58d1cc2e15f4
+# ╠═1c5c9353-90d0-4637-b73a-ea510d38a0a9
+# ╠═1e38322c-821f-45a5-aad9-d4c114ae37b7
 # ╠═444766e8-86b9-496b-8b11-979b08fa842e
 # ╠═ae86b798-1d42-4bf0-8bde-7d4c922a48fd
 # ╠═3ffe7a75-ebd5-4194-ab15-e7827ced581d
@@ -404,6 +458,7 @@ end;
 # ╠═4beb91af-f91a-490b-b701-2637c90d1d57
 # ╠═1a132ed9-3ff5-42d2-bb63-642958abc5ce
 # ╠═aa015e5a-88ca-4699-8f39-d0c54d8679e5
+# ╟─2bd08619-ccd4-4ade-8d40-955c5fcd3fc2
 # ╟─4c04253e-cb54-4f46-817e-af76053eef16
 # ╠═aee6f37f-2a8a-451b-96e4-ec4eeb852b20
 # ╠═f8c21752-1dc5-4a41-90d6-796b83d80848

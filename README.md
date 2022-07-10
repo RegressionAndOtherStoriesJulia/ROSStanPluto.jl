@@ -13,7 +13,7 @@ This project will contain (work is in very early stages of progress!!!) a set of
 
 These notebooks are intended to be used in conjunction with above book.
 
-The notebooks are by chapter with sections that follow [this](https://avehtari.github.io/ROS-Examples/examples.html#Examples_by_chapters) sequence.
+Each notebook contains a chapter. 
 
 ## Personal note
 
@@ -27,7 +27,7 @@ To complete below steps and run the notebooks you need:
 
 1. A functioning [cmdstan](https://mc-stan.org/users/interfaces/cmdstan.html).
 2. A functioning [Julia](https://julialang.org/downloads/).
-3. A Julia base environment containing `Pkg` and `Pluto`.
+3. A minimal Julia base environment containing `Pkg` and `Pluto`.
 
 ## Setup the Pluto based ROSStanPluto notebooks
 
@@ -52,4 +52,4 @@ A Pluto page should open in a browser. See [this page](https://www.juliafordatas
 
 ## Usage
 
-Select a chapter in the `open a file` entry box, e.g. type `./` and select a chapter. Type '/' after selecting a chapter to see the notebooks in the chapter. Select the notebook and press `open`..
+Select the `open a file` entry box and select `chapters`. Select a chapter notebook and press `open`.

@@ -150,7 +150,7 @@ let
 	data = (N = length(metabolic.body_mass), m = metabolic.body_mass, r = metabolic.rate)
 	global m3_1s = SampleModel("m3.1s", stan3_1)
 	global rc3_1s = stan_sample(m3_1s; data)
-	success(rc3_1s) && model_summary(m3_1s)
+	success(rc3_1s) && describe(m3_1s)
 end
 
 # ╔═╡ f160e9a6-08e6-4163-960b-0380a598d9dc
@@ -172,7 +172,7 @@ let
 		xlabel="log(body mass [kg])", ylabel="log(metobolic rate [W])")
 	x = LinRange(minimum(metabolic.body_mass), maximum(metabolic.body_mass), 100)
 	scatter!(metabolic.body_mass, metabolic.rate)
-	lines!(x, ms3_1s[:a, :mean] .+ ms3_1s[:b, :mean] * x; color=:darkred)
+	lines!(x, ms3_1s(:a, :mean) .+ ms3_1s(:b, :mean) * x; color=:darkred)
 	current_figure()
 end
 
@@ -347,7 +347,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -1394,9 +1394,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1839,7 +1839,7 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═c87e36ac-2f7b-474c-9ad6-72c65f4d8e21
+# ╟─c87e36ac-2f7b-474c-9ad6-72c65f4d8e21
 # ╟─1b86b8b4-6892-4f41-ab89-fa3d1b3b7c0a
 # ╠═e6974166-80e9-4903-b4bd-3f4cc3651823
 # ╠═3ec83660-c767-49a4-ab27-923ea3443c98

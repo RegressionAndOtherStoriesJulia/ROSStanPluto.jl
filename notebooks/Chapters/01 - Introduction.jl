@@ -375,7 +375,7 @@ let
 	data = (N = n, x = x, x_binary = x_binary, y = y)
 	global m1_4_1s = SampleModel("m1_4_1s", stan1_4_1);
 	global rc1_4_1s = stan_sample(m1_4_1s; data)
-	success(rc1_4_1s) && model_summary(m1_4_1s)
+	success(rc1_4_1s) && describe(m1_4_1s)
 end
 
 # ╔═╡ adb8c432-07ef-4844-a75f-c48dffc8746f
@@ -402,23 +402,11 @@ md" ###### With vector parameters `read_samples()` can create a nested DataFrame
 # ╔═╡ 057a873c-53f9-488a-afde-4444d1ee8f72
 nd1_4_1s = read_samples(m1_4_1s, :nesteddataframe)
 
-# ╔═╡ c7396fad-aaa7-4fe6-8cb8-403f0b8e52c3
-md" ###### With vectored parameters, I prefer to not to use Symbols for the parameters but Strings:"
-
-# ╔═╡ 896c63c5-2d8a-4f9d-bad0-068352533dff
-success(rc1_4_1s) && model_summary(post1_4_1s, Symbol.(names(post1_4_1s)))
-
 # ╔═╡ 7798b760-eeab-406a-820e-bf1019395a12
 ms1_4_1s = success(rc1_4_1s) && model_summary(post1_4_1s, names(post1_4_1s))
 
-# ╔═╡ 67817631-aa7b-4976-9b50-890e5e87d28f
-md"
-!!! note
-
-By default, in the latter case, both the parameters and the column headers are now of type `String`:"
-
 # ╔═╡ 3cb3dc1f-ed9d-47d4-844b-feb5166561dc
-ms1_4_1s["b.2", "mad_sd"]
+ms1_4_1s("b.2", "mad_sd")
 
 # ╔═╡ 21cd68c8-4e6b-4030-a42d-f9d14abd60ce
 md" ###### Nested dataframes are handy to obtain a matrix of say the b values:"
@@ -433,7 +421,7 @@ Array(post1_4_1s[:, ["b.1", "b.2"]])
 let
 	x1 = 1.0:0.01:5.0
 	f = Figure()
-	medians = ms1_4_1s[:, "median"]
+	medians = ms1_4_1s.df[:, "median"]
 	ax = Axis(f[1, 2], title = "Regression on continuous treatment",
 		xlabel = "Treatment level", ylabel = "Outcome")
 	sca1 = scatter!(x, y)
@@ -488,9 +476,7 @@ let
 	data = (N = n1, x = x1, y = y1)
 	global m1_4_2s = SampleModel("m1.4_2s", stan1_4_2);
 	global rc1_4_2s = stan_sample(m1_4_2s; data)
-	df = success(rc1_4_2s) && model_summary(m1_4_2s)
-	df.parameters = string.(df.parameters)
-	df
+	success(rc1_4_2s) && describe(m1_4_2s)
 end
 
 # ╔═╡ 9d1a2f40-e10b-47bc-b5db-5bd8ba6f66e3
@@ -503,7 +489,7 @@ end
 nd1_4_2s = read_samples(m1_4_2s, :nesteddataframe)
 
 # ╔═╡ eaed7d4a-f897-4008-ba9e-c61353c28410
-â₁, â₂, b̂, b̂ₑₓₚ, σ̂₁, σ̂₂ = ms1_4_2s[:, "median"];
+â₁, â₂, b̂, b̂ₑₓₚ, σ̂₁, σ̂₂ = [ms1_4_2s(p, "median") for p in ["a.1", "a.2", "b", "b_exp", "sigma.1", "sigma.2"]];
 
 # ╔═╡ 10e61721-da24-444e-b668-a910d4faff8a
 â₂
@@ -621,17 +607,14 @@ let
 	data = (N = nrow(helis), y = helis.time_sec, w = helis.width_cm, l = helis.length_cm)
 	global m1_5s = SampleModel("m1.5s", stan1_5);
 	global rc1_5s = stan_sample(m1_5s; data)
-	success(rc1_5s) && model_summary(m1_5s)
+	success(rc1_5s) && describe(m1_5s)
 end
 
 # ╔═╡ fbb2e703-fbff-4dd4-a58c-3b2f5b6f49e1
 if success(rc1_5s)
 	post1_5s = read_samples(m1_5s, :dataframe)
-	model_summary(post1_5s, [:a, :b, :c, :sigma])
+	model_summary(post1_5s, [:a, :b, :c, :sigma]; digits=4)
 end
-
-# ╔═╡ 3350621b-893b-40f3-90c7-fafad978e84b
-model_summary(m1_5s, names(post1_5s))
 
 # ╔═╡ f7ba1202-2fe8-4289-8905-96e9849a513d
 plot_chains(post1_5s, [:a, :b, :c])
@@ -691,7 +674,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -1778,9 +1761,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -2289,10 +2272,7 @@ version = "3.5.0+0"
 # ╠═942a32ff-1edd-4e84-a1fd-ace09d2b09ec
 # ╟─df2896d5-2820-4115-b8fa-bc10ed79f953
 # ╠═057a873c-53f9-488a-afde-4444d1ee8f72
-# ╟─c7396fad-aaa7-4fe6-8cb8-403f0b8e52c3
-# ╠═896c63c5-2d8a-4f9d-bad0-068352533dff
 # ╠═7798b760-eeab-406a-820e-bf1019395a12
-# ╟─67817631-aa7b-4976-9b50-890e5e87d28f
 # ╠═3cb3dc1f-ed9d-47d4-844b-feb5166561dc
 # ╟─21cd68c8-4e6b-4030-a42d-f9d14abd60ce
 # ╠═a76df572-cf7f-451a-84b0-5023b146da0e
@@ -2320,7 +2300,6 @@ version = "3.5.0+0"
 # ╠═82becf62-2701-4af6-87e6-4ee0a0c91eac
 # ╠═12588d28-10dc-4551-84f2-ecf82a09aef0
 # ╠═fbb2e703-fbff-4dd4-a58c-3b2f5b6f49e1
-# ╠═3350621b-893b-40f3-90c7-fafad978e84b
 # ╠═f7ba1202-2fe8-4289-8905-96e9849a513d
 # ╠═50588b61-75b1-42b6-9870-43641811d0ad
 # ╠═790839f9-0b49-4da2-8dc1-00bab883e3af

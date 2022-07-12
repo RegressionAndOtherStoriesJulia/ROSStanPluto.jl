@@ -126,7 +126,7 @@ let
 	data = (N=nrow(hibbs), vote=hibbs.vote, growth=hibbs.growth)
 	global m7_1s = SampleModel("hibbs", stan7_1)
 	global rc7_1s = stan_sample(m7_1s; data)
-	success(rc7_1s) && model_summary(m7_1s)
+	success(rc7_1s) && describe(m7_1s)
 end
 
 # ╔═╡ 28f6f692-65a1-4b97-825b-62ba6d734244
@@ -202,7 +202,7 @@ let
 	data = (N=nrow(fake), vote=fake.y, growth=fake.x)
 	global m7_2s = SampleModel("fake", stan7_1)
 	global rc7_2s = stan_sample(m7_2s; data)
-	success(rc7_2s) && model_summary(m7_2s)
+	success(rc7_2s) && describe(m7_2s)
 end
 
 # ╔═╡ cf4e7277-514a-4338-b1b3-203399627701
@@ -228,8 +228,8 @@ function sim(sm::SampleModel)
 	rc = stan_sample(sm; data)
 	post = read_samples(sm, :dataframe)
 	ms = model_summary(post, Symbol.([:a, :b, :sigma]))
-	b̂ = ms[:b, :mean] 
-	b_se = ms[:b, :std]
+	b̂ = ms(:b, :mean) 
+	b_se = ms(:b, :std)
 
 	(
 		b̂ = b̂, 
@@ -315,7 +315,7 @@ end
 begin
 	m7_3_0s = SampleModel("fake_0", stan7_3)
 	rc7_3_0s = stan_sample(m7_3_0s; data=data_0)
-	success(rc7_3_0s) && model_summary(m7_3_0s)
+	success(rc7_3_0s) && describe(m7_3_0s)
 end
 
 # ╔═╡ 1f1d9ff2-a5ed-4872-a47e-d3d0d1302e3e
@@ -323,7 +323,7 @@ end
 begin
 	m7_3_1s = SampleModel("fake_1", stan7_3)
 	rc7_3_1s = stan_sample(m7_3_1s; data=data_1)
-	success(rc7_3_1s) && model_summary(m7_3_1s)
+	success(rc7_3_1s) && describe(m7_3_1s)
 end
 
 # ╔═╡ a1799c25-90f3-48a5-857c-3931b76c920d
@@ -373,7 +373,7 @@ let
 	data = (N = n, x = x, y = y)
 	global m7_3_2s = SampleModel("fake_2", stan7_3_2)
 	global rc7_3_2s = stan_sample(m7_3_2s; data)
-	success(rc7_3_2s) && model_summary(m7_3_2s)
+	success(rc7_3_2s) && describe(m7_3_2s, [:a, :b, :sigma])
 end
 
 # ╔═╡ 8e4cb62d-8252-4203-a345-00fb8628d9bb
@@ -388,8 +388,8 @@ let
 	ax = Axis(f[1, 1]; title="Least-squares regression on an indicator is\nthe same as computing a difference in means",
 	xlabel="Indicator, x", ylabel="y")
 	x_range = LinRange(0, 1, 100)
-	â = sm7_3_2s[:a, :median]
-	b̂ = sm7_3_2s[:b, :median]
+	â = sm7_3_2s(:a, :median)
+	b̂ = sm7_3_2s(:b, :median)
 	y = â .+ b̂ .* x_range
 	lines!(x_range, y)
 	x = vcat(zeros(Int, n₀), ones(Int, n₁))
@@ -421,7 +421,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -765,10 +765,10 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.1"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "d8a578692e3077ac998b50c0217dfd67f21d1e5f"
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "ccd479984c7838684b3ac204b716c89955c76623"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "4.4.0+0"
+version = "4.4.2+0"
 
 [[deps.FFTW]]
 deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
@@ -1508,9 +1508,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1777,9 +1777,9 @@ version = "0.4.1"
 
 [[deps.VectorizationBase]]
 deps = ["ArrayInterface", "CPUSummary", "HostCPUFeatures", "IfElse", "LayoutPointers", "Libdl", "LinearAlgebra", "SIMDTypes", "Static"]
-git-tree-sha1 = "70b86ab24cf5321e51d1b6c22a7076106c979ccb"
+git-tree-sha1 = "953ba1475022a4de16439857a8f79831abf5fa30"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.21.41"
+version = "0.21.42"
 
 [[deps.WeakRefStrings]]
 deps = ["DataAPI", "InlineStrings", "Parsers"]
@@ -1893,6 +1893,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "51b5eeb3f98367157a7a12a1fb0aa5328946c03c"
 uuid = "9a68df92-36a6-505f-a73e-abb412b6bfb4"
 version = "0.2.3+0"
+
+[[deps.libaom_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "3a2ea60308f0996d26f1e5354e10c24e9ef905d4"
+uuid = "a4ae2306-e953-59d6-aa16-d00cac43593b"
+version = "3.4.0+0"
 
 [[deps.libass_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]

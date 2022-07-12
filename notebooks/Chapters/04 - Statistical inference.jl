@@ -93,7 +93,7 @@ let
 	data = (N = length(x), x = x, y = y)
 	global m4_1s = SampleModel("m4.1s", stan4_1)
 	global rc4_1s = stan_sample(m4_1s; data)
-	success(rc4_1s) && model_summary(m4_1s)
+	success(rc4_1s) && describe(m4_1s)
 end
 
 # ╔═╡ acafb529-bda5-4814-a56d-5445894a2f19
@@ -119,10 +119,10 @@ let
 	f = Figure()
 	ax = Axis(f[1, 1]; title="Linear regression")
 	scatter!(x, y)
-	lines!(x, ms4_1s[:a, :mean] .+ ms4_1s[:b, :mean] .* x; color=:darkred)
-	mean_a = round(ms4_1s[:a, :mean]; digits=2)
-	mean_b = round(ms4_1s[:b, :mean]; digits=2)
-	mean_σ = round(ms4_1s[:sigma, :mean]; digits=2)
+	lines!(x, ms4_1s(:a, :mean) .+ ms4_1s(:b, :mean) .* x; color=:darkred)
+	mean_a = round(ms4_1s(:a, :mean); digits=2)
+	mean_b = round(ms4_1s(:b, :mean); digits=2)
+	mean_σ = round(ms4_1s(:sigma, :mean); digits=2)
 	annotations!("y = $(mean_a) + $(mean_b) * x + $(mean_σ)", position=(0, -2), textsize=20)
 	current_figure()
 end
@@ -134,8 +134,8 @@ md" #### 4.2 Estimates, standard errors, and confidence intervals."
 let
 	f = Figure()
 	ax = Axis(f[1, 1]; title="Sampling distribution of b (revisited)")
-	b̂ = ms4_1s[:b, :mean]
-	σ̂ = ms4_1s[:b, :std]
+	b̂ = ms4_1s(:b, :mean)
+	σ̂ = ms4_1s(:b, :std)
 	x = LinRange(b̂ - 4σ̂ , b̂ + 4σ̂, 100)
 	y = pdf.(Normal(b̂, σ̂), x)
 	ylims!(ax, [0, maximum(y) + 1.0])
@@ -243,7 +243,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -1290,9 +1290,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]

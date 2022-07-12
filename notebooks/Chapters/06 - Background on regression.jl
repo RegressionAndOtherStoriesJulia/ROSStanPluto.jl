@@ -88,7 +88,7 @@ let
 	data = (N=nrow(fake), x=fake.x, y=fake.y)
 	global m6_1s = SampleModel("m6_1s", stan6_1)
 	global rc6_1s = stan_sample(m6_1s; data)
-	success(rc6_1s) && model_summary(m6_1s)
+	success(rc6_1s) && describe(m6_1s)
 end
 
 # ╔═╡ 1cd81462-2ed3-4b23-90c6-fdb4e3a6f143
@@ -104,10 +104,10 @@ let
 	ax = Axis(f[1, 1]; title="Regression of fake data.", xlabel="fake.x", ylabel="fake.y")
 	scatter!(fake.x, fake.y)
 	x = 1:0.01:20
-	y = ms6_1s[:a, :mean] .+  ms6_1s[:b, :mean] .* x
+	y = ms6_1s(:a, :mean) .+  ms6_1s(:b, :mean) .* x
 	lines!(x, y)
-	â = round(ms6_1s[:a, :mean]; digits=2)
-	b̂ = round(ms6_1s[:b, :mean]; digits=2)
+	â = round(ms6_1s(:a, :mean); digits=2)
+	b̂ = round(ms6_1s(:b, :mean); digits=2)
 	annotations!("y = $(â) + $(b̂) * x + ϵ"; position=(5, 0.8))
 	
 	ax = Axis(f[1, 2]; title="Regression of fake data.", subtitle="(using the link() function)",
@@ -122,7 +122,7 @@ let
 end
 
 # ╔═╡ 9a2ec98b-6f45-4bc2-8ac0-5d6337cfb644
-DataFrame(parameters = Symbol.(names(post6_1s)), simulated = [0.2, 0.3, 0.5], median = ms6_1s[:, :median], mad_sd = ms6_1s[:, :mad_sd])
+DataFrame(parameters = Symbol.(names(post6_1s)), simulated = [0.2, 0.3, 0.5], median = ms6_1s.df[:, :median], mad_sd = ms6_1s.df[:, :mad_sd])
 
 # ╔═╡ bc877661-9aa0-425d-88e0-b82239c2552c
 md" ### 6.3 Interpret coefficients as comparisons, not effects."
@@ -162,7 +162,7 @@ let
 	data = (N=nrow(earnings), height=earnings.height, male=earnings.male, earnk=earnings.earnk)
 	global m6_2s = SampleModel("m6_2s", stan6_2)
 	global rc6_2s = stan_sample(m6_2s; data)
-	success(rc6_2s) && model_summary(m6_2s)
+	success(rc6_2s) && describe(m6_2s)
 end
 
 # ╔═╡ f43ce0c2-a77f-4230-af27-85f46d3f10b7
@@ -173,9 +173,7 @@ end
 
 # ╔═╡ 9727012b-1b76-4cde-84ef-bdd7bfa4b025
 let
-	â = round(ms6_2s[:a, :mean]; digits=2)
-	b̂ = round(ms6_2s[:b, :mean]; digits=2)
-	ĉ = round(ms6_2s[:c, :mean]; digits=2)
+	â, b̂, ĉ = round.(ms6_2s.df[:, :mean]; digits=2)
 
 	fig = Figure()
 	
@@ -199,7 +197,7 @@ let
 end	
 
 # ╔═╡ ec3f566f-278c-4342-a365-db379b7d54aa
-R2 = 1 - ms6_2s[:sigma, :mean]^2 / std(earnings.earnk)^2
+R2 = 1 - ms6_2s(:sigma, :mean)^2 / std(earnings.earnk)^2
 
 # ╔═╡ c752672e-56de-4498-a85d-e3dffdc254d6
 md" ### 6.4 Historical origins of regression."
@@ -231,7 +229,7 @@ let
 	data = (N=nrow(heights), m_height=heights.mother_height, d_height=heights.daughter_height)
 	global m6_3s = SampleModel("m6_3s", stan6_3)
 	global rc6_3s = stan_sample(m6_3s; data)
-	success(rc6_3s) && model_summary(m6_3s)
+	success(rc6_3s) && describe(m6_3s)
 end
 
 # ╔═╡ f549f068-87e5-485d-bb9f-58d1cc2e15f4
@@ -314,7 +312,7 @@ let
 	data = (N = nrow(heights), m = heights.mother_height, d = heights.daughter_height)
 	global m6_4s = SampleModel("m6_4s", stan6_4)
 	global rc6_4s = stan_sample(m6_4s; data)
-	success(rc6_4s) && model_summary(m6_4s)
+	success(rc6_4s) && describe(m6_4s)
 end
 
 # ╔═╡ 4beb91af-f91a-490b-b701-2637c90d1d57
@@ -370,7 +368,7 @@ let
 	data = (N=nrow(exams), midterm=exams.midterm, final=exams.final)
 	global m6_5s = SampleModel("m6_5s", stan6_5)
 	global rc6_5s = stan_sample(m6_5s; data)
-	success(rc6_5s) && model_summary(m6_5s)
+	success(rc6_5s) && describe(m6_5s)
 end
 
 # ╔═╡ 381d3341-e789-4ca4-98ab-7f980cbd6745
@@ -434,7 +432,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -1521,9 +1519,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]

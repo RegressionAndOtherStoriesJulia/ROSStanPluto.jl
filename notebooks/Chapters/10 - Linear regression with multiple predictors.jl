@@ -80,8 +80,8 @@ let
 	data =(N = nrow(kidiq), mom_hs = kidiq.mom_hs, mom_iq = kidiq.mom_iq, kid_score = kidiq.kid_score)
 	global m10_1s = SampleModel("m10.1s", stan10_1)
 	global rc10_1s = stan_sample(m10_1s; data)
-	success(rc10_1s) && model_summary(m10_1s)
-end;
+	success(rc10_1s) && describe(m10_1s)
+end
 
 # ╔═╡ 2e1f291f-8e84-4903-b368-a99279a15fcd
 if success(rc10_1s)
@@ -95,7 +95,7 @@ let
 	ax = Axis(f[1, 1]; title="KidIQ data: kid_score ~ mom_hs")
 	scatter!(kidiq[kidiq.mom_hs .== 0, :mom_hs], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	scatter!(kidiq[kidiq.mom_hs .== 1, :mom_hs], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)
-	lines!([0.0, 1.0], [ms10_1s[:a, :median], ms10_1s[:a, :median] + ms10_1s[:b, :median]])
+	lines!([0.0, 1.0], [ms10_1s(:a, :median), ms10_1s(:a, :median) + ms10_1s(:b, :median)])
 	current_figure()
 end
 
@@ -125,7 +125,7 @@ let
 	data =(N = nrow(kidiq), mom_hs = kidiq.mom_hs, mom_iq = kidiq.mom_iq, kid_score = kidiq.kid_score)
 	global m10_2s = SampleModel("m10.2s", stan10_2)
 	global rc10_2s = stan_sample(m10_2s; data)
-	success(rc10_2s) && model_summary(m10_2s)
+	success(rc10_2s) && describe(m10_2s)
 end
 
 # ╔═╡ 0ed2981d-f505-4f99-81dd-26d7a4fa3039
@@ -143,7 +143,7 @@ let
 	scatter!(kidiq[kidiq.mom_hs .== 0, :mom_iq], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	scatter!(kidiq[kidiq.mom_hs .== 1, :mom_iq], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)
 	x = LinRange(70.0, 140.0, 100)
-	lines!(x, ms10_2s[:a, :median] .+ ms10_2s[:b, :median] .* x)
+	lines!(x, ms10_2s(:a, :median) .+ ms10_2s(:b, :median) .* x)
 	current_figure()
 end
 
@@ -176,7 +176,7 @@ begin
 	data =(N = nrow(kidiq), mom_hs = kidiq.mom_hs, mom_iq = kidiq.mom_iq, kid_score = kidiq.kid_score)
 	global m10_3s = SampleModel("m10.3s", stan10_3)
 	global rc10_3s = stan_sample(m10_3s; data)
-	success(rc10_3s) && model_summary(m10_3s)
+	success(rc10_3s) && describe(m10_3s)
 end
 
 # ╔═╡ b6330c4f-8129-4bbd-aa39-3ddd00c062b5
@@ -198,10 +198,10 @@ let
 	sca1 = scatter!(kidiq[kidiq.mom_hs .== 0, :mom_iq], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	sca2 = scatter!(kidiq[kidiq.mom_hs .== 1, :mom_iq], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)
 	x = sort(kidiq.mom_iq[nohs])
-	lin1 =lines!(x, ms10_3s[:a, :median] .+ ms10_3s[:b, :median] .* kidiq.mom_hs[nohs] .+ ms10_3s[:c, :median] .* x; 
+	lin1 =lines!(x, ms10_3s(:a, :median) .+ ms10_3s(:b, :median) .* kidiq.mom_hs[nohs] .+ ms10_3s(:c, :median) .* x; 
 		color=:darkred)
 	x = sort(kidiq.mom_iq[hs])
-	lin2 =lines!(x, ms10_3s[:a, :median] .+ ms10_3s[:b, :median] .* kidiq.mom_hs[hs] .+ ms10_3s[:c, :median] .* x; 	
+	lin2 =lines!(x, ms10_3s(:a, :median) .+ ms10_3s(:b, :median) .* kidiq.mom_hs[hs] .+ ms10_3s(:c, :median) .* x; 	
 		color=:darkblue)
 	Legend(f[1, 2],
     	[sca1, sca2, lin1, lin2],
@@ -223,7 +223,7 @@ StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 DrWatson = "~2.9.1"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -544,10 +544,10 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.1"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "d8a578692e3077ac998b50c0217dfd67f21d1e5f"
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "ccd479984c7838684b3ac204b716c89955c76623"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "4.4.0+0"
+version = "4.4.2+0"
 
 [[deps.FFTW]]
 deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
@@ -1270,9 +1270,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1539,9 +1539,9 @@ version = "0.4.1"
 
 [[deps.VectorizationBase]]
 deps = ["ArrayInterface", "CPUSummary", "HostCPUFeatures", "IfElse", "LayoutPointers", "Libdl", "LinearAlgebra", "SIMDTypes", "Static"]
-git-tree-sha1 = "70b86ab24cf5321e51d1b6c22a7076106c979ccb"
+git-tree-sha1 = "953ba1475022a4de16439857a8f79831abf5fa30"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.21.41"
+version = "0.21.42"
 
 [[deps.WeakRefStrings]]
 deps = ["DataAPI", "InlineStrings", "Parsers"]
@@ -1655,6 +1655,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "51b5eeb3f98367157a7a12a1fb0aa5328946c03c"
 uuid = "9a68df92-36a6-505f-a73e-abb412b6bfb4"
 version = "0.2.3+0"
+
+[[deps.libaom_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "3a2ea60308f0996d26f1e5354e10c24e9ef905d4"
+uuid = "a4ae2306-e953-59d6-aa16-d00cac43593b"
+version = "3.4.0+0"
 
 [[deps.libass_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]

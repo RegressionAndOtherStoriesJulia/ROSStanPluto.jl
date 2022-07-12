@@ -159,7 +159,7 @@ let
 	data = (N = size(hdivotes2, 1), rank_income = collect(1:size(hdivotes2, 1)), rank_hdi = hdivotes2.rank_hdi)
 	global m2_1s = SampleModel("hdi", stan2_1)
 	global rc2_1s = stan_sample(m2_1s; data)
-	success(rc2_1s) && model_summary(m2_1s, [:a, :b, :sigma])
+	success(rc2_1s) && describe(m2_1s, [:lp__, :a, :b, :sigma])
 end
 
 # ╔═╡ a96a5658-33c6-4f73-8e5e-bb74b2e7fec1
@@ -170,7 +170,7 @@ end
 
 # ╔═╡ 1bcc7dde-85ef-48b7-b7ff-9d9560bdc16d
 let
-	ā, b̄, σ = ms2_1s[:, :median]
+	ā, b̄, σ = ms2_1s.df[:, :median]
 	f = Figure()
 	ax = Axis(f[1, 1]; title = "HDI ~ income",
 		xlabel = "Average state income in 2000",
@@ -412,7 +412,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -1459,9 +1459,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]

@@ -135,6 +135,46 @@ model {
   	sigma ~ exponential(1);
 }";
 
+# ╔═╡ db6a5dab-a738-42d3-a97a-4ca60894b9ca
+begin
+	m1_0s = SampleModel("hibbs", stan1_0)
+	rc1_0s = stan_sample(m1_0s)
+	success(rc1_0s) && describe(m1_0s)
+end
+
+# ╔═╡ 9e471ad3-6c48-4f8a-b204-4ee864837898
+begin
+	post1_0s = read_samples(m1_0s, :dataframe)
+	ms1_0s = model_summary(post1_0s, [:a, :b, :sigma])
+end
+
+# ╔═╡ 10395123-f9c9-441d-a497-cb7be9fa7b18
+let
+	fig = Figure()
+	xlabel = "Average growth personal income [%]"
+	ylabel="Incumbent's party vote share"
+	ax = Axis(fig[1, 1]; title="Lines based on prior samples", 
+		xlabel, ylabel)
+	ylims!(ax, 40, 65)
+	xrange = LinRange(-1, 4, 200)
+	for i = 1:100
+		lines!(xrange, post1_0s.a[i] .+ post1_0s.b[i] .* xrange, color = :grey)
+	end
+	fig
+end
+
+# ╔═╡ 1786b700-0d99-4541-87d4-b6308a2331bc
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Density :a")
+	density!(f[1, 1], post1_0s.a)
+	ax = Axis(f[1, 2]; title="Density :b")
+	density!(f[1, 2], post1_0s.b)
+	ax = Axis(f[1, 3]; title="Density :sigma")
+	density!(f[1, 3], post1_0s.sigma)
+	f
+end
+
 # ╔═╡ 261c1e49-13be-4950-b211-29c35e0da5e8
 md" #### Conditioning based on the available data."
 
@@ -170,16 +210,13 @@ let
 	data = (N=16, vote=hibbs.vote, growth=hibbs.growth)
 	global m1_1s = SampleModel("hibbs", stan1_1)
 	global rc1_1s = stan_sample(m1_1s; data)
-	success(rc1_1s) && model_summary(m1_1s)
+	success(rc1_1s) && describe(m1_1s, [:a, :b, :sigma])
 end
-
-# ╔═╡ 77a2a293-e48f-46b5-a104-003772d8a922
-read_samples(m1_1s, :dataframe)
 
 # ╔═╡ 9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
 if success(rc1_1s)
-	sdf = read_summary(m1_1s)
 	post1_1s = read_samples(m1_1s, :dataframe)
+	ms1_1s = model_summary(post1_1s, [:a, :b, :sigma])
 end
 
 # ╔═╡ 9842ce96-98f9-4a87-9208-d32d16418c15
@@ -198,8 +235,8 @@ let
 	for i in 1:50
 		mat1[i, :] = a[i] .+ b[i] .* x
 	end
-	ā = sdf[sdf.parameters .== :a, :mean][1]
-	b̄ = sdf[sdf.parameters .== :b, :mean][1]
+	ā = ms1_1s(:a, :mean)
+	b̄ = ms1_1s(:b, :mean)
 
 	# Maybe could use a `link` function here
 	mat2 = zeros(50, 100)
@@ -223,6 +260,29 @@ let
 	fig
 end
 
+# ╔═╡ a872c820-57b6-45d5-a7e9-2ab7349c81e7
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="Density :a")
+	xlims!(ax, -10, 125)
+	density!(post1_0s.a)
+	ax = Axis(f[1, 2]; title="Density :b")
+	xlims!(ax, -40, 45)
+	density!(post1_0s.b)
+	ax = Axis(f[1, 3]; title="Density :sigma")
+	density!(post1_1s.sigma)
+	
+	ax = Axis(f[2, 1]; title="Density :a")
+	density!(post1_1s.a)
+	xlims!(ax, -10, 125)
+	ax = Axis(f[2, 2]; title="Density :b")
+	xlims!(ax, -40, 45)
+	density!(post1_1s.b)
+	ax = Axis(f[2, 3]; title="Density :sigma")
+	density!(post1_1s.sigma)
+	f
+end
+
 # ╔═╡ 99259579-97fa-46f5-93b4-710b3180ded2
 begin
 	fig = Figure()
@@ -242,8 +302,8 @@ begin
 
 	# Superimpose Stan fit
 	let
-		ā = sdf[sdf.parameters .== :a, :mean][1]
-		b̄ = sdf[sdf.parameters .== :b, :mean][1]
+		ā = ms1_1s(:a, :mean)
+		b̄ = ms1_1s(:b, :mean)
 		title = "Compare GLM and Stan fitted lines"
 		axis = (; title, xlabel, ylabel)
 		df = DataFrame()
@@ -262,12 +322,6 @@ begin
 	end
 	fig
 end
-
-# ╔═╡ f3863e01-deae-4e9d-b044-5515c5a19ab4
-describe(post1_1s)
-
-# ╔═╡ 5efb6ee3-8f20-42e3-a8af-cbfbb9acd075
-ms1_1s = model_summary(post1_1s, [:a, :b, :sigma])
 
 # ╔═╡ 750a66c1-47bc-466c-a7f1-567640e2e2bb
 let
@@ -301,206 +355,17 @@ let
 		median(abs.(post1_1s.sigma .- median(post1_1s.sigma)))]
 end
 
-# ╔═╡ 17baa001-092f-44d4-a18a-e9894cd43f61
-begin
-	import Base.show
-	
-	mutable struct ModelSummary
-	    df::DataFrame;
-	end
-	
-	show(ModelSummary) = show(ModelSummary.df)
-
-	mutable struct StanSummary
-	    df::DataFrame;
-	end
-	
-	show(StanSummary) = show(StanSummary.df)
-	
-
-	function (ms::ModelSummary)(par, stat)
-	
-	    varlocalx = String(par)
-	    varlocaly = String(stat)
-	    
-	    if !(varlocalx in ms.df.parameters)
-	        @warn "Variable \"$(varlocalx)\" not found in $(ms.df.parameters)."
-	        return nothing
-	    elseif !(varlocaly in names(ms.df))
-	        @warn "Variable $(varlocaly) not found in $(names(ms.df))."
-	        return nothing
-	    end
-	 
-	    return ms.df[ms.df.parameters .== String(varlocalx), String(varlocaly)]
-	end
-
-	function (ss::StanSummary)(par, stat)
-	
-	    varlocalx = String(par)
-	    varlocaly = String(stat)
-	    
-	    if !(varlocalx in ss.df.parameters)
-	        @warn "Variable \"$(varlocalx)\" not found in $(ss.df.parameters)."
-	        return nothing
-		elseif !(varlocaly in names(ss.df))
-	        @warn "Variable $(varlocaly) not found in $(names(ss.df))."
-	        return nothing
-	    end
-	 
-	    return ss.df[ss.df.parameters .== String(varlocalx), String(varlocaly)]
-	end
-	
-	function stan_summary(model::SampleModel, params; round_estimates=true, digits=3)
-	
-	    if !(typeof(params) in [Vector{String}, Vector{Symbol}])
-	        @warn "Parameter vector is not a Vector of Strings or Symbols."
-	        return nothing
-	    end
-	
-	    sdf = read_summary(model)
-		sdf.parameters = String.(sdf.parameters)
-		dfnew = DataFrame()
-		for p in String.(params)
-			append!(dfnew, sdf[sdf.parameters .== p, :])
-		end
-
-		if round_estimates
-			colnames = names(dfnew)
-			for col in colnames
-				if col !== "parameters"
-					dfnew[!, col] = round.(dfnew[:, col]; digits)
-				end
-			end
-		end
-
-	    StanSummary(dfnew)
-	end
-
-end
-
-# ╔═╡ db6a5dab-a738-42d3-a97a-4ca60894b9ca
-begin
-	m1_0s = SampleModel("hibbs", stan1_0)
-	rc1_0s = stan_sample(m1_0s)
-	success(rc1_0s) && stan_summary(m1_0s, [:a, :b, :sigma])
-end
-
-# ╔═╡ 9e471ad3-6c48-4f8a-b204-4ee864837898
-post1_0s = read_samples(m1_0s, :dataframe)
-
-# ╔═╡ 10395123-f9c9-441d-a497-cb7be9fa7b18
-let
-	fig = Figure()
-	xlabel = "Average growth personal income [%]"
-	ylabel="Incumbent's party vote share"
-	ax = Axis(fig[1, 1]; title="Lines based on prior samples", 
-		xlabel, ylabel)
-	ylims!(ax, 40, 65)
-	xrange = LinRange(-1, 4, 200)
-	for i = 1:100
-		lines!(xrange, post1_0s.a[i] .+ post1_0s.b[i] .* xrange, color = :grey)
-	end
-	fig
-end
-
-# ╔═╡ 1786b700-0d99-4541-87d4-b6308a2331bc
-let
-	f = Figure()
-	ax = Axis(f[1, 1]; title="Density :a")
-	density!(f[1, 1], post1_0s.a)
-	ax = Axis(f[1, 2]; title="Density :b")
-	density!(f[1, 2], post1_0s.b)
-	ax = Axis(f[1, 3]; title="Density :sigma")
-	density!(f[1, 3], post1_0s.sigma)
-	f
-end
-
-# ╔═╡ a872c820-57b6-45d5-a7e9-2ab7349c81e7
-let
-	f = Figure()
-	ax = Axis(f[1, 1]; title="Density :a")
-	xlims!(ax, -10, 125)
-	density!(post1_0s.a)
-	ax = Axis(f[1, 2]; title="Density :b")
-	xlims!(ax, -40, 45)
-	density!(post1_0s.b)
-	ax = Axis(f[1, 3]; title="Density :sigma")
-	density!(post1_1s.sigma)
-	
-	ax = Axis(f[2, 1]; title="Density :a")
-	density!(post1_1s.a)
-	xlims!(ax, -10, 125)
-	ax = Axis(f[2, 2]; title="Density :b")
-	xlims!(ax, -40, 45)
-	density!(post1_1s.b)
-	ax = Axis(f[2, 3]; title="Density :sigma")
-	density!(post1_1s.sigma)
-	f
-end
-
-# ╔═╡ 899eb8ba-39d4-4e30-bc89-0c5c0ff4ff03
-function model_summary_df(df::DataFrame, params; round_estimates = true, digits = 3)
-
-    if !(typeof(params) in [Vector{String}, Vector{Symbol}])
-        @error "Parameter vector is not a Vector of Strings or Symbols."
-        return nothing
-    end
-
-    colnames = String.(names(df))
-    prs = String.(params)
-
-	pars = String[]
-    for par in prs
-        if par in colnames
-            append!(pars, [par])
-        else
-            @warn ":$(par) not in $(colnames), will be dropped."
-        end
-    end
-
-    if length(pars) > 0
-		dfnew = DataFrame()
-        dfnew[!, "parameters"] = String.(pars)
-        estimates = zeros(length(pars), 4)
-        for (indx, par) in enumerate(pars)
-            if par in colnames
-                vals = df[:, par]
-                estimates[indx, :] = 
-                    [median(vals), mad(vals, normalize=true),
-                        mean(vals), std(vals)]
-            end
-        end
-
-        if round_estimates
-            estimates = round.(estimates; digits)
-        end
-
-		dfnew[!, "median"] = estimates[:, 1]
-		dfnew[!, "mad_sd"] = estimates[:, 2]
-		dfnew[!, "mean"] = estimates[:, 3]
-		dfnew[!, "std"] = estimates[:, 4]
-    end
-	ModelSummary(dfnew)
-end
-
-
 # ╔═╡ e87627bb-1a5a-4209-8519-e0905e5fe2ca
-ms1_1 = model_summary_df(post1_1s, ["a", "b", "sigma"])
+ms1_1 = model_summary(post1_1s, ["a", "b", "sigma"])
 
 # ╔═╡ b51a73a2-3f21-4811-9057-bcce4222e1ec
 ms1_1(:b, :mad_sd)
 
 # ╔═╡ 1d9665a6-639e-4ef1-8b5c-151944a8fc33
-ss1_1 = stan_summary(m1_1s, ["a", "b", "sigma"]; digits=2)
-
-# ╔═╡ a7089194-9de4-4658-815c-f19c61ea100a
-names(ss1_1.df)
+ss1_1 = describe(m1_1s, ["a", "b", "sigma"]; digits=2)
 
 # ╔═╡ f544db54-86e2-4694-9cac-fc42e2c00e50
 ss1_1("a", "ess")
-
-# ╔═╡ 862fa229-88c9-4beb-b937-63331a54acd3
-ss1_1(:a, :ess)
 
 # ╔═╡ f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
 md" ##### Quick simulation with median, mad, mean and std of Normal observations."
@@ -537,43 +402,22 @@ quantile(nt.x, [0.25, 0.75])
 md" ###### A closer look at Stan's summary. Below the full version:"
 
 # ╔═╡ 45a307ad-4f6a-4cb6-9182-bda870c42679
-sdf
+success(rc1_1s) && describe(m1_1s; showall=true)
 
 # ╔═╡ 8a04158e-a24d-477f-9cf8-30f062ec29bb
 md" ###### Usually I use the abbreviated version:"
 
 # ╔═╡ a3277285-5acb-4117-a567-67fdfd2cd4ba
-success(rc1_1s) && model_summary(m1_1s)
-
-# ╔═╡ 28640925-0d67-4f07-8ac3-eb4e4960380d
-md" ###### This DataFrame is a different type then above created NamedArray `ms1_1s`."
-
-# ╔═╡ fef949ca-ba53-407c-81db-14aa48e0706c
-let
-	df = model_summary(m1_1s)
-	df[df.parameters .== :a, :ess]
-end
+ss1_1s = success(rc1_1s) && describe(m1_1s, names(post1_1s))
 
 # ╔═╡ bd15d29b-552e-4f62-bb55-c57dca312b5b
 ms1_1s
 
-# ╔═╡ 8703f610-71db-46fa-ad6b-d51ccd7b4ff2
-sdf2 = model_summary(m1_1s, [:a, :b])
-
-# ╔═╡ 2d1c65ed-f3e4-42fd-bf3f-f89efc543888
-sdf3 = model_summary(m1_1s, [:lp__, :a, :b])
-
 # ╔═╡ 29c2e746-a79d-4bef-84d2-2f2172807185
-sdf3[:a, :r_hat]
+ss1_1s(:a, :ess)
 
-# ╔═╡ 6ac30593-ce04-4295-af51-2c094596c61e
-sdf4 = model_summary(m1_1s, ["lp__", "a", "b"])
-
-# ╔═╡ d7c7f194-2a2b-4150-824c-dca609c5c692
-sdf4["lp__", "std"]
-
-# ╔═╡ 31b47c0f-fd45-4a40-a57c-43cfbfe6d721
-md" ###### I use Strings if parameters are Vectors, otherwise I prefer Symbols."
+# ╔═╡ a07ce943-1ce7-4961-93e2-c3ed8e78d2e3
+ms1_1s(:a, :mad_sd)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -593,7 +437,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.8"
 Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.4.7"
+RegressionAndOtherStories = "~0.5.1"
 StanSample = "~6.8.2"
 """
 
@@ -603,7 +447,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "c333244a55cbbc6911497888b90794859e8ebfaa"
+project_hash = "30125371a3a37dfe6aacfd3a2c02060f61bf3be6"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -892,9 +736,9 @@ version = "0.8.6"
 
 [[deps.Documenter]]
 deps = ["ANSIColoredPrinters", "Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "f7809f532671564e48cd81627ddcfb1ba670f87d"
+git-tree-sha1 = "e4967ebb9dce1328d582200b03bcc44c69372312"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.19"
+version = "0.27.20"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
@@ -1680,9 +1524,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "439538fecda9677fbd10b379a57ed3b17a444689"
+git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.4.7"
+version = "0.5.1"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -2152,27 +1996,20 @@ version = "3.5.0+0"
 # ╟─261c1e49-13be-4950-b211-29c35e0da5e8
 # ╠═274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
 # ╠═953eea61-f05f-4233-86aa-d5af3b47b41e
-# ╠═77a2a293-e48f-46b5-a104-003772d8a922
 # ╠═9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
 # ╠═9842ce96-98f9-4a87-9208-d32d16418c15
 # ╠═3a256571-459c-4346-a511-377a273cbb66
 # ╠═8abccff4-2015-467e-92d6-067bd8db4e10
 # ╠═a872c820-57b6-45d5-a7e9-2ab7349c81e7
 # ╠═99259579-97fa-46f5-93b4-710b3180ded2
-# ╠═f3863e01-deae-4e9d-b044-5515c5a19ab4
-# ╠═5efb6ee3-8f20-42e3-a8af-cbfbb9acd075
 # ╠═750a66c1-47bc-466c-a7f1-567640e2e2bb
 # ╟─95cdfe9f-a06f-49f3-888f-34e47025c810
 # ╟─10b925db-5f9c-4603-b49a-bd9b9a2e64d0
 # ╠═14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
-# ╠═899eb8ba-39d4-4e30-bc89-0c5c0ff4ff03
 # ╠═e87627bb-1a5a-4209-8519-e0905e5fe2ca
 # ╠═b51a73a2-3f21-4811-9057-bcce4222e1ec
-# ╠═17baa001-092f-44d4-a18a-e9894cd43f61
 # ╠═1d9665a6-639e-4ef1-8b5c-151944a8fc33
-# ╠═a7089194-9de4-4658-815c-f19c61ea100a
 # ╠═f544db54-86e2-4694-9cac-fc42e2c00e50
-# ╠═862fa229-88c9-4beb-b937-63331a54acd3
 # ╟─f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
 # ╠═1f44495d-50cf-4e92-97b2-d19a82c46c78
 # ╠═a72ca80f-b42e-4638-8ffd-f23dc70c7bc0
@@ -2186,14 +2023,8 @@ version = "3.5.0+0"
 # ╠═45a307ad-4f6a-4cb6-9182-bda870c42679
 # ╟─8a04158e-a24d-477f-9cf8-30f062ec29bb
 # ╠═a3277285-5acb-4117-a567-67fdfd2cd4ba
-# ╟─28640925-0d67-4f07-8ac3-eb4e4960380d
-# ╠═fef949ca-ba53-407c-81db-14aa48e0706c
 # ╠═bd15d29b-552e-4f62-bb55-c57dca312b5b
-# ╠═8703f610-71db-46fa-ad6b-d51ccd7b4ff2
-# ╠═2d1c65ed-f3e4-42fd-bf3f-f89efc543888
 # ╠═29c2e746-a79d-4bef-84d2-2f2172807185
-# ╠═6ac30593-ce04-4295-af51-2c094596c61e
-# ╠═d7c7f194-2a2b-4150-824c-dca609c5c692
-# ╟─31b47c0f-fd45-4a40-a57c-43cfbfe6d721
+# ╠═a07ce943-1ce7-4961-93e2-c3ed8e78d2e3
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

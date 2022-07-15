@@ -108,13 +108,13 @@ end
 # ╔═╡ ad881730-c0f7-45b4-b7f6-b7f68b08580e
 let
 	ss7_1s = describe(m7_1s)
-	ss7_1s(:sigma, :ess)
+	ss7_1s[:sigma, :ess]
 end
 
 # ╔═╡ 1fcd99ac-a7a2-4d61-b4ea-f1b31f23b7e6
 let
 	ss7_1s = describe(m7_1s; showall=true)
-	ss7_1s(:sigma, :ess)
+	ss7_1s[:sigma, :ess]
 end
 
 # ╔═╡ e5bfe43f-7c77-402a-b7c8-e268b6ce23c0

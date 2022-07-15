@@ -59,13 +59,6 @@ begin
 	)
 end
 
-# ╔═╡ fd1965c8-a05d-4076-a587-f6506e589422
-data = (
-    W=standardize(ZScoreTransform, sim_df.W_sim),
-    E=standardize(ZScoreTransform, sim_df.E_sim),
-    Q=standardize(ZScoreTransform, Float64.(Q_sim))
-);
-
 # ╔═╡ 4a762650-2f97-483c-a2d8-ca9a5e15038e
 stan14_6 = "
 data{
@@ -108,6 +101,12 @@ model{
 # ╔═╡ d24ea359-a900-453f-bd15-19a073dacc1f
 # ╠═╡ show_logs = false
 let
+    data = (
+        W=standardize(ZScoreTransform, sim_df.W_sim),
+        E=standardize(ZScoreTransform, sim_df.E_sim),
+        Q=standardize(ZScoreTransform, Float64.(Q_sim))
+    )
+
 	global m14_6s = SampleModel("m14_6s", stan14_6)
 	global rc14_6s = stan_sample(m14_6s; data)
 	if success(rc14_6s)
@@ -160,13 +159,108 @@ StanSample.select_nested_column(post14_6s, :Rho)
 nd = read_samples(m14_6s, :nesteddataframe)
 
 # ╔═╡ 9b015a56-a3e0-4a44-98ff-130aac93fdcd
-m = matrix(nd, :Rho)
+m = array(nd, :Rho)
 
 # ╔═╡ fb283b4f-42cf-4db7-bbf9-2fe67fcd21e0
 nd[3, :Rho]
 
 # ╔═╡ 54c3cd51-35d9-4973-8dc2-ab3e938966e5
-matrix(nd, :Sigma)
+array(nd, :Sigma)
+
+# ╔═╡ eae9cc3e-e815-4678-9582-90f4734be215
+md" #### A more complicated example."
+
+# ╔═╡ df2623a0-75cf-45f0-a520-cecda8df93aa
+begin
+	Omega = [1 0.3 0.2; 0.3 1 0.1; 0.2 0.1 1]
+	sigma = [1, 2, 3]
+	Sigma = diagm(sigma) .* Omega .* diagm(sigma)
+	y = rand(MvNormal([0,0,0], Sigma), 100)
+	datat = (N = 100, J = 3, y=Matrix(transpose(y)), Zero=zeros(3))
+end
+
+# ╔═╡ 9d955aed-6e2a-4925-a13c-4d32b2dc47b2
+stan1_0 = "
+data {
+  int<lower=1> N; // number of observations
+  int<lower=1> J; // dimension of observations
+  vector[J] y[N]; // observations
+  vector[J] Zero; // a vector of Zeros (fixed means of observations)
+}
+parameters {
+  corr_matrix[J] Omega; 
+  vector<lower=0>[J] sigma; 
+}
+transformed parameters {
+  cov_matrix[J] Sigma; 
+  Sigma <- quad_form_diag(Omega, sigma); 
+}
+model {
+  y ~ multi_normal(Zero,Sigma); // sampling distribution of the observations
+  sigma ~ cauchy(0, 5); // prior on the standard deviations
+  Omega ~ lkj_corr(1); // LKJ prior on the correlation matrix 
+}";
+
+# ╔═╡ e36f6ece-6a5a-4df3-a9ac-83dcb33e914c
+stan2_0 = "
+data {
+  int<lower=1> N; // number of observations
+  int<lower=1> J; // dimension of observations
+  vector[J] y[N]; // observations
+  vector[J] Zero; // a vector of Zeros (fixed means of observations)
+}
+parameters {
+  cholesky_factor_corr[J] Lcorr;  
+  vector<lower=0>[J] sigma; 
+}
+model {
+  y ~ multi_normal_cholesky(Zero, diag_pre_multiply(sigma, Lcorr));
+  sigma ~ cauchy(0, 5);
+  Lcorr ~ lkj_corr_cholesky(1);
+}
+generated quantities {
+  matrix[J,J] Omega;
+  matrix[J,J] Sigma;
+  Omega <- multiply_lower_tri_self_transpose(Lcorr);
+  Sigma <- quad_form_diag(Omega, sigma); 
+}";
+
+# ╔═╡ d513652f-7360-491a-a185-6263f8f39748
+# ╠═╡ show_logs = false
+begin
+	m1_0s = SampleModel("stan1_0s", stan1_0)
+	rc1_0s = stan_sample(m1_0s; num_samples=9000, data=datat)
+	success(rc1_0s) && describe(m1_0s)
+end
+
+# ╔═╡ a72f7df7-9cf1-4845-9f67-5dfa8f003f6a
+md"
+!!! note
+
+Note that `hide logs` has been selected in above cell."
+
+# ╔═╡ e49078fc-a0b0-49b4-865c-d526e7bf7750
+if success(rc1_0s)
+  post1_0s = read_samples(m1_0s, :nesteddataframe)
+end
+
+# ╔═╡ 392ecd83-ccb5-4312-a8f5-ea7e5a63a019
+begin
+	m2_0s = SampleModel("stan2_0s", stan2_0)
+	rc2_0s = stan_sample(m2_0s; num_samples=9000, data=datat)
+	success(rc2_0s) && describe(m2_0s)
+end
+
+# ╔═╡ 6e6f09f4-7f7f-477d-8352-bf80819a63a9
+if success(rc2_0s)
+  post2_0s = read_samples(m2_0s, :nesteddataframe)
+end
+
+# ╔═╡ 80aa8676-b6e5-4ee8-8622-498e055c9db8
+array(post2_0s, :Omega)
+
+# ╔═╡ 52ebdcd8-9083-4d77-ae41-07115c721a2c
+post2_0s.Omega[1:3]
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -184,10 +278,10 @@ StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 AlgebraOfGraphics = "~0.6.9"
 Distributions = "~0.25.65"
 DrWatson = "~2.9.1"
-GLMakie = "~0.6.8"
-Makie = "~0.17.8"
-RegressionAndOtherStories = "~0.5.1"
-StanSample = "~6.8.2"
+GLMakie = "~0.6.9"
+Makie = "~0.17.9"
+RegressionAndOtherStories = "~0.6.0"
+StanSample = "~6.9.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -333,9 +427,9 @@ version = "0.10.6"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "2dd813e5f2f7eec2d1268c57cf2373d3ee91fcea"
+git-tree-sha1 = "ff38036fb7edc903de4e79f32067d8497508616b"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.15.1"
+version = "1.15.2"
 
 [[deps.ChangesOfVariables]]
 deps = ["ChainRulesCore", "LinearAlgebra", "Test"]
@@ -402,10 +496,9 @@ uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "0.5.2+0"
 
 [[deps.Contour]]
-deps = ["StaticArrays"]
-git-tree-sha1 = "9f02045d934dc030edad45944ea80dbd1f0ebea7"
+git-tree-sha1 = "d05d9e7b7aedff4e5b51a029dced05cfb6125781"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
-version = "0.5.7"
+version = "0.6.2"
 
 [[deps.CpuId]]
 deps = ["Markdown"]
@@ -485,9 +578,9 @@ version = "0.8.6"
 
 [[deps.Documenter]]
 deps = ["ANSIColoredPrinters", "Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "e4967ebb9dce1328d582200b03bcc44c69372312"
+git-tree-sha1 = "2498c3704e9cd26bf586a351473417881676bb2d"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.20"
+version = "0.27.21"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
@@ -634,9 +727,9 @@ version = "1.8.0"
 
 [[deps.GLMakie]]
 deps = ["ColorTypes", "Colors", "FileIO", "FixedPointNumbers", "FreeTypeAbstraction", "GLFW", "GeometryBasics", "LinearAlgebra", "Makie", "Markdown", "MeshIO", "ModernGL", "Observables", "Printf", "Serialization", "ShaderAbstractions", "StaticArrays"]
-git-tree-sha1 = "79f9f225a7f0c51a52ed1c299d092bb4fdfbd93f"
+git-tree-sha1 = "1845040be292ddaa258736fdfe852582465f7023"
 uuid = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
-version = "0.6.8"
+version = "0.6.9"
 
 [[deps.GeoInterface]]
 deps = ["Extents"]
@@ -698,10 +791,10 @@ uuid = "3e5b6fbb-0976-4d2c-9146-d79de83f2fb0"
 version = "0.1.8"
 
 [[deps.HypergeometricFunctions]]
-deps = ["DualNumbers", "LinearAlgebra", "SpecialFunctions", "Test"]
-git-tree-sha1 = "cb7099a0109939f16a4d3b572ba8396b1f6c7c31"
+deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions", "Test"]
+git-tree-sha1 = "709d864e3ed6e3545230601f94e11ebc65994641"
 uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
-version = "0.3.10"
+version = "0.3.11"
 
 [[deps.IOCapture]]
 deps = ["Logging", "Random"]
@@ -883,7 +976,7 @@ version = "0.6.3"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "7.83.1+1"
+version = "7.84.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -972,15 +1065,15 @@ version = "0.5.9"
 
 [[deps.Makie]]
 deps = ["Animations", "Base64", "ColorBrewer", "ColorSchemes", "ColorTypes", "Colors", "Contour", "Distributions", "DocStringExtensions", "FFMPEG", "FileIO", "FixedPointNumbers", "Formatting", "FreeType", "FreeTypeAbstraction", "GeometryBasics", "GridLayoutBase", "ImageIO", "IntervalSets", "Isoband", "KernelDensity", "LaTeXStrings", "LinearAlgebra", "MakieCore", "Markdown", "Match", "MathTeXEngine", "Observables", "OffsetArrays", "Packing", "PlotUtils", "PolygonOps", "Printf", "Random", "RelocatableFolders", "Serialization", "Showoff", "SignedDistanceFields", "SparseArrays", "Statistics", "StatsBase", "StatsFuns", "StructArrays", "UnicodeFun"]
-git-tree-sha1 = "b0946fd8f4f981210980bef0a7ed63ab5fb4206f"
+git-tree-sha1 = "ba72a2f4be8dcce9473a80f0f96c5952ab8d695b"
 uuid = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
-version = "0.17.8"
+version = "0.17.9"
 
 [[deps.MakieCore]]
 deps = ["Observables"]
-git-tree-sha1 = "469221640e5e798b52877fd12c596204cee05df1"
+git-tree-sha1 = "5ad699710cba8b01ca6c6eeb419a6865607c875d"
 uuid = "20f20a25-4f0e-4fdf-b5d1-57303727442b"
-version = "0.3.4"
+version = "0.3.5"
 
 [[deps.ManualMemory]]
 git-tree-sha1 = "bcaef4fc7a0cfe2cba636d84cda54b5e4e4ca3cd"
@@ -1050,9 +1143,10 @@ uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 version = "2022.2.1"
 
 [[deps.NaNMath]]
-git-tree-sha1 = "737a5957f387b17e74d4ad2f440eb330b39a62c5"
+deps = ["OpenLibm_jll"]
+git-tree-sha1 = "a7c3d1da1189a1c2fe843a3bfa04d18d20eb3211"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-version = "1.0.0"
+version = "1.0.1"
 
 [[deps.NamedArrays]]
 deps = ["Combinatorics", "DataStructures", "DelimitedFiles", "InvertedIndices", "LinearAlgebra", "Random", "Requires", "SparseArrays", "Statistics"]
@@ -1273,9 +1367,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "6d66ef145955d46a93708e78964fdb8579f5d6dc"
+git-tree-sha1 = "4f1838bf559d812e3370425d95df52d123b942cb"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.5.1"
+version = "0.6.0"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1329,9 +1423,9 @@ version = "0.3.2"
 
 [[deps.Scratch]]
 deps = ["Dates"]
-git-tree-sha1 = "0b4b7f1393cff97c33891da2a0bf69c6ed241fda"
+git-tree-sha1 = "f94f779c94e58bf9ea243e77a37e16d9de9126bd"
 uuid = "6c6a2e73-6563-6170-7368-637461726353"
-version = "1.1.0"
+version = "1.1.1"
 
 [[deps.SentinelArrays]]
 deps = ["Dates", "Random"]
@@ -1408,9 +1502,9 @@ version = "4.7.1"
 
 [[deps.StanSample]]
 deps = ["CSV", "CompatHelperLocal", "DataFrames", "DelimitedFiles", "Distributed", "DocStringExtensions", "JSON", "MonteCarloMeasurements", "NamedTupleTools", "OrderedCollections", "Parameters", "Random", "Reexport", "Requires", "StanBase", "TableOperations", "Tables", "Unicode"]
-git-tree-sha1 = "2ee7c7f792cf8f6f9584b6b9617431cb5da4c5cc"
+git-tree-sha1 = "88b750c9e350db1c79aa7b257911d33ac943cb0f"
 uuid = "c1514b29-d3a0-5178-b312-660c88baa699"
-version = "6.8.2"
+version = "6.9.1"
 
 [[deps.Static]]
 deps = ["IfElse"]
@@ -1420,9 +1514,9 @@ version = "0.7.5"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "StaticArraysCore", "Statistics"]
-git-tree-sha1 = "9f8a5dc5944dc7fbbe6eb4180660935653b0a9d9"
+git-tree-sha1 = "e972716025466461a3dc1588d9168334b71aafff"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.5.0"
+version = "1.5.1"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "66fe9eb253f910fe8cf161953880cfdaef01cdf0"
@@ -1731,7 +1825,6 @@ version = "3.5.0+0"
 # ╠═5d720373-d1c8-4947-b29e-9bedb9a63a2c
 # ╠═7c435cd5-769c-477b-bccf-398053bcbd74
 # ╠═d8ca810d-1bb6-4087-a760-ded35b3ea5b5
-# ╠═fd1965c8-a05d-4076-a587-f6506e589422
 # ╠═4a762650-2f97-483c-a2d8-ca9a5e15038e
 # ╠═d24ea359-a900-453f-bd15-19a073dacc1f
 # ╠═b2697f47-59be-49fe-8e58-dffd705b3b4c
@@ -1745,5 +1838,16 @@ version = "3.5.0+0"
 # ╠═9b015a56-a3e0-4a44-98ff-130aac93fdcd
 # ╠═fb283b4f-42cf-4db7-bbf9-2fe67fcd21e0
 # ╠═54c3cd51-35d9-4973-8dc2-ab3e938966e5
+# ╠═eae9cc3e-e815-4678-9582-90f4734be215
+# ╠═df2623a0-75cf-45f0-a520-cecda8df93aa
+# ╠═9d955aed-6e2a-4925-a13c-4d32b2dc47b2
+# ╠═e36f6ece-6a5a-4df3-a9ac-83dcb33e914c
+# ╠═d513652f-7360-491a-a185-6263f8f39748
+# ╟─a72f7df7-9cf1-4845-9f67-5dfa8f003f6a
+# ╠═e49078fc-a0b0-49b4-865c-d526e7bf7750
+# ╠═392ecd83-ccb5-4312-a8f5-ea7e5a63a019
+# ╠═6e6f09f4-7f7f-477d-8352-bf80819a63a9
+# ╠═80aa8676-b6e5-4ee8-8622-498e055c9db8
+# ╠═52ebdcd8-9083-4d77-ae41-07115c721a2c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

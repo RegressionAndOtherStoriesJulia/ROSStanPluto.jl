@@ -13,7 +13,7 @@ This project will contain (work is in very early stages of progress!!!) a set of
 
 These notebooks are intended to be used in conjunction with above book.
 
-Each notebook contains a chapter. 
+Each notebook contains a chapter. A static website can be found [here](https://regressionandotherstoriesjulia.github.io/ROSStanPluto.jl/).
 
 ## Personal note
 

@@ -15,7 +15,6 @@ begin
 	using StanOptimize
 
 	using GLMakie
-	using Makie
 	
 	using RegressionAndOtherStories
 end

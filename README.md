@@ -15,6 +15,16 @@ These notebooks are intended to be used in conjunction with above book.
 
 Each notebook contains a chapter. A static website can be found [here](https://regressionandotherstoriesjulia.github.io/ROSStanPluto.jl/).
 
+## Table of Contents
+
+### Chapters
+
+### Notebook maintenance
+
+### ROS playgrounds
+
+0.2 [Chains playground.jl](https://github.com/RegressionAndOtherStoriesJulia/docs/0.2 Chains playground.pdf)
+
 ## Personal note
 
 This project will take quite a while to complete, I expect at least a year.

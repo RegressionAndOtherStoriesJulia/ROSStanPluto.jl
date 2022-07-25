@@ -14,7 +14,6 @@ begin
 	
 	# Graphics related
     using GLMakie
-    using Makie
 
 	# Common data files and functions
 	using RegressionAndOtherStories

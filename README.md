@@ -23,7 +23,7 @@ Each notebook contains a chapter. A static website can be found [here](https://r
 
 ### ROS playgrounds
 
-0.2 [Chains playground.jl](https://github.com/RegressionAndOtherStoriesJulia/docs/0.2 Chains playground.pdf)
+0.2 [Chains playground.jl](https://github.com/RegressionAndOtherStoriesJulia/docs/Chains_playground.pdf)
 
 ## Personal note
 

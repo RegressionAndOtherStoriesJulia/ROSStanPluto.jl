@@ -23,11 +23,11 @@ Each notebook contains a chapter. A static website can be found [here](https://r
 2. [Data and Measurement](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Data_and_Measurement.pdf)
 3. [Probability](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Probability.pdf)
 4. [Statistical inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Statistical_inference.pdf)
-5. [Simulation](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%Simulation.pdf)
-6. [Background on regression](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%Background_on_regression.pdf)
-7. [Linear regression with single predictor](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%Linear_regression_with_single_predictor.pdf)
-8. [Fitting regression models](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%Fitting_regression_models.pdf)
-9. [Prediction and Bayesian inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%Predictions_and_Bayesian_inference.pdf)
+5. [Simulation](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Simulation.pdf)
+6. [Background on regression](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Background_on_regression.pdf)
+7. [Linear regression with single predictor](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Linear_regression_with_single_predictor.pdf)
+8. [Fitting regression models](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Fitting_regression_models.pdf)
+9. [Prediction and Bayesian inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Predictions_and_Bayesian_inference.pdf)
 10. [Linear regression with multiple predictors](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Linear_regression_with_multiple_predictors.pdf)
 
 ### ROS playgrounds

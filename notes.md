@@ -24,3 +24,11 @@ julia>
 ### Extract .jl from Jupyter notebook (`jupytext` needs to be installed)
 
 # jupytext --to jl "./ch7.ipynb"
+
+
+### Creating pdf files (cd to notebooks/chapters)
+
+```
+import PlutoPDF
+PlutoPDF.pluto_to_pdf("notebook.jl")
+```

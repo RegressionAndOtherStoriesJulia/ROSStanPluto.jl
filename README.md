@@ -13,27 +13,7 @@ This project will contain (work is in very early stages of progress!!!) a set of
 
 These notebooks are intended to be used in conjunction with above book.
 
-Each notebook contains a chapter. A static website can be found [here](https://regressionandotherstoriesjulia.github.io/ROSStanPluto.jl/).
-
-## Table of Contents
-
-### Chapters
-
-1. [Introduction](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Introduction.pdf)
-2. [Data and Measurement](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Data_and_Measurement.pdf)
-3. [Probability](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Probability.pdf)
-4. [Statistical inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Statistical_inference.pdf)
-5. [Simulation](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Simulation.pdf)
-6. [Background on regression](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Background_on_regression.pdf)
-7. [Linear regression with single predictor](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Linear_regression_with_single_predictor.pdf)
-8. [Fitting regression models](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Fitting_regression_models.pdf)
-9. [Prediction and Bayesian inference](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Predictions_and_Bayesian_inference.pdf)
-10. [Linear regression with multiple predictors](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Linear_regression_with_multiple_predictors.pdf)
-
-### ROS playgrounds
-
-1. [Stan playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Stan_playground.pdf)
-2. [Chains playground](https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl/blob/main/docs/🎈%20Chains_playground.pdf)
+Each notebook contains a chapter. In the `notebooks/chapters` directory there are also PDF versions of all chapters.
 
 ## Personal note
 

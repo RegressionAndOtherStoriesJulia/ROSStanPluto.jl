@@ -294,6 +294,36 @@ let
 	wireframe(a, b, z, axis=(type=Axis3,))
 end
 
+# ╔═╡ 2e060389-0b27-4182-a871-a6bd889e746f
+my_μ = [ms8_1s["a", "mean"], ms8_1s["b", "mean"]]
+
+# ╔═╡ e6e8becb-30ed-48a8-9ac2-3470e4798778
+my_Σ = cov([post8_1s.a post8_1s.b])
+
+# ╔═╡ f5a8786b-1d88-4070-9ea1-abf2c4506523
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="(â, b̂) and covariance matrix derivative")
+	lines!(getellipsepoints(my_μ, my_Σ)..., label="95% confidence interval of derivative", color=:black)
+	lines!(getellipsepoints(my_μ, my_Σ, 0.5)..., label="50% confidence interval of derivative", color=:darkred)
+	scatter!(post8_1s.a, post8_1s.b; markersize=4)
+	axislegend(position=:rt)
+	f
+end
+
+# ╔═╡ 09b4223c-ef55-4255-bd9b-91683ce3c3cb
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; title="(â, b̂) and covariance matrix derivative")
+	poly!(Point2f.(zip(getellipsepoints(my_μ, my_Σ)...)); color=(:yellow, 0.5))
+	poly!(Point2f.(zip(getellipsepoints(my_μ, my_Σ, 0.50)...)); color=(:lightgrey, 0.5))
+	lines!(getellipsepoints(my_μ, my_Σ)..., label="95% confidence interval of derivative", color=:black)
+	lines!(getellipsepoints(my_μ, my_Σ, 0.5)..., label="50% confidence interval of derivative", color=:darkred)
+	scatter!(post8_1s.a, post8_1s.b; markersize=4)
+	axislegend(position=:rt)
+	f
+end
+
 # ╔═╡ 261db479-f8cf-42b3-86d8-547facbe32e9
 md" ### 8.2 Influence of individual points in a fitted regression."
 
@@ -397,7 +427,7 @@ DrWatson = "~2.9.1"
 GLM = "~1.8.0"
 GLMakie = "~0.6.12"
 Optim = "~1.7.0"
-RegressionAndOtherStories = "~0.6.1"
+RegressionAndOtherStories = "~0.6.2"
 StanOptimize = "~4.2.3"
 StanSample = "~6.9.2"
 StatsAPI = "~1.4.0"
@@ -409,7 +439,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "c2588b30471d19ccea48c6a1349af2589247f209"
+project_hash = "32e4f0805ad5df96926debdf4997e99583a57a42"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -1505,9 +1535,9 @@ version = "1.2.2"
 
 [[deps.RegressionAndOtherStories]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "DocStringExtensions", "GLM", "LaTeXStrings", "LinearAlgebra", "NamedArrays", "NamedTupleTools", "Parameters", "Random", "Reexport", "Requires", "Statistics", "StatsBase", "StatsFuns", "Unicode"]
-git-tree-sha1 = "6a9f14a42411c4dc61106b9c28dd94e63df788e3"
+git-tree-sha1 = "ce3a2e9dc4c8e779084eaa6fb62d0afce42b3eaa"
 uuid = "21324389-b050-441a-ba7b-9a837781bda0"
-version = "0.6.1"
+version = "0.6.2"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1685,9 +1715,9 @@ version = "1.4.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "472d044a1c8df2b062b23f222573ad6837a615ba"
+git-tree-sha1 = "0005d75f43ff23688914536c5e9d5ac94f8077f7"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.19"
+version = "0.33.20"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
@@ -2005,6 +2035,10 @@ version = "3.5.0+0"
 # ╠═8f3f5bb6-0813-401a-a99c-491f62ded4ec
 # ╠═815acfd8-18e7-4c3e-a4df-e2fdb8a7ad78
 # ╠═2a3715b5-27c0-47c3-bcde-2375d512c428
+# ╠═2e060389-0b27-4182-a871-a6bd889e746f
+# ╠═e6e8becb-30ed-48a8-9ac2-3470e4798778
+# ╠═f5a8786b-1d88-4070-9ea1-abf2c4506523
+# ╠═09b4223c-ef55-4255-bd9b-91683ce3c3cb
 # ╟─261db479-f8cf-42b3-86d8-547facbe32e9
 # ╠═ff062913-8600-476a-a87d-3ea953364240
 # ╟─6ef207a8-ed88-41a9-b5fe-e3b2f9437362

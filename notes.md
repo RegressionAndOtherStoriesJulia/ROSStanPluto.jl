@@ -26,9 +26,20 @@ julia>
 # jupytext --to jl "./ch7.ipynb"
 
 
-### Creating pdf files (cd to notebooks/chapters)
+### Creating pdf files (cd to notebooks/Chapters)
 
-```
+```Julis
 import PlutoPDF
-PlutoPDF.pluto_to_pdf("notebook.jl")
+#cd("path_to_chapters")
+files = readdir(pwd(); join=true)
+for file in files
+    if !(file[end-8:end] == ".DS_Store")
+        fin = split(file, '/')[end]
+        print(fin)
+        print(" => ")
+        fout = "../../pdfs/" * fin[1:end-3] * ".pdf"
+        println(fout)
+        PlutoPDF.pluto_to_pdf(fin, fout)
+    end
+end
 ```

@@ -6,10 +6,10 @@ using InteractiveUtils
 
 # ╔═╡ 97ccf6e7-c415-4454-8964-58ea0d29d632
 begin
-	using DataFrames
-	using NamedArrays
-	using OrderedCollections
-	using Statistics
+    using DataFrames
+    using NamedArrays
+    using OrderedCollections
+    using Statistics
 end
 
 # ╔═╡ 95e62562-a75a-4e5b-8f96-877bfe03e0e7
@@ -58,12 +58,12 @@ md" #### Widen the notebook."
 # ╔═╡ d4482972-4b5a-489a-b7a9-02ce5731aba3
 html"""
 <style>
-	main {
-		margin: 0 auto;
-		max-width: 2000px;
-    	padding-left: max(160px, 10%);
-    	padding-right: max(160px, 10%);
-	}
+    main {
+        margin: 0 auto;
+        max-width: 2000px;
+        padding-left: max(160px, 10%);
+        padding-right: max(160px, 10%);
+    }
 </style>
 """
 
@@ -73,14 +73,14 @@ The data frame that we are going to use in our examples is defined as follows (I
 
 # ╔═╡ 2c024e43-68e7-457d-962b-477f6ca8d6e4
 df = DataFrame(id = 1:6,
-	name = ["Aaron Aardvark", "Belen Barboza",
-		"春 陈", "Даниил Дубов",
-		"Elżbieta Elbląg", "Felipe Fittipaldi"],
-	age = [50, 45, 40, 35, 30, 25],
-	eye = ["blue", "brown", "hazel", "blue", "green", "brown"],
-	grade_1 = [95, 90, 85, 90, 95, 90],
-	grade_2 = [75, 80, 65, 90, 75, 95],
-	grade_3 = [85, 85, 90, 85, 80, 85])
+    name = ["Aaron Aardvark", "Belen Barboza",
+        "春 陈", "Даниил Дубов",
+        "Elżbieta Elbląg", "Felipe Fittipaldi"],
+    age = [50, 45, 40, 35, 30, 25],
+    eye = ["blue", "brown", "hazel", "blue", "green", "brown"],
+    grade_1 = [95, 90, 85, 90, 95, 90],
+    grade_2 = [75, 80, 65, 90, 75, 95],
+    grade_3 = [85, 85, 90, 85, 80, 85])
 
 # ╔═╡ 93a6cc62-eaf4-45dd-89df-05ff55a30adb
 md" ### Column selection."
@@ -172,7 +172,7 @@ md" Let us discuss one more example, this case using GroupedDataFrame. As you ca
 
 # ╔═╡ c39a062e-7764-401a-8125-44b30249f2e0
 combine(groupby(df, :eye),
-	:name => (x -> identity(x)) => :name,
+    :name => (x -> identity(x)) => :name,
     :age => mean => :age)
 
 # ╔═╡ a3c878fd-b69e-4bc2-b821-11572c700357
@@ -183,7 +183,7 @@ md" In some cases it would be more natural not to expand the :name column into m
 
 # ╔═╡ 242db192-f25b-432e-92f5-88ef74683d60
 combine(groupby(df, :eye),
-	:name => (x -> Ref(identity(x))) => :name,
+    :name => (x -> Ref(identity(x))) => :name,
     :age => mean => :age)
 
 # ╔═╡ 4f2fe53e-c9ce-41e1-8235-b43ffd93a09b
@@ -209,7 +209,7 @@ md" If you want to avoid this then pass renemecols=false keyword argument (this 
 
 # ╔═╡ fbb71345-020e-4216-9aae-31aaa9582c25
 select(df,
-	:grade_1 => ByRow(x -> x / 100),
+    :grade_1 => ByRow(x -> x / 100),
     :grade_2 => ByRow(x -> x / 100),
     :grade_3 => ByRow(x -> x / 100),
     renamecols=false)
@@ -410,20 +410,20 @@ md" DataFrames are not very suitable to hold a summary, say a model summary, and
 
 # ╔═╡ e2579a26-1c70-48ca-90f6-1a415f2dfeb1
 begin
-	estimates = [3.0 1.0 3.01 1.1; 0.9 0.2 0.88 0.2; 0.0 1.0 0.001 1.0]
-	df_na = DataFrame("median" => estimates[:, 1], "mad_sd" => estimates[:, 2], 
-		"mean" => estimates[:, 3], "std" => estimates[:, 4])
-	df_na.parameters = Symbol.(["a", "b", "σ"])
-	df_na
+    estimates = [3.0 1.0 3.01 1.1; 0.9 0.2 0.88 0.2; 0.0 1.0 0.001 1.0]
+    df_na = DataFrame("median" => estimates[:, 1], "mad_sd" => estimates[:, 2], 
+        "mean" => estimates[:, 3], "std" => estimates[:, 4])
+    df_na.parameters = Symbol.(["a", "b", "σ"])
+    df_na
 end
 
 # ╔═╡ a326a4f7-e67b-4942-86f0-cd86c9729a0b
 function toNamedArray(df::DataFrame, params=df[:, :parameters], stats=names(df))
-	parameters = Pair{Symbol, Int}[]
-	for (index, par) in enumerate(params)
-		append!(parameters, [par => index])
-	end
-	return NamedArray(
+    parameters = Pair{Symbol, Int}[]
+    for (index, par) in enumerate(params)
+        append!(parameters, [par => index])
+    end
+    return NamedArray(
         round.(estimates; digits=2), 
             (OrderedDict(parameters...), 
             OrderedDict(:median=>1, :mad_sd=>2, :mean=>3, :std=>4)),

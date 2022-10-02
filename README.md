@@ -11,9 +11,7 @@
 
 This project will contain (work is in very early stages of progress!!!) a set of Pluto notebooks that contain Julia versions of the examples in the R project `ROS-Examples` based on the book ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
 
-These notebooks are intended to be used in conjunction with above book.
-
-Each notebook contains a chapter. In the `pdfs` directory there are also PDF versions of the chapters created with PlutoPDF (see notes.md).
+These notebooks are intended to be used in conjunction with above book. Each notebook contains a chapter.
 
 ## Personal note
 

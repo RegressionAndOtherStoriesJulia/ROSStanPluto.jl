@@ -9,9 +9,6 @@ using Pkg
 
 # ╔═╡ 550371ad-d411-4e66-9d63-7329322c6ea1
 begin
-	# Specific to this notebook
-    using GLM
-
     # Specific to ROSStanPluto
     using StanSample
 	
@@ -21,26 +18,6 @@ begin
 	# Include basic packages
 	using RegressionAndOtherStories
 end
-
-# ╔═╡ 2580c05d-0b53-44d4-a137-45354270e899
-md"#### In `Regression and Other Stories`, mcmc is _just_ a tool. Hence whether one uses Stan or Turing is not the main focus of the book. This notebook uses `ElectionsEconomy: hibbs.csv` to illustrate how Stan and other tools are used in the Julia _project_ ROSStanPluto.jl."
-
-# ╔═╡ 62150db9-7078-4ab9-b193-63ec2a721dd2
-md" ##### Over time I will expand below the list of topics:
-
-1. Stan (StanSample.jl, ...)
-2. Using median and mad to summarize a posterior distribution.
-3. ...
-4. Model comparison (TBD)
-5. DAGs (TBD)
-6. Graphs (TBD)
-7. BridgeStan
-8. ...
-
-"
-
-# ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"##### See Chapter 1.2, Figure 1.1 in Regression and Other Stories."
 
 # ╔═╡ cf39df58-3371-4535-88e4-f3f6c0404500
 md" ##### Widen the cells."
@@ -60,73 +37,113 @@ html"""
 # ╔═╡ 4755dab0-d228-41d3-934a-56f2863a5652
 md"###### A typical set of Julia packages to include in notebooks."
 
-# ╔═╡ 5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
-md"
-!!! note
+# ╔═╡ 64b4a0ff-57ab-40e0-846c-607ba56f87c0
+pwd()
 
-All data files are available (as .csv files) in the data subdirectory of package RegressionAndOtherStories.jl.
-"
+# ╔═╡ f41a688c-dd21-499b-a8fd-e04479d65833
+mn_radon = CSV.read(joinpath(pwd(), "data", "mn_radon.csv"), DataFrame)
 
-# ╔═╡ 100e2ea9-17e5-4eef-b880-823311f5d496
-ros_datadir()
+# ╔═╡ eaf0cef7-49c0-407f-8490-56df84a87c30
+mn_uranium = CSV.read(joinpath(pwd(), "data", "mn_uranium.csv"), DataFrame)
 
-# ╔═╡ d830f41c-0fb6-4bff-9fe0-0bd51f444779
-hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
+# ╔═╡ cb6e55ba-1423-49d8-b84e-f7a7766e5ebb
+begin
+	tmp_radon = leftjoin(mn_radon, mn_uranium[:, [:county, :homes]]; on=:county)
+	mn_radon_sorted = sort(tmp_radon, [order(:homes, rev=false), order(:county, rev=true)])
+end
 
-# ╔═╡ 35bee056-5cd8-48ee-b9c0-74a8b53229bd
-hibbs_lm = lm(@formula(vote ~ growth), hibbs)
-
-# ╔═╡ 3c4672aa-d17e-4681-9863-9ee026fefee6
-residuals(hibbs_lm)
-
-# ╔═╡ a9970ef7-1e0e-4976-b8c9-1db4dd3a222b
-mad(residuals(hibbs_lm))
-
-# ╔═╡ f48df50b-5450-4998-8dab-014c8b9d42a2
-std(residuals(hibbs_lm))
-
-# ╔═╡ be41c745-c87d-4f3a-ab4e-a8ae3b9ae091
-coef(hibbs_lm)
-
-# ╔═╡ 06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
+# ╔═╡ 1b78d487-9072-4e3a-9a9d-eaaec00d2a4e
 let
-	fig = Figure()
-	hibbs.label = string.(hibbs.year)
-	xlabel = "Average growth personal income [%]"
-	ylabel = "Incumbent's party vote share"
-	let
-		title = "Forecasting the election from the economy"
-		ax = Axis(fig[1, 1]; title, xlabel, ylabel)
-		for (ind, yr) in enumerate(hibbs.year)
-			annotations!("$(yr)"; position=(hibbs.growth[ind], hibbs.vote[ind]), textsize=10)
+	f = Figure()
+	ax = Axis(f[1, 1], xlabel="log_radon", ylabel="count")
+	lr_0 = mn_radon[mn_radon.floor .== 0, :]
+	h1 = hist!(lr_0.log_radon; bins = LinRange(-3, 4, 30), normalization = :none, color=:blue, strokewidth = 1, strokecolor = :black)
+	lr_1 = mn_radon[mn_radon.floor .== 1, :]
+	h2 = hist!(lr_1.log_radon; bins = LinRange(-3, 4, 30), normalization = :none, color=:red, strokewidth = 1, strokecolor = :black)
+	Legend(f[1, 2], [h1, h2], ["Basenent", "First floor"])
+	f
+end
+
+# ╔═╡ 68b5b903-15e8-4b6e-a5c9-e9ff68eb9393
+let
+	f = Figure()
+	ax = Axis(f[1, 1], xlabel="log_radon", ylabel="count")
+	lr_0 = mn_radon[mn_radon.floor .== 0, :]
+	h1 = density!(lr_0.log_radon; color=(:blue, 0.2), strokecolor = :blue, strokewidth = 3, strokearound = true)
+	lr_1 = mn_radon[mn_radon.floor .== 1, :]
+	h2 = density!(lr_1.log_radon; color=(:red, 0.2), strokecolor = :red, strokewidth = 3, strokearound = true)
+	Legend(f[1, 2], [h1, h2], ["Basenent", "First floor"])
+	f
+end
+
+# ╔═╡ 66b541cd-303e-410d-8969-39c22ca92cc0
+let
+	cat_labels = [x == 0 ? "Basement" : "First floor" for x in mn_radon.floor]
+	colors = [x == 0 ? :blue : :red for x in mn_radon.floor]
+	f = Figure()
+	ax = Axis(f[1, 1])
+	rainclouds!(ax, cat_labels, mn_radon.log_radon; plot_boxplots=true, plot_clouds=true, color=colors)
+	f
+end
+
+# ╔═╡ 531f6333-19ad-4850-9773-d0fa4c46a4c7
+length(unique(mn_radon.county))
+
+# ╔═╡ e472968a-47d9-4091-8518-e1bbd4947602
+length(unique(mn_radon[mn_radon.floor .== 0, [:county]]).county)
+
+# ╔═╡ 49eefcd1-14f5-496a-8724-19ac3fa5fee1
+length(unique(mn_radon[mn_radon.floor .== 1, [:county]]).county)
+
+# ╔═╡ 9467a274-4a6f-43e0-a4f8-23d43d17ff7e
+let
+	f = Figure()
+	ax = Axis(f[1, 1])
+	hist!(mn_uranium.homes; bins=LinRange(-10, 120, 60))
+	f
+end
+
+# ╔═╡ e1ac6e9d-46a8-4794-ae0f-c246e73c03a7
+begin
+	labs = unique(mn_radon_sorted.county)
+	counties = [findfirst(==(i), labs) for i in mn_radon_sorted.county]
+	boxplot(counties, mn_radon_sorted.log_radon; axis = (xticks = (1:85, labs), xticklabelrotation = pi/2, xticklabelsize=8))
+end
+
+# ╔═╡ 9af74a38-6ca3-4f4d-b944-ee8cf3949798
+mn_radon_sorted
+
+# ╔═╡ 10d52a16-e315-40db-b1d6-6edcc9efde62
+begin
+	f = Figure()
+	ax = Axis(f[1, 1]; xlabel="Observations per county", ylabel="County soil log_uranium")
+	scatter!(mn_uranium.homes, mn_uranium.log_uranium)
+	for r in eachrow(mn_uranium)
+		if r.homes > 25
+			annotations!(r.county; position=(r.homes - 4, r.log_uranium + 0.02), textsize=10)
 		end
 	end
-	let
-		x = LinRange(-1, 4, 100)
-		title = "Data and linear fit"
-		ax = Axis(fig[1, 2]; title, xlabel, ylabel)
-		scatter!(hibbs.growth, hibbs.vote)
-		lines!(x, coef(hibbs_lm)[1] .+ coef(hibbs_lm)[2] .* x; color=:darkred)
-		annotations!("vote = 46.2 + 3.0 * growth"; position=(0, 41))
-	end
-	fig
+	f
 end
 
 # ╔═╡ df07541f-13ec-4192-acde-82c02ab6bcf6
-md" #### Priors used in the Stan model."
+md" #### Complete pooling regression log_radon on floor."
 
 # ╔═╡ f11b4bdc-3ad4-467d-b75c-37da5e9dcb2c
-stan1_0 = "
+stan_cp = "
+/* simple linear regression model */
+data {
+  int<lower=0> N;
+  vector[N] x;
+  vector[N] y;
+}
 parameters {
-	real b;              // Coefficient independent variable
-	real a;              // Intercept
-	real<lower=0> sigma; // dispersion parameter
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
 }
 model {
-	// priors including constants
-	a ~ normal(50, 20);
-	b ~ normal(2, 10);
-  	sigma ~ exponential(1);
+  y ~ normal(alpha + beta * x, sigma);
 }";
 
 # ╔═╡ d2585fa2-0d5e-480f-863a-c7c515404057
@@ -134,296 +151,159 @@ tmpdir = mktempdir()
 
 # ╔═╡ db6a5dab-a738-42d3-a97a-4ca60894b9ca
 begin
-	m1_0s = SampleModel("m1_0s", stan1_0, tmpdir)
-	rc1_0s = stan_sample(m1_0s)
-	success(rc1_0s) && describe(m1_0s)
+	m_cp = SampleModel("cp", stan_cp, tmpdir)
+	rc_cp = stan_sample(m_cp; data=(N=length(mn_radon.floor), x=mn_radon.floor, y=mn_radon.log_radon))
+	success(rc_cp) && describe(m_cp, [:alpha, :beta, :sigma]; digits=2)
 end
 
 # ╔═╡ 9e471ad3-6c48-4f8a-b204-4ee864837898
 begin
-	post1_0s = read_samples(m1_0s, :dataframe)
-	ms1_0s = model_summary(post1_0s, [:a, :b, :sigma])
+	post_cp = read_samples(m_cp, :dataframe)
+	ms_cp = model_summary(post_cp, [:alpha, :beta, :sigma]; digits=2)
 end
 
 # ╔═╡ 10395123-f9c9-441d-a497-cb7be9fa7b18
 let
 	fig = Figure()
-	xlabel = "Average growth personal income [%]"
-	ylabel="Incumbent's party vote share"
-	ax = Axis(fig[1, 1]; title="Lines based on prior samples", 
-		xlabel, ylabel)
-	ylims!(ax, 40, 65)
-	xrange = LinRange(-1, 4, 200)
-	for i = 1:100
-		lines!(xrange, post1_0s.a[i] .+ post1_0s.b[i] .* xrange, color = :grey)
-	end
+	xlabel = "floor"
+	ylabel="log_radon"
+	ax = Axis(fig[1, 1]; title="Regression log_radon on floor, all counties.", 
+		xlabel, ylabel, xticks=([0, 1], ["Basement", "First floor"]))
+	scatter!(mn_radon.floor .+ rand(Normal(0, 0.01), 919), mn_radon.log_radon, markersize=2)
+	xrange = LinRange(0, 1, 30)
+	lines!(xrange, mean(post_cp.alpha) .+ mean(post_cp.beta) .* xrange, color = :grey)
 	fig
 end
 
-# ╔═╡ 1786b700-0d99-4541-87d4-b6308a2331bc
-let
-	f = Figure()
-	ax = Axis(f[1, 1]; title="Density :a")
-	density!(f[1, 1], post1_0s.a)
-	ax = Axis(f[1, 2]; title="Density :b")
-	density!(f[1, 2], post1_0s.b)
-	ax = Axis(f[1, 3]; title="Density :sigma")
-	density!(f[1, 3], post1_0s.sigma)
-	f
-end
+# ╔═╡ 8fd8ec26-7c0c-43a2-ae4c-af6e89b185fd
+md" #### No pooling regression log_radon on floor."
 
-# ╔═╡ 261c1e49-13be-4950-b211-29c35e0da5e8
-md" #### Conditioning based on the available data."
-
-# ╔═╡ 274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
-stan1_1 = "
-functions {
-}
+# ╔═╡ 6618c5b5-be74-40db-9488-f65581102556
+stan_np ="
 data {
-	int<lower=1> N;      // total number of observations
-	vector[N] growth;    // Independent variable: growth
-	vector[N] vote;      // Dependent variable: votes 
+  int<lower=1> N;  // observations
+  int<lower=1> J;  // counties
+  array[N] int<lower=1, upper=J> county;
+  vector[N] x;     // floor
+  vector[N] y;     // radon
 }
 parameters {
-	real b;              // Coefficient independent variable
-	real a;              // Intercept
-	real<lower=0> sigma; // Dispersion parameter
+  vector[J] alpha;
+  real beta;
+  real<lower=0> sigma;
 }
 model {
-	vector[N] mu;
-	mu = a + b * growth;
-
-	// priors including constants
-	a ~ normal(50, 20);
-	b ~ normal(2, 10);
-  	sigma ~ exponential(1);
-
-	// likelihood including constants
-	vote ~ normal(mu, sigma);
+  y ~ normal(alpha[county] + beta * x, sigma);  
+  alpha ~ normal(0, 10);
+  beta ~ normal(0, 10);
+  sigma ~ normal(0, 10);
+}
+generated quantities {
+  array[N] real y_rep = normal_rng(alpha[county] + beta * x, sigma);
 }";
 
-# ╔═╡ 953eea61-f05f-4233-86aa-d5af3b47b41e
-let
-	data = (N=16, vote=hibbs.vote, growth=hibbs.growth)
-	global m1_1s = SampleModel("m1_1s", stan1_1, tmpdir)
-	global rc1_1s = stan_sample(m1_1s; data)
-	success(rc1_1s) && describe(m1_1s, [:a, :b, :sigma])
-end
-
-# ╔═╡ 9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
-if success(rc1_1s)
-	post1_1s = read_samples(m1_1s, :dataframe)
-	ms1_1s = model_summary(post1_1s, [:a, :b, :sigma])
-end
-
-# ╔═╡ 9842ce96-98f9-4a87-9208-d32d16418c15
-plot_chains(post1_1s, [:a, :b, :sigma])
-
-# ╔═╡ 3a256571-459c-4346-a511-377a273cbb66
-trankplot(post1_1s, "b")
-
-# ╔═╡ 8abccff4-2015-467e-92d6-067bd8db4e10
-let
-	N = 100
-	x = LinRange(-1, 4, N)
-	a = rand(Normal(50, 20), N)
-	b = rand(Normal(2, 10), N)
-	mat1 = zeros(50, 100)
-	for i in 1:50
-		mat1[i, :] = a[i] .+ b[i] .* x
-	end
-	ā = ms1_1s[:a, :mean]
-	b̄ = ms1_1s[:b, :mean]
-
-	# Maybe could use a `link` function here
-	mat2 = zeros(50, 100)
-	for i in 1:50
-		mat2[i, :] = post1_1s.a[i] .+ post1_1s.b[i] .* x
-	end
-
-	fig = Figure()
-	xlabel = "Average growth personal income [%]"
-	ylabel="Incumbent's party vote share"
-	ax = Axis(fig[1, 1]; title="Lines based on prior samples", 
-		xlabel, ylabel)
-	ylims!(ax, 40, 65)
-	series!(fig[1, 1], x, mat1, solid_color=:lightgrey)
-	ax = Axis(fig[1, 2]; title="Lines based on posterior samples", 
-		xlabel, ylabel)
-	series!(fig[1, 2], x, mat2, solid_color=:lightgrey)
-	scatter!(hibbs.growth, hibbs.vote)
-	lines!(fig[1, 2], x, ā .+ b̄ * x, color = :red)
-
-	fig
-end
-
-# ╔═╡ a872c820-57b6-45d5-a7e9-2ab7349c81e7
-let
-	f = Figure()
-	ax = Axis(f[1, 1]; title="Density :a")
-	xlims!(ax, -10, 125)
-	density!(post1_0s.a)
-	ax = Axis(f[1, 2]; title="Density :b")
-	xlims!(ax, -40, 45)
-	density!(post1_0s.b)
-	ax = Axis(f[1, 3]; title="Density :sigma")
-	density!(post1_1s.sigma)
-	
-	ax = Axis(f[2, 1]; title="Density :a")
-	density!(post1_1s.a)
-	xlims!(ax, -10, 125)
-	ax = Axis(f[2, 2]; title="Density :b")
-	xlims!(ax, -40, 45)
-	density!(post1_1s.b)
-	ax = Axis(f[2, 3]; title="Density :sigma")
-	density!(post1_1s.sigma)
-	f
-end
-
-# ╔═╡ 99259579-97fa-46f5-93b4-710b3180ded2
+# ╔═╡ 78a27a91-ed1d-4123-8c5c-db16937e38f1
 begin
-	fig = Figure()
-	hibbs.label = string.(hibbs.year)
-	xlabel = "Average growth personal income [%]"
-	ylabel="Incumbent's party vote share"
-
-	# Same figure as above
-	let
-		title = "Forecasting the election from the economy"
-		ax = Axis(fig[1, 1]; title, xlabel, ylabel)
-		xlims!(ax, -0.5, 5)
-		for (ind, yr) in enumerate(hibbs.year)
-			annotations!("$(yr)"; position=(hibbs.growth[ind], hibbs.vote[ind]), textsize=12)
-		end
-	end
-
-	# Superimpose Stan fit
-	let
-		ā = ms1_1s[:a, :mean]
-		b̄ = ms1_1s[:b, :mean]
-		title = "Compare GLM and Stan fitted lines"
-		axis = (; title, xlabel, ylabel)
-		
-		x = LinRange(-1, 4.4, 100)
-		title = "Data and linear fit"
-		ax = Axis(fig[1, 2]; title, xlabel, ylabel)
-		xlims!(ax, -0.5, 5)
-		scatter!(hibbs.growth, hibbs.vote)
-		lines!(x, coef(hibbs_lm)[1] .+ coef(hibbs_lm)[2] .* x)
-		lines!(x, ā .+  b̄ .* x; color=:darkred)
-		annotations!("vote = $(round(ā, digits=1)) + $(round(b̄, digits=0)) \
-			* growth"; position=(0, 41), textsize=16)
-	end
-	fig
+	m_np = SampleModel("m_np", stan_np, tmpdir)
+	rc_np = stan_sample(m_np; data=(N=length(mn_radon.floor), J=85, county=mn_radon.county_id, x=mn_radon.floor, y=mn_radon.log_radon))
+	success(rc_np) && describe(m_np, [:beta, :sigma]; digits=2)
 end
 
-# ╔═╡ 750a66c1-47bc-466c-a7f1-567640e2e2bb
-let
-	N = 10000
-	nt = (
-		a = post1_1s.a,
-		b = post1_1s.b,
-		σ = post1_1s.sigma,
-	)
-
-	fig = Figure()
-	for (i, k) in enumerate(keys(nt))
-		ax = Axis(fig[1, i]; title = "Density $k")
-		den = density!(nt[k])
-	end
-	fig
+# ╔═╡ 655a13b1-a2c4-4703-9040-b17f361d62ab
+begin
+	post_np = read_samples(m_np, :dataframe)
+	ms_np = model_summary(post_np, [:beta, :sigma];digits=2)
 end
 
-# ╔═╡ 95cdfe9f-a06f-49f3-888f-34e47025c810
-md"#### Compute median and mad."
-
-# ╔═╡ 10b925db-5f9c-4603-b49a-bd9b9a2e64d0
-md" ##### Alternative computation of mad()."
-
-# ╔═╡ 14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
-let
-	1.483 .* [
-		median(abs.(post1_1s.a .- median(post1_1s.a))),
-		median(abs.(post1_1s.b .- median(post1_1s.b))),
-		median(abs.(post1_1s.sigma .- median(post1_1s.sigma)))]
+# ╔═╡ bfe787fa-9512-47d9-af60-e71c4f43646b
+begin
+	no_pool_post_alpha_df = DataFrame(post_np, :alpha)
+	no_pool_post_alpha = Matrix(no_pool_post_alpha_df)
 end
 
-# ╔═╡ e87627bb-1a5a-4209-8519-e0905e5fe2ca
-ms1_1 = model_summary(post1_1s, ["a", "b", "sigma"])
-
-# ╔═╡ b51a73a2-3f21-4811-9057-bcce4222e1ec
-ms1_1[:b, :mad_sd]
-
-# ╔═╡ 1d9665a6-639e-4ef1-8b5c-151944a8fc33
-ss1_1 = describe(m1_1s, ["a", "b", "sigma"]; digits=2)
-
-# ╔═╡ f544db54-86e2-4694-9cac-fc42e2c00e50
-ss1_1["a", "ess"]
-
-# ╔═╡ f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
-md" ##### Quick simulation with median, mad, mean and std of Normal observations."
-
-# ╔═╡ 1f44495d-50cf-4e92-97b2-d19a82c46c78
-nt = (x=rand(Normal(5, 2), 10000),)
-
-# ╔═╡ a72ca80f-b42e-4638-8ffd-f23dc70c7bc0
-[median(nt.x), mad(nt.x), mean(nt.x), std(nt.x)]
-
-# ╔═╡ 4db28bae-8901-44fe-a479-3272342413c6
-sd_mean = round(mad(nt.x)/√10000; digits=2)
-
-# ╔═╡ 0b711521-5b96-429e-8e73-e2d68d94c0ce
-median(abs.(nt.x .- median(nt.x)))
-
-# ╔═╡ e193199a-188b-4fa9-ae51-0fce401872e0
-1.483 * median(abs.(nt.x .- median(nt.x)))
-
-# ╔═╡ be3898d3-af87-4808-a1a7-4e2e76583ee2
-let
-	fig = Figure()
-	ax = Axis(fig[1, 1]; title = "Density")
-	den = density!(nt.x)
-	fig
+# ╔═╡ d7d2be8a-d792-451b-9136-2d439047c07c
+begin
+	no_poll_alpha_mean = mean(no_pool_post_alpha; dims=1)
+	errorbars_mean(no_pool_post_alpha_df, [0.055, 0.945])
 end
 
-# ╔═╡ a2be1bd7-6897-438c-928f-787e36134ec7
-quantile(nt.x, [0.025, 0.975])
+# ╔═╡ 3c4742b2-36cf-4721-bb91-7e12c39db494
+describe(no_pool_post_alpha_df)
 
-# ╔═╡ 6ce605aa-9504-4ebc-bfdf-c4c54c048647
-quantile(nt.x, [0.25, 0.75])
+# ╔═╡ 32489edb-1ad5-4f1e-81fd-0b2b8087fb36
+begin
+	df_y_rep_np = DataFrame(post_np, :y_rep)
+	y_rep_np = Matrix(df_y_rep_np)
+end
 
-# ╔═╡ 86636b94-f945-4bb1-b7b9-90bc5cc0c836
-md" ###### A closer look at Stan's summary. Below the full version:"
+# ╔═╡ 6d01fcba-1af1-4c73-a0ea-fb90fede4247
+mean(y_rep_np; dims=1)
 
-# ╔═╡ 45a307ad-4f6a-4cb6-9182-bda870c42679
-success(rc1_1s) && describe(m1_1s; showall=true)
+# ╔═╡ 52a15ff6-d705-4b62-bf45-dd6693f4f9d9
+md" #### Partial pooling regression log_radon on floor."
 
-# ╔═╡ 8a04158e-a24d-477f-9cf8-30f062ec29bb
-md" ###### Usually I use the abbreviated version:"
+# ╔═╡ d2087caa-d168-4a75-b8df-8d00e393bcfd
+stan_pp = "
+data {
+  int<lower=1> N;  // observations
+  int<lower=1> J;  // counties
+  array[N] int<lower=1, upper=J> county;
+  vector[N] x;
+  vector[N] y;
+}
+parameters {
+  real mu_alpha;
+  real<lower=0> sigma_alpha;
+  vector<offset=mu_alpha, multiplier=sigma_alpha>[J] alpha;  // non-centered parameterization
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha[county] + beta * x, sigma);  
+  alpha ~ normal(mu_alpha, sigma_alpha); // partial-pooling
+  beta ~ normal(0, 10);
+  sigma ~ normal(0, 10);
+  mu_alpha ~ normal(0, 10);
+  sigma_alpha ~ normal(0, 10);
+}
+generated quantities {
+  array[N] real y_rep = normal_rng(alpha[county] + beta * x, sigma);
+}";
 
-# ╔═╡ a3277285-5acb-4117-a567-67fdfd2cd4ba
-ss1_1s = success(rc1_1s) && describe(m1_1s, names(post1_1s))
+# ╔═╡ 8ed5bbeb-96cb-42e4-8617-bab46b1dbcdd
+begin
+	m_pp = SampleModel("m_pp", stan_pp, tmpdir)
+	rc_pp = stan_sample(m_pp; data=(N=length(mn_radon.floor), J=85, county=mn_radon.county_id, x=mn_radon.floor, y=mn_radon.log_radon))
+	success(rc_pp) && describe(m_pp)
+end
 
-# ╔═╡ bd15d29b-552e-4f62-bb55-c57dca312b5b
-ms1_1s
+# ╔═╡ d176a5b2-1e33-4b81-998a-6f336a19b57f
+begin
+	post_pp = read_samples(m_pp, :dataframe)
+	ms_pp = model_summary(post_pp, [:beta, :sigma])
+end
 
-# ╔═╡ 29c2e746-a79d-4bef-84d2-2f2172807185
-ss1_1s[:a, :ess]
+# ╔═╡ a7cf073b-4b91-486c-9b28-6ffa82a96ee6
+begin
+	df_alpha_pp = DataFrame(post_pp, :alpha)
+	alpha_pp = Matrix(df_alpha_pp)
+end
 
-# ╔═╡ a07ce943-1ce7-4961-93e2-c3ed8e78d2e3
-ms1_1s[:a, :mad_sd]
+# ╔═╡ 97eb6e86-c123-4e9c-882b-587a4b77b3aa
+begin
+	df_y_rep_pp = DataFrame(post_pp, :y_rep)
+	y_rep_pp = Matrix(df_y_rep_pp)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
-GLM = "~1.8.0"
 GLMakie = "~0.6.13"
 RegressionAndOtherStories = "~0.7.2"
 StanSample = "~6.10.1"
@@ -435,7 +315,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "b9f160c34313fc7a93a01bdbf70fffa7dfea8510"
+project_hash = "206e06df945ce771eb38fcc537716ab2dd1a094b"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -2212,62 +2092,45 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─2580c05d-0b53-44d4-a137-45354270e899
-# ╟─62150db9-7078-4ab9-b193-63ec2a721dd2
-# ╟─eb7ea04a-da52-4e69-ac3e-87dc7f014652
 # ╟─cf39df58-3371-4535-88e4-f3f6c0404500
 # ╠═0616ece8-ccf8-4281-bfed-9c1192edf88e
 # ╟─4755dab0-d228-41d3-934a-56f2863a5652
 # ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
 # ╠═550371ad-d411-4e66-9d63-7329322c6ea1
-# ╟─5fdc1b11-ce9b-4f67-8e2e-5ab22cd75b70
-# ╠═100e2ea9-17e5-4eef-b880-823311f5d496
-# ╠═d830f41c-0fb6-4bff-9fe0-0bd51f444779
-# ╠═35bee056-5cd8-48ee-b9c0-74a8b53229bd
-# ╠═3c4672aa-d17e-4681-9863-9ee026fefee6
-# ╠═a9970ef7-1e0e-4976-b8c9-1db4dd3a222b
-# ╠═f48df50b-5450-4998-8dab-014c8b9d42a2
-# ╠═be41c745-c87d-4f3a-ab4e-a8ae3b9ae091
-# ╠═06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
+# ╠═64b4a0ff-57ab-40e0-846c-607ba56f87c0
+# ╠═f41a688c-dd21-499b-a8fd-e04479d65833
+# ╠═eaf0cef7-49c0-407f-8490-56df84a87c30
+# ╠═cb6e55ba-1423-49d8-b84e-f7a7766e5ebb
+# ╠═1b78d487-9072-4e3a-9a9d-eaaec00d2a4e
+# ╠═68b5b903-15e8-4b6e-a5c9-e9ff68eb9393
+# ╠═66b541cd-303e-410d-8969-39c22ca92cc0
+# ╠═531f6333-19ad-4850-9773-d0fa4c46a4c7
+# ╠═e472968a-47d9-4091-8518-e1bbd4947602
+# ╠═49eefcd1-14f5-496a-8724-19ac3fa5fee1
+# ╠═9467a274-4a6f-43e0-a4f8-23d43d17ff7e
+# ╠═e1ac6e9d-46a8-4794-ae0f-c246e73c03a7
+# ╠═9af74a38-6ca3-4f4d-b944-ee8cf3949798
+# ╠═10d52a16-e315-40db-b1d6-6edcc9efde62
 # ╟─df07541f-13ec-4192-acde-82c02ab6bcf6
 # ╠═f11b4bdc-3ad4-467d-b75c-37da5e9dcb2c
 # ╠═d2585fa2-0d5e-480f-863a-c7c515404057
 # ╠═db6a5dab-a738-42d3-a97a-4ca60894b9ca
 # ╠═9e471ad3-6c48-4f8a-b204-4ee864837898
 # ╠═10395123-f9c9-441d-a497-cb7be9fa7b18
-# ╠═1786b700-0d99-4541-87d4-b6308a2331bc
-# ╟─261c1e49-13be-4950-b211-29c35e0da5e8
-# ╠═274dc84c-b416-4f9e-8ff2-6ca0f08a40cf
-# ╠═953eea61-f05f-4233-86aa-d5af3b47b41e
-# ╠═9d1a8b9a-2b0c-4b8d-af31-1717e7a5ecd7
-# ╠═9842ce96-98f9-4a87-9208-d32d16418c15
-# ╠═3a256571-459c-4346-a511-377a273cbb66
-# ╠═8abccff4-2015-467e-92d6-067bd8db4e10
-# ╠═a872c820-57b6-45d5-a7e9-2ab7349c81e7
-# ╠═99259579-97fa-46f5-93b4-710b3180ded2
-# ╠═750a66c1-47bc-466c-a7f1-567640e2e2bb
-# ╟─95cdfe9f-a06f-49f3-888f-34e47025c810
-# ╟─10b925db-5f9c-4603-b49a-bd9b9a2e64d0
-# ╠═14cbb5c2-db18-4bc1-a9b9-06ef2ab2ccec
-# ╠═e87627bb-1a5a-4209-8519-e0905e5fe2ca
-# ╠═b51a73a2-3f21-4811-9057-bcce4222e1ec
-# ╠═1d9665a6-639e-4ef1-8b5c-151944a8fc33
-# ╠═f544db54-86e2-4694-9cac-fc42e2c00e50
-# ╟─f8e7241f-46a9-4e2b-bdc9-8c63da6bc8ab
-# ╠═1f44495d-50cf-4e92-97b2-d19a82c46c78
-# ╠═a72ca80f-b42e-4638-8ffd-f23dc70c7bc0
-# ╠═4db28bae-8901-44fe-a479-3272342413c6
-# ╠═0b711521-5b96-429e-8e73-e2d68d94c0ce
-# ╠═e193199a-188b-4fa9-ae51-0fce401872e0
-# ╠═be3898d3-af87-4808-a1a7-4e2e76583ee2
-# ╠═a2be1bd7-6897-438c-928f-787e36134ec7
-# ╠═6ce605aa-9504-4ebc-bfdf-c4c54c048647
-# ╟─86636b94-f945-4bb1-b7b9-90bc5cc0c836
-# ╠═45a307ad-4f6a-4cb6-9182-bda870c42679
-# ╟─8a04158e-a24d-477f-9cf8-30f062ec29bb
-# ╠═a3277285-5acb-4117-a567-67fdfd2cd4ba
-# ╠═bd15d29b-552e-4f62-bb55-c57dca312b5b
-# ╠═29c2e746-a79d-4bef-84d2-2f2172807185
-# ╠═a07ce943-1ce7-4961-93e2-c3ed8e78d2e3
+# ╟─8fd8ec26-7c0c-43a2-ae4c-af6e89b185fd
+# ╠═6618c5b5-be74-40db-9488-f65581102556
+# ╠═78a27a91-ed1d-4123-8c5c-db16937e38f1
+# ╠═655a13b1-a2c4-4703-9040-b17f361d62ab
+# ╠═bfe787fa-9512-47d9-af60-e71c4f43646b
+# ╠═d7d2be8a-d792-451b-9136-2d439047c07c
+# ╠═3c4742b2-36cf-4721-bb91-7e12c39db494
+# ╠═32489edb-1ad5-4f1e-81fd-0b2b8087fb36
+# ╠═6d01fcba-1af1-4c73-a0ea-fb90fede4247
+# ╟─52a15ff6-d705-4b62-bf45-dd6693f4f9d9
+# ╠═d2087caa-d168-4a75-b8df-8d00e393bcfd
+# ╠═8ed5bbeb-96cb-42e4-8617-bab46b1dbcdd
+# ╠═d176a5b2-1e33-4b81-998a-6f336a19b57f
+# ╠═a7cf073b-4b91-486c-9b28-6ffa82a96ee6
+# ╠═97eb6e86-c123-4e9c-882b-587a4b77b3aa
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

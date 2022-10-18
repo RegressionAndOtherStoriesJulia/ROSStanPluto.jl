@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.12
+# v0.19.13
 
 using Markdown
 using InteractiveUtils
@@ -1771,6 +1771,7 @@ version = "3.2.0"
 [[deps.Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+version = "1.9.0"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]

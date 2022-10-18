@@ -1,3 +1,4 @@
+
 data {
   int<lower=1> N;  // observations
   int<lower=1> J;  // counties

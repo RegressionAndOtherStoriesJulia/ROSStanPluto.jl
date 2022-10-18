@@ -212,7 +212,7 @@ end
 # ╔═╡ 655a13b1-a2c4-4703-9040-b17f361d62ab
 begin
 	post_np = read_samples(m_np, :dataframe)
-	ms_np = model_summary(post_np, [:beta, :sigma];digits=2)
+	ms_np = model_summary(post_np, [:beta, :sigma]; digits=2)
 end
 
 # ╔═╡ bfe787fa-9512-47d9-af60-e71c4f43646b
@@ -223,7 +223,7 @@ end
 
 # ╔═╡ d7d2be8a-d792-451b-9136-2d439047c07c
 begin
-	no_poll_alpha_mean = mean(no_pool_post_alpha; dims=1)
+	no_pool_alpha_mean = mean(no_pool_post_alpha; dims=1)
 	errorbars_mean(no_pool_post_alpha_df, [0.055, 0.945])
 end
 
@@ -274,13 +274,13 @@ generated quantities {
 begin
 	m_pp = SampleModel("m_pp", stan_pp, tmpdir)
 	rc_pp = stan_sample(m_pp; data=(N=length(mn_radon.floor), J=85, county=mn_radon.county_id, x=mn_radon.floor, y=mn_radon.log_radon))
-	success(rc_pp) && describe(m_pp)
+	success(rc_pp) && describe(m_pp, [:beta, :mu_alpha, :sigma_alpha, :sigma]; digits=2)
 end
 
 # ╔═╡ d176a5b2-1e33-4b81-998a-6f336a19b57f
 begin
 	post_pp = read_samples(m_pp, :dataframe)
-	ms_pp = model_summary(post_pp, [:beta, :sigma])
+	ms_pp = model_summary(post_pp, [:beta, :mu_alpha, :sigma_alpha, :sigma], digits=2)
 end
 
 # ╔═╡ a7cf073b-4b91-486c-9b28-6ffa82a96ee6
@@ -289,11 +289,17 @@ begin
 	alpha_pp = Matrix(df_alpha_pp)
 end
 
+# ╔═╡ 57edcd70-e399-462a-9c71-0aa8ea592bd6
+mean(alpha_pp; dims=1)
+
 # ╔═╡ 97eb6e86-c123-4e9c-882b-587a4b77b3aa
 begin
 	df_y_rep_pp = DataFrame(post_pp, :y_rep)
 	y_rep_pp = Matrix(df_y_rep_pp)
 end
+
+# ╔═╡ df22024e-6e52-4c08-a4b6-68a413784193
+mean(y_rep_pp; dims=1)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2131,6 +2137,8 @@ version = "3.5.0+0"
 # ╠═8ed5bbeb-96cb-42e4-8617-bab46b1dbcdd
 # ╠═d176a5b2-1e33-4b81-998a-6f336a19b57f
 # ╠═a7cf073b-4b91-486c-9b28-6ffa82a96ee6
+# ╠═57edcd70-e399-462a-9c71-0aa8ea592bd6
 # ╠═97eb6e86-c123-4e9c-882b-587a4b77b3aa
+# ╠═df22024e-6e52-4c08-a4b6-68a413784193
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

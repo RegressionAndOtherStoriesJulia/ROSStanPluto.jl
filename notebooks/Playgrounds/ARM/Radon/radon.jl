@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.13
+# v0.19.14
 
 using Markdown
 using InteractiveUtils
@@ -11,6 +11,7 @@ using Pkg
 begin
     # Specific to ROSStanPluto
     using StanSample
+	using DataFramesMeta
 	
 	# Graphics related
     using GLMakie
@@ -41,25 +42,61 @@ md"###### A typical set of Julia packages to include in notebooks."
 pwd()
 
 # ╔═╡ f41a688c-dd21-499b-a8fd-e04479d65833
-mn_radon = CSV.read(joinpath(pwd(), "data", "mn_radon.csv"), DataFrame)
+begin
+	mn_radon = CSV.read(joinpath(pwd(), "data", "mn_radon.csv"), DataFrame)
+	mn_radon.county = rstrip.(String.(mn_radon.county))
+	mn_radon
+end
 
 # ╔═╡ eaf0cef7-49c0-407f-8490-56df84a87c30
-mn_uranium = CSV.read(joinpath(pwd(), "data", "mn_uranium.csv"), DataFrame)
+begin
+	mn_uranium = CSV.read(joinpath(pwd(), "data", "mn_uranium.csv"), DataFrame)
+	mn_uranium.county = rstrip.(String.(mn_uranium.county))
+	mn_uranium
+end
 
 # ╔═╡ cb6e55ba-1423-49d8-b84e-f7a7766e5ebb
 begin
-	tmp_radon = leftjoin(mn_radon, mn_uranium[:, [:county, :homes]]; on=:county)
-	mn_radon_sorted = sort(tmp_radon, [order(:homes, rev=false), order(:county, rev=true)])
+	mn_not_sorted = leftjoin(mn_radon, mn_uranium[:, [:county, :homes]]; on=:county)
+	mn_basement = mn_not_sorted[mn_not_sorted.floor .== 0, :]
+	mn_floor = mn_not_sorted[mn_not_sorted.floor .== 1, :]
+	mn_basement_length = nrow(mn_basement)
+	mn_floor_length = nrow(mn_floor)
+	# Sort according no of homes with measurements
+	mn_sorted = sort(mn_not_sorted, [order(:homes, rev=false), order(:county_id, rev=true)])
+	mn_basement_sorted = mn_sorted[mn_sorted.floor .== 0, :]
+	mn_floor_sorted = mn_sorted[mn_sorted.floor .== 1, :]
+	# Sort mn_uranium the same way
+	mn_uranium_sorted = sort(mn_uranium, [order(:homes, rev=false), order(:county_id, rev=true)])
+	mn_sorted
 end
+
+# ╔═╡ 534496cf-d97c-4584-b220-a7b642447c6a
+begin
+	df_by = @by(mn_not_sorted,:county, :mean_log_radon = mean(:log_radon))
+	df_by.log_uranium = mn_uranium.log_uranium
+	df_by.homes = mn_uranium.homes
+	df_by.county_id = mn_uranium.county_id
+	df_by
+end
+
+# ╔═╡ 6e4893d8-e11b-4bda-8f65-d14476b1b4f8
+sort(df_by, [order(:homes), order(:county_id, rev=true)])
+
+# ╔═╡ a78cf2d0-0c7e-470c-9f31-d1140416f31f
+mn_sorted
+
+# ╔═╡ d73b3781-4c42-420f-ad0b-5d7ed5629049
+mn_uranium_sorted
 
 # ╔═╡ 1b78d487-9072-4e3a-9a9d-eaaec00d2a4e
 let
 	f = Figure()
 	ax = Axis(f[1, 1], xlabel="log_radon", ylabel="count")
-	lr_0 = mn_radon[mn_radon.floor .== 0, :]
-	h1 = hist!(lr_0.log_radon; bins = LinRange(-3, 4, 30), normalization = :none, color=:blue, strokewidth = 1, strokecolor = :black)
-	lr_1 = mn_radon[mn_radon.floor .== 1, :]
-	h2 = hist!(lr_1.log_radon; bins = LinRange(-3, 4, 30), normalization = :none, color=:red, strokewidth = 1, strokecolor = :black)
+	h1 = hist!(mn_basement.log_radon; bins = LinRange(-3, 4, 30), normalization = :none, color=:blue, strokewidth = 1,
+		strokecolor = :black)
+	h2 = hist!(mn_floor.log_radon; bins = LinRange(-3, 4, 30), normalization = :none, color=:red, strokewidth = 1,
+		strokecolor = :black)
 	Legend(f[1, 2], [h1, h2], ["Basenent", "First floor"])
 	f
 end
@@ -68,10 +105,8 @@ end
 let
 	f = Figure()
 	ax = Axis(f[1, 1], xlabel="log_radon", ylabel="count")
-	lr_0 = mn_radon[mn_radon.floor .== 0, :]
-	h1 = density!(lr_0.log_radon; color=(:blue, 0.2), strokecolor = :blue, strokewidth = 3, strokearound = true)
-	lr_1 = mn_radon[mn_radon.floor .== 1, :]
-	h2 = density!(lr_1.log_radon; color=(:red, 0.2), strokecolor = :red, strokewidth = 3, strokearound = true)
+	h1 = density!(mn_basement.log_radon; color=(:blue, 0.2), strokecolor = :blue, strokewidth = 3, strokearound = true)
+	h2 = density!(mn_floor.log_radon; color=(:red, 0.2), strokecolor = :red, strokewidth = 3, strokearound = true)
 	Legend(f[1, 2], [h1, h2], ["Basenent", "First floor"])
 	f
 end
@@ -87,13 +122,13 @@ let
 end
 
 # ╔═╡ 531f6333-19ad-4850-9773-d0fa4c46a4c7
-length(unique(mn_radon.county))
+length(unique(mn_not_sorted.county))
 
 # ╔═╡ e472968a-47d9-4091-8518-e1bbd4947602
-length(unique(mn_radon[mn_radon.floor .== 0, [:county]]).county)
+length(unique(mn_basement.county))
 
 # ╔═╡ 49eefcd1-14f5-496a-8724-19ac3fa5fee1
-length(unique(mn_radon[mn_radon.floor .== 1, [:county]]).county)
+length(unique(mn_floor.county))
 
 # ╔═╡ 9467a274-4a6f-43e0-a4f8-23d43d17ff7e
 let
@@ -104,21 +139,18 @@ let
 end
 
 # ╔═╡ e1ac6e9d-46a8-4794-ae0f-c246e73c03a7
-begin
-	labs = unique(mn_radon_sorted.county)
-	counties = [findfirst(==(i), labs) for i in mn_radon_sorted.county]
-	boxplot(counties, mn_radon_sorted.log_radon; axis = (xticks = (1:85, labs), xticklabelrotation = pi/2, xticklabelsize=8))
+let
+	labs = unique(mn_sorted.county)
+	counties = [findfirst(==(i), labs) for i in mn_sorted.county]
+	boxplot(counties, mn_sorted.log_radon; axis = (xticks = (1:85, labs), xticklabelrotation = pi/2, xticklabelsize=8))
 end
 
-# ╔═╡ 9af74a38-6ca3-4f4d-b944-ee8cf3949798
-mn_radon_sorted
-
-# ╔═╡ 10d52a16-e315-40db-b1d6-6edcc9efde62
-begin
+# ╔═╡ 80c03d27-a44e-4967-812f-0d4523d86249
+let
 	f = Figure()
 	ax = Axis(f[1, 1]; xlabel="Observations per county", ylabel="County soil log_uranium")
-	scatter!(mn_uranium.homes, mn_uranium.log_uranium)
-	for r in eachrow(mn_uranium)
+	scatter!(mn_not_sorted.homes, mn_not_sorted.log_uranium)
+	for r in eachrow(mn_not_sorted)
 		if r.homes > 25
 			annotations!(r.county; position=(r.homes - 4, r.log_uranium + 0.02), textsize=10)
 		end
@@ -147,12 +179,12 @@ model {
 }";
 
 # ╔═╡ d2585fa2-0d5e-480f-863a-c7c515404057
-tmpdir = mktempdir()
+tmpdir = joinpath(pwd(), "tmp")
 
 # ╔═╡ db6a5dab-a738-42d3-a97a-4ca60894b9ca
 begin
 	m_cp = SampleModel("cp", stan_cp, tmpdir)
-	rc_cp = stan_sample(m_cp; data=(N=length(mn_radon.floor), x=mn_radon.floor, y=mn_radon.log_radon))
+	rc_cp = stan_sample(m_cp; data=(N=length(mn_not_sorted.floor), x=mn_not_sorted.floor, y=mn_not_sorted.log_radon))
 	success(rc_cp) && describe(m_cp, [:alpha, :beta, :sigma]; digits=2)
 end
 
@@ -169,10 +201,21 @@ let
 	ylabel="log_radon"
 	ax = Axis(fig[1, 1]; title="Regression log_radon on floor, all counties.", 
 		xlabel, ylabel, xticks=([0, 1], ["Basement", "First floor"]))
-	scatter!(mn_radon.floor .+ rand(Normal(0, 0.01), 919), mn_radon.log_radon, markersize=2)
+	scatter!(mn_basement.floor .+ rand(Normal(0, 0.01), mn_basement_length), mn_basement.log_radon, markersize=2, color=:blue)
+	scatter!(mn_floor.floor .+ rand(Normal(0, 0.01), mn_floor_length), mn_floor.log_radon, markersize=2, color=:red)
 	xrange = LinRange(0, 1, 30)
-	lines!(xrange, mean(post_cp.alpha) .+ mean(post_cp.beta) .* xrange, color = :grey)
+	lines!(xrange, mean(post_cp.alpha) .+ mean(post_cp.beta) .* xrange, color = :darkgrey)
 	fig
+end
+
+# ╔═╡ fbe0ea14-69be-4cc6-9d38-4e114b2e2562
+let
+	f = Figure()
+	ax = Axis(f[1, 1], xlabel="county-level log_uranium", ylabel="home log_radon", title="Home log_radon basement")
+	scatter!(mn_basement.log_uranium, mn_basement.log_radon; markersize=6)
+	ax = Axis(f[1, 2], xlabel="county-level log_uranium", title="Home log_radon first floor")
+	scatter!(mn_floor.log_uranium, mn_floor.log_radon; color=:red, markersize=6)
+	f
 end
 
 # ╔═╡ 8fd8ec26-7c0c-43a2-ae4c-af6e89b185fd
@@ -205,39 +248,120 @@ generated quantities {
 # ╔═╡ 78a27a91-ed1d-4123-8c5c-db16937e38f1
 begin
 	m_np = SampleModel("m_np", stan_np, tmpdir)
-	rc_np = stan_sample(m_np; data=(N=length(mn_radon.floor), J=85, county=mn_radon.county_id, x=mn_radon.floor, y=mn_radon.log_radon))
-	success(rc_np) && describe(m_np, [:beta, :sigma]; digits=2)
+	rc_np = stan_sample(m_np; data=(N=length(mn_not_sorted.floor), J=85, county=mn_not_sorted.county_id, x=mn_not_sorted.floor,
+		y=mn_not_sorted.log_radon))
+	sum_np = success(rc_np) && read_summary(m_np)
+	sum_np[1:12, :]
 end
 
-# ╔═╡ 655a13b1-a2c4-4703-9040-b17f361d62ab
-begin
-	post_np = read_samples(m_np, :dataframe)
-	ms_np = model_summary(post_np, [:beta, :sigma]; digits=2)
+# ╔═╡ 3c34799c-86bb-4e30-b0de-fda416ac26d5
+np_post = read_samples(m_np, :dataframe)
+
+# ╔═╡ af7d7105-ba33-42d5-8e82-98fcff8d3d37
+function mlu(data, PI = (0.055, 0.945))
+    m = mean.(eachcol(data))
+    lower = quantile.(eachcol(data), PI[1])
+    upper = quantile.(eachcol(data), PI[2])
+    return (mean = m,
+            lower = lower,
+            upper = upper)
 end
 
 # ╔═╡ bfe787fa-9512-47d9-af60-e71c4f43646b
-begin
-	no_pool_post_alpha_df = DataFrame(post_np, :alpha)
-	no_pool_post_alpha = Matrix(no_pool_post_alpha_df)
+let
+	m, l, u = mlu(DataFrame(np_post, :alpha), (0.16, 0.84))
+	labs = unique(mn_not_sorted.county)
+	homes = [mn_not_sorted[mn_not_sorted.county .==  l, :homes][1] for l in labs]
+	global np_alpha = DataFrame(county=labs, county_id=mn_uranium.county_id, homes=homes, mean=m, lower=l, upper=u)
 end
 
-# ╔═╡ d7d2be8a-d792-451b-9136-2d439047c07c
-begin
-	no_pool_alpha_mean = mean(no_pool_post_alpha; dims=1)
-	errorbars_mean(no_pool_post_alpha_df, [0.055, 0.945])
+# ╔═╡ 14cfd6e9-0d8a-4e1e-b601-c924380bff27
+let
+	f = Figure()
+	ax = Axis(f[1, 1]; xticks = (1:85, np_alpha.county), xticklabelrotation = pi/2, xticklabelsize=8,
+		title="No-pooling estimates of alpha values in each county.", ylabel="alpha", xlabel="counties")
+	hlines!(ms_cp[:alpha, :mean]; color=:orange)
+	indx = 1
+	for r in eachrow(np_alpha)
+		lines!([indx, indx], [np_alpha.lower[indx], np_alpha.upper[indx]]; color=:grey)
+		scatter!(np_alpha.mean)
+		indx += 1
+	end
+	f
 end
 
-# ╔═╡ 3c4742b2-36cf-4721-bb91-7e12c39db494
-describe(no_pool_post_alpha_df)
-
-# ╔═╡ 32489edb-1ad5-4f1e-81fd-0b2b8087fb36
-begin
-	df_y_rep_np = DataFrame(post_np, :y_rep)
-	y_rep_np = Matrix(df_y_rep_np)
+# ╔═╡ bcc93793-f264-4070-aca0-b166fb16c91d
+let
+	np_alpha = sort(np_alpha, [order(:homes), order(:county_id, rev=true)])
+	f = Figure()
+	ax = Axis(f[1, 1]; xticks = (1:85, np_alpha.county), xticklabelrotation = pi/2, xticklabelsize=8,
+		title="No-pooling estimates of alpha values in each county, sorted by no_of_homes.", ylabel="alpha", xlabel="counties")
+	hlines!(ms_cp[:alpha, :mean]; color=:orange)
+	indx = 1
+	for r in eachrow(np_alpha)
+		lines!([indx, indx], [np_alpha.lower[indx], np_alpha.upper[indx]]; color=:grey)
+		scatter!(np_alpha.mean)
+		indx += 1
+	end
+	f
 end
 
-# ╔═╡ 6d01fcba-1af1-4c73-a0ea-fb90fede4247
-mean(y_rep_np; dims=1)
+# ╔═╡ 2ffeb590-d367-468c-aa2b-87fc462c6870
+md" #### Predictive values."
+
+# ╔═╡ 54cf46fb-fdef-493f-9d2c-89ff0675994a
+begin
+	m_np_bsmt = SampleModel("m_np", stan_np, tmpdir)
+	rc_np_bsmt = stan_sample(m_np_bsmt; data=(N=length(mn_basement_sorted.floor), J=85, county=mn_basement_sorted.county_id,
+		x=mn_basement_sorted.floor, y=mn_basement_sorted.log_radon))
+	sum_np_bsmt = success(rc_np_bsmt) && read_summary(m_np_bsmt)
+	sum_np_bsmt
+end
+
+# ╔═╡ 0df0c8ad-0499-4b89-9987-e01284f1fe5e
+function mslu(data, PI = (0.055, 0.945))
+    m = mean.(eachcol(data))
+	s = std.(eachcol(data))
+    lower = quantile.(eachcol(data), PI[1])
+    upper = quantile.(eachcol(data), PI[2])
+    return (mean = m,
+			std = s,
+            lower = lower,
+            upper = upper)
+end
+
+# ╔═╡ fc03f276-2e2b-46a3-8059-5df0ae5eec6a
+let
+	global np_post_bsmt = read_samples(m_np_bsmt, :dataframe)
+	m, s, l, u = mslu(DataFrame(np_post_bsmt, :y_rep), (0.16, 0.84))
+	global np_y_rep_bsmt = DataFrame(county=mn_basement_sorted.county, mean=m, std=s,lower=l, upper=u)
+end
+
+# ╔═╡ c3d9fe98-003b-446c-a058-79b120309b83
+let
+	labs = unique(mn_basement_sorted.county)
+	counties = [findfirst(==(i), labs) for i in mn_basement_sorted.county]
+	
+	f = Figure()
+	ax = Axis(f[1, 1]; xticks = (1:85, labs), xticklabelrotation = pi/2, xticklabelsize=8,
+		xlabel="Counties (sorted by no of measurements)", ylabel="Predicted log_radon value", title="No pooling predictions")
+	scatter!(counties, np_y_rep_bsmt.mean)
+	hlines!(mean(Array(DataFrame(np_post_bsmt, :y_rep))); color=:orange)
+	for (indx, county) in enumerate(counties)
+		lines!([county, county], 
+			[
+				np_y_rep_bsmt.mean[indx] - np_y_rep_bsmt.std[indx]/sqrt(mn_basement_sorted.homes[indx]), 
+				np_y_rep_bsmt.mean[indx] + np_y_rep_bsmt.std[indx]/sqrt(mn_basement_sorted.homes[indx])
+			], color=:grey)
+	end
+	f
+end
+
+# ╔═╡ 5fc3ef9b-c41c-4b7f-b1ac-1a60cc5d36d1
+DataFrame(np_post_bsmt, :y_rep)
+
+# ╔═╡ dd1492d2-e994-4371-9dcd-246ae498035d
+mean(Array(DataFrame(np_post_bsmt, :y_rep)))
 
 # ╔═╡ 52a15ff6-d705-4b62-bf45-dd6693f4f9d9
 md" #### Partial pooling regression log_radon on floor."
@@ -283,33 +407,69 @@ begin
 	ms_pp = model_summary(post_pp, [:beta, :mu_alpha, :sigma_alpha, :sigma], digits=2)
 end
 
-# ╔═╡ a7cf073b-4b91-486c-9b28-6ffa82a96ee6
-begin
-	df_alpha_pp = DataFrame(post_pp, :alpha)
-	alpha_pp = Matrix(df_alpha_pp)
+# ╔═╡ 9e27130e-e397-4014-a2ca-fbf4972651ad
+pp_post = read_samples(m_pp, :dataframe)
+
+# ╔═╡ db722a37-3044-4ab2-8a0d-a3a8565a5ccd
+let
+	m, l, u = mlu(DataFrame(pp_post, :alpha), (0.16, 0.84))
+	labs = unique(mn_not_sorted.county)
+	homes = [mn_not_sorted[mn_not_sorted.county .==  l, :homes][1] for l in labs]
+	global pp_alpha = DataFrame(county=labs, county_id=mn_uranium.county_id, homes=homes, mean=m, lower=l, upper=u)
 end
 
-# ╔═╡ 57edcd70-e399-462a-9c71-0aa8ea592bd6
-mean(alpha_pp; dims=1)
-
-# ╔═╡ 97eb6e86-c123-4e9c-882b-587a4b77b3aa
-begin
-	df_y_rep_pp = DataFrame(post_pp, :y_rep)
-	y_rep_pp = Matrix(df_y_rep_pp)
+# ╔═╡ c725ed6c-607d-4f09-93dd-70f8c39d7127
+let
+	pp_alpha = sort(np_alpha, [order(:homes), order(:county_id, rev=true)])
+	f = Figure()
+	ax = Axis(f[1, 1]; xticks = (1:85, pp_alpha.county), xticklabelrotation = pi/2, xticklabelsize=8,
+		title="Partial-pooling estimates of alpha values in each county, sorted by homes.", ylabel="alpha", xlabel="counties")
+	hlines!(ms_cp[:alpha, :mean]; color=:orange)
+	indx = 1
+	for r in eachrow(pp_alpha)
+		lines!([indx, indx], [pp_alpha.lower[indx], pp_alpha.upper[indx]]; color=:grey)
+		scatter!(pp_alpha.mean)
+		indx += 1
+	end
+	f
 end
 
-# ╔═╡ df22024e-6e52-4c08-a4b6-68a413784193
-mean(y_rep_pp; dims=1)
+# ╔═╡ e5d7c810-35ff-4875-ba6b-485411b99640
+let
+	np_alpha = sort(np_alpha, [order(:homes), order(:county_id, rev=true)])
+	f = Figure()
+	ax = Axis(f[1, 1]; title="No-pooling", ylabel="alpha", xlabel="counties")
+	hlines!(ms_cp[:alpha, :mean]; color=:orange)
+	indx = 1
+	for r in eachrow(np_alpha)
+		lines!([indx, indx], [np_alpha.lower[indx], np_alpha.upper[indx]]; color=:grey)
+		scatter!(np_alpha.mean)
+		indx += 1
+	end
+	
+	pp_alpha = sort(pp_alpha, [order(:homes), order(:county_id, rev=true)])
+	ax = Axis(f[1, 2]; title="Partial-pooling", ylabel="alpha", xlabel="counties")
+	hlines!(ms_cp[:alpha, :mean]; color=:orange)
+	indx = 1
+	for r in eachrow(pp_alpha)
+		lines!([indx, indx], [pp_alpha.lower[indx], pp_alpha.upper[indx]]; color=:grey)
+		scatter!(pp_alpha.mean)
+		indx += 1
+	end
+	f
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
+DataFramesMeta = "~0.12.0"
 GLMakie = "~0.6.13"
 RegressionAndOtherStories = "~0.7.2"
 StanSample = "~6.10.1"
@@ -321,7 +481,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "206e06df945ce771eb38fcc537716ab2dd1a094b"
+project_hash = "c5a37b7ef67ac6d21f674ad171fc1dde11d84f59"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -483,6 +643,11 @@ git-tree-sha1 = "5f5a975d996026a8dd877c35fe26a7b8179c02ba"
 uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 version = "0.10.6"
 
+[[deps.Chain]]
+git-tree-sha1 = "8c4920235f6c561e401dfe569beb8b924adad003"
+uuid = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+version = "0.5.0"
+
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
 git-tree-sha1 = "e7ff6cadf743c098e08fca25c91103ee4303c9bb"
@@ -608,6 +773,12 @@ deps = ["Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExte
 git-tree-sha1 = "db2a9cb664fcea7836da4b414c3278d71dd602d2"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 version = "1.3.6"
+
+[[deps.DataFramesMeta]]
+deps = ["Chain", "DataFrames", "MacroTools", "OrderedCollections", "Reexport"]
+git-tree-sha1 = "a70c340c1306febfd770a932218561b5e19cf0f6"
+uuid = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
+version = "0.12.0"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -2107,6 +2278,10 @@ version = "3.5.0+0"
 # ╠═f41a688c-dd21-499b-a8fd-e04479d65833
 # ╠═eaf0cef7-49c0-407f-8490-56df84a87c30
 # ╠═cb6e55ba-1423-49d8-b84e-f7a7766e5ebb
+# ╠═534496cf-d97c-4584-b220-a7b642447c6a
+# ╠═6e4893d8-e11b-4bda-8f65-d14476b1b4f8
+# ╠═a78cf2d0-0c7e-470c-9f31-d1140416f31f
+# ╠═d73b3781-4c42-420f-ad0b-5d7ed5629049
 # ╠═1b78d487-9072-4e3a-9a9d-eaaec00d2a4e
 # ╠═68b5b903-15e8-4b6e-a5c9-e9ff68eb9393
 # ╠═66b541cd-303e-410d-8969-39c22ca92cc0
@@ -2115,30 +2290,36 @@ version = "3.5.0+0"
 # ╠═49eefcd1-14f5-496a-8724-19ac3fa5fee1
 # ╠═9467a274-4a6f-43e0-a4f8-23d43d17ff7e
 # ╠═e1ac6e9d-46a8-4794-ae0f-c246e73c03a7
-# ╠═9af74a38-6ca3-4f4d-b944-ee8cf3949798
-# ╠═10d52a16-e315-40db-b1d6-6edcc9efde62
+# ╠═80c03d27-a44e-4967-812f-0d4523d86249
 # ╟─df07541f-13ec-4192-acde-82c02ab6bcf6
 # ╠═f11b4bdc-3ad4-467d-b75c-37da5e9dcb2c
 # ╠═d2585fa2-0d5e-480f-863a-c7c515404057
 # ╠═db6a5dab-a738-42d3-a97a-4ca60894b9ca
 # ╠═9e471ad3-6c48-4f8a-b204-4ee864837898
 # ╠═10395123-f9c9-441d-a497-cb7be9fa7b18
+# ╠═fbe0ea14-69be-4cc6-9d38-4e114b2e2562
 # ╟─8fd8ec26-7c0c-43a2-ae4c-af6e89b185fd
 # ╠═6618c5b5-be74-40db-9488-f65581102556
 # ╠═78a27a91-ed1d-4123-8c5c-db16937e38f1
-# ╠═655a13b1-a2c4-4703-9040-b17f361d62ab
+# ╠═3c34799c-86bb-4e30-b0de-fda416ac26d5
+# ╠═af7d7105-ba33-42d5-8e82-98fcff8d3d37
 # ╠═bfe787fa-9512-47d9-af60-e71c4f43646b
-# ╠═d7d2be8a-d792-451b-9136-2d439047c07c
-# ╠═3c4742b2-36cf-4721-bb91-7e12c39db494
-# ╠═32489edb-1ad5-4f1e-81fd-0b2b8087fb36
-# ╠═6d01fcba-1af1-4c73-a0ea-fb90fede4247
+# ╠═14cfd6e9-0d8a-4e1e-b601-c924380bff27
+# ╠═bcc93793-f264-4070-aca0-b166fb16c91d
+# ╟─2ffeb590-d367-468c-aa2b-87fc462c6870
+# ╠═54cf46fb-fdef-493f-9d2c-89ff0675994a
+# ╠═0df0c8ad-0499-4b89-9987-e01284f1fe5e
+# ╠═fc03f276-2e2b-46a3-8059-5df0ae5eec6a
+# ╠═c3d9fe98-003b-446c-a058-79b120309b83
+# ╠═5fc3ef9b-c41c-4b7f-b1ac-1a60cc5d36d1
+# ╠═dd1492d2-e994-4371-9dcd-246ae498035d
 # ╟─52a15ff6-d705-4b62-bf45-dd6693f4f9d9
 # ╠═d2087caa-d168-4a75-b8df-8d00e393bcfd
 # ╠═8ed5bbeb-96cb-42e4-8617-bab46b1dbcdd
 # ╠═d176a5b2-1e33-4b81-998a-6f336a19b57f
-# ╠═a7cf073b-4b91-486c-9b28-6ffa82a96ee6
-# ╠═57edcd70-e399-462a-9c71-0aa8ea592bd6
-# ╠═97eb6e86-c123-4e9c-882b-587a4b77b3aa
-# ╠═df22024e-6e52-4c08-a4b6-68a413784193
+# ╠═9e27130e-e397-4014-a2ca-fbf4972651ad
+# ╠═db722a37-3044-4ab2-8a0d-a3a8565a5ccd
+# ╠═c725ed6c-607d-4f09-93dd-70f8c39d7127
+# ╠═e5d7c810-35ff-4875-ba6b-485411b99640
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

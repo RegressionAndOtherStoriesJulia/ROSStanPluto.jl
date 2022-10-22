@@ -295,7 +295,7 @@ let
 	np_alpha = sort(np_alpha, [order(:homes), order(:county_id, rev=true)])
 	f = Figure()
 	ax = Axis(f[1, 1]; xticks = (1:85, np_alpha.county), xticklabelrotation = pi/2, xticklabelsize=8,
-		title="No-pooling estimates of alpha values in each county, sorted by no_of_homes.", ylabel="alpha", xlabel="counties")
+		title="No-pooling estimates of alpha values in each county, sorted by homes.", ylabel="alpha", xlabel="counties")
 	hlines!(ms_cp[:alpha, :mean]; color=:orange)
 	indx = 1
 	for r in eachrow(np_alpha)
@@ -376,11 +376,11 @@ data {
   vector[N] y;
 }
 parameters {
+  real beta;
+  real<lower=0> sigma;
   real mu_alpha;
   real<lower=0> sigma_alpha;
   vector<offset=mu_alpha, multiplier=sigma_alpha>[J] alpha;  // non-centered parameterization
-  real beta;
-  real<lower=0> sigma;
 }
 model {
   y ~ normal(alpha[county] + beta * x, sigma);  
@@ -439,21 +439,23 @@ let
 	np_alpha = sort(np_alpha, [order(:homes), order(:county_id, rev=true)])
 	f = Figure()
 	ax = Axis(f[1, 1]; title="No-pooling", ylabel="alpha", xlabel="counties")
+	ylims!(ax, [0, 3.5])
 	hlines!(ms_cp[:alpha, :mean]; color=:orange)
 	indx = 1
 	for r in eachrow(np_alpha)
 		lines!([indx, indx], [np_alpha.lower[indx], np_alpha.upper[indx]]; color=:grey)
-		scatter!(np_alpha.mean)
+		scatter!(np_alpha.mean; color=:darkblue, markersize=12, marker='+')
 		indx += 1
 	end
 	
 	pp_alpha = sort(pp_alpha, [order(:homes), order(:county_id, rev=true)])
 	ax = Axis(f[1, 2]; title="Partial-pooling", ylabel="alpha", xlabel="counties")
+	ylims!(ax, [0, 3.5])
 	hlines!(ms_cp[:alpha, :mean]; color=:orange)
 	indx = 1
 	for r in eachrow(pp_alpha)
 		lines!([indx, indx], [pp_alpha.lower[indx], pp_alpha.upper[indx]]; color=:grey)
-		scatter!(pp_alpha.mean)
+		scatter!(pp_alpha.mean; color=:darkred, markersize=12, marker='o')
 		indx += 1
 	end
 	f

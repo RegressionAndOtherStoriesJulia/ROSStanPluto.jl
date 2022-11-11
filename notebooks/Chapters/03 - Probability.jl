@@ -1,11 +1,11 @@
 ### A Pluto.jl notebook ###
-# v0.19.13
+# v0.19.14
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 3ec83660-c767-49a4-ab27-923ea3443c98
-using Pkg, DrWatson
+using Pkg
 
 # ╔═╡ 44233635-6129-4ccd-8bad-bbafa5287112
 # ╠═╡ show_logs = false
@@ -331,7 +331,6 @@ md" ### 3.6 - Probability modeling"
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
@@ -339,7 +338,6 @@ RegressionAndOtherStories = "21324389-b050-441a-ba7b-9a837781bda0"
 StanSample = "c1514b29-d3a0-5178-b312-660c88baa699"
 
 [compat]
-DrWatson = "~2.11.1"
 GLM = "~1.8.0"
 GLMakie = "~0.7.0"
 RegressionAndOtherStories = "~0.7.2"
@@ -352,7 +350,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-DEV"
 manifest_format = "2.0"
-project_hash = "9b56050ed08d1e370c880af1c89b1218439c27c7"
+project_hash = "2a07007617a9c6d0fd71cae3ab031cffc2c20488"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -588,7 +586,7 @@ version = "0.1.25"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "0.5.2+0"
+version = "1.0.1+0"
 
 [[deps.CompositionsBase]]
 git-tree-sha1 = "455419f7e328a1a2493cabc6428d79e951349769"
@@ -716,12 +714,6 @@ version = "0.27.23"
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
-
-[[deps.DrWatson]]
-deps = ["Dates", "FileIO", "JLD2", "LibGit2", "MacroTools", "Pkg", "Random", "Requires", "Scratch", "UnPack"]
-git-tree-sha1 = "9ebe5d6941e8d12921226cba4d9220c72600d0de"
-uuid = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
-version = "2.11.1"
 
 [[deps.DualNumbers]]
 deps = ["Calculus", "NaNMath", "SpecialFunctions"]
@@ -1063,12 +1055,6 @@ version = "1.4.0"
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
-
-[[deps.JLD2]]
-deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "Pkg", "Printf", "Reexport", "TranscodingStreams", "UUIDs"]
-git-tree-sha1 = "1c3ff7416cb727ebf4bab0491a56a296d7b8cf1d"
-uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
-version = "0.4.25"
 
 [[deps.JLLWrappers]]
 deps = ["Preferences"]
@@ -1893,7 +1879,7 @@ version = "5.10.1+0"
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
-version = "1.0.0"
+version = "1.0.3"
 
 [[deps.TableOperations]]
 deps = ["SentinelArrays", "Tables", "Test"]
@@ -2096,7 +2082,7 @@ version = "1.4.0+3"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
-version = "1.2.12+3"
+version = "1.2.13+0"
 
 [[deps.ZygoteRules]]
 deps = ["MacroTools"]

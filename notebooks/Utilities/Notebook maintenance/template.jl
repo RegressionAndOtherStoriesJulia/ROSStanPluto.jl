@@ -14,7 +14,7 @@ html"""
 </style>
 """
 
-using Pkg, DrWatson
+using Pkg
 
 md"##### A typical set of Julia packages to include in notebooks."
 

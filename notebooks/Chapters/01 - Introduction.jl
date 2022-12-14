@@ -677,9 +677,9 @@ StanSample = "~6.11.7"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.9.0-DEV"
+julia_version = "1.10.0-DEV"
 manifest_format = "2.0"
-project_hash = "38001d0577bf4735a5bee27827baf919762d159e"
+project_hash = "1c4621161ffc52f18ae51ab1dffe12d1ed17c223"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"

@@ -348,7 +348,7 @@ StanSample = "~6.10.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.9.0-DEV"
+julia_version = "1.10.0-DEV"
 manifest_format = "2.0"
 project_hash = "2a07007617a9c6d0fd71cae3ab031cffc2c20488"
 

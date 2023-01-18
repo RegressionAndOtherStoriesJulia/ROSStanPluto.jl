@@ -34,7 +34,7 @@ To (locally) use this project, do the following:
 Download ROSStanPluto.jl from [RegressionAndOtherStoriesJulia](https://github.com/RegressionAndOtherStoriesJulia/), e.g. to clone it to the `~/.julia/dev/ROSStanPluto` directory:
 
 ```Julia
-$ cd ~/.julia/dev
+$ cd ~/.julia/dev # This is just my preference!
 $ git clone https://github.com/RegressionAndOtherStoriesJulia/ROSStanPluto.jl ROSStanPluto
 $ cd ROSStanPluto/notebooks # Move to the downloaded notebooks directory
 $ julia # Start the Julia REPL
@@ -47,7 +47,5 @@ julia> Pluto.run()
 ```
 
 A Pluto page should open in a browser. See [this page](https://www.juliafordatascience.com/first-steps-5-pluto/) for a quick Pluto introduction.
-
-## Usage
 
 Select the `open a file` entry box and select `chapters`. Select a chapter notebook and press `open`.

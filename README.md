@@ -17,6 +17,8 @@ This project will ultimately contain three sets of Pluto notebooks that contain 
 
 These notebooks are intended to be used in conjunction with above books. Each notebook contains a chapter. It is not the intention to cover each example in all books, just to get the reader going.
 
+I consider both projects `ROSStanPluto` and `SR2StanPluto` as "work in progress projects", no guarantees all notebooks will always work without hickups.
+
 ## Prerequisites
 
 To complete below steps and run the notebooks you need:

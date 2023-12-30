@@ -28,7 +28,7 @@ julia>
 
 ### Creating pdf files (cd to notebooks/Chapters)
 
-```Julis
+```Julia
 import PlutoPDF
 #cd("path_to_chapters")
 files = readdir(pwd(); join=true)

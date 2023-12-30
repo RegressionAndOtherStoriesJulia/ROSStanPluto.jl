@@ -16,7 +16,7 @@ begin
     using StanSample
     
     # Graphics related
-    using GLMakie
+    using CairoMakie
 
     # Common data files and functions
     using RegressionAndOtherStories

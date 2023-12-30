@@ -9,15 +9,13 @@
 
 ## Purpose
 
-This project will contain (work is in very early stages of progress!!!) a set of Pluto notebooks that contain Julia versions of the examples in the R project `ROS-Examples` based on the book ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
+This project will ultimately contain three sets of Pluto notebooks that contain selected Julia examples used in the books:
 
-These notebooks are intended to be used in conjunction with above book. Each notebook contains a chapter.
+1. ["ARM" book](http://www.stat.columbia.edu/~gelman/arm/)
+2. ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
+3. ["Advanced Regression and Multilevel Models," by Gelman, Hill, Goodrich, Gabry, Simpson, and Vehtari (in progress, expected late 2024?)](http://www.stat.columbia.edu/~gelman/armm/)
 
-## Personal note
-
-This project will take quite a while to complete, I expect at least a year.
-
-But it has a special meaning to me: When I started to work on Julia interfaces for Stan's cmdstan binary in 2011, I did that to work through the ["ARM" book](http://www.stat.columbia.edu/~gelman/arm/). The ["ROS" book](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview) in a sense is a successor to the ARM book.
+These notebooks are intended to be used in conjunction with above books. Each notebook contains a chapter. It is not the intention to cover each example in all books, just to get the reader going.
 
 ## Prerequisites
 

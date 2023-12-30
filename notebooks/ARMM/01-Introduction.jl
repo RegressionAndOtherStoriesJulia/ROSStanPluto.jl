@@ -1,11 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.19.20
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 5084b8f0-65ac-4704-b1fc-2a9008132bd7
 using Pkg
+
+# ╔═╡ d7753cf6-7452-421a-a3ec-76e07646f808
+Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
 
 # ╔═╡ 550371ad-d411-4e66-9d63-7329322c6ea1
 begin
@@ -24,7 +27,7 @@ begin
 end
 
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"## See chapter 1 in Regression and Other Stories."
+md"## Just a place holder for now for ARMM."
 
 # ╔═╡ cf39df58-3371-4535-88e4-f3f6c0404500
 md" ###### Widen the cells."
@@ -36,13 +39,10 @@ html"""
         margin: 0 auto;
         max-width: 2000px;
         padding-left: max(160px, 10%);
-        padding-right: max(160px, 30%);
+        padding-right: max(160px, 15%);
     }
 </style>
 """
-
-# ╔═╡ 3d46979f-8d7e-4e05-8db5-7aa2d674c8c7
-#default_figure_resolution = (1100, 600);
 
 # ╔═╡ 4755dab0-d228-41d3-934a-56f2863a5652
 md"###### A typical set of Julia packages to include in notebooks."
@@ -89,7 +89,7 @@ coef(hibbs_lm)
 
 # ╔═╡ 06ab4f30-68cc-4e35-9fa2-b8f8f25d3776
 let
-	fig = Figure(resolution = default_figure_resolution)
+	fig = Figure(; size=default_figure_resolution)
 	hibbs.label = string.(hibbs.year)
 	xlabel = "Average growth personal income [%]"
 	ylabel = "Incumbent's party vote share"
@@ -140,21 +140,53 @@ md" ##### Post-test density for each grade conditioned on treatment."
 
 # ╔═╡ 54e3c7b6-c2b0-47d0-890a-5c55a19e42d9
 let
-	f = Figure(resolution = default_figure_resolution)
-	axis = (; width = 150, height = 150)
+	f = Figure(; size=default_figure_resolution)
+	axis = (; width = 200, height = 200)
 	el = data(electric) * mapping(:post_test, col=:grade, color=:treatment)
 	plt = el * AlgebraOfGraphics.histogram(;bins=20) * mapping(row=:treatment)
 	draw!(f[1, 1], plt; axis)
 	f
 end
 
-# ╔═╡ 3c03311f-bdb8-4c06-a870-3e70a628f684
+# ╔═╡ 63020f0b-ff5e-453b-ba70-98340c3d5265
 let
-	f = Figure(resolution = default_figure_resolution)
-	axis = (; width = 150, height = 150)
-	el = data(electric) * mapping(:post_test, col=:grade, color=:treatment)
-	plt = el * AlgebraOfGraphics.density() * mapping(row=:treatment)
-	draw!(f[1, 1], plt; axis)
+	f = Figure(; size=default_figure_resolution)
+	axis = Axis(f[1, 1])
+	for i in unique(electric.grade)
+		for j in unique(electric.treatment)
+			tmp = electric[electric.grade .== i .&& electric.treatment .== 0, :]
+			CairoMakie.density!(tmp.post_test)
+		end
+	end
+	axis = Axis(f[2, 1])
+	for i in unique(electric.grade)
+		for j in unique(electric.treatment)
+			tmp = electric[electric.grade .== i .&& electric.treatment .== 1, :]
+			CairoMakie.density!(tmp.post_test)
+		end
+	end
+	f
+end
+
+# ╔═╡ 308b5a5d-991e-4fe7-8ceb-c8e3f4f269e1
+let
+	f = Figure(; size=default_figure_resolution)
+	for i in unique(electric.grade)
+		for j in unique(electric.treatment)
+			axis = Axis(f[1, i]; title="Grade=$i. Treatment=0")
+			xlims!(25, 140)
+			tmp = electric[electric.grade .== i .&& electric.treatment .== 0, :]
+			CairoMakie.density!(tmp.post_test)
+		end
+	end
+	for i in unique(electric.grade)
+		for j in unique(electric.treatment)
+			axis = Axis(f[2, i]; title="Grade=$i. Treatment=1")
+			xlims!(25, 140)
+			tmp = electric[electric.grade .== i .&& electric.treatment .== 1, :]
+			CairoMakie.density!(tmp.post_test)
+		end
+	end
 	f
 end
 
@@ -162,16 +194,7 @@ end
 md"
 !!! note
 
-In above cell, as density() is exported by both GLMakie and AlgebraOfGraphics, it needs to be qualified."
-
-# ╔═╡ 30b7e449-bcc7-4dbe-aef3-a50b85048f03
-let
-	f = Figure(resolution = default_figure_resolution)
-	el = data(electric) * mapping(:post_test, col=:grade)
-	plt = el * AlgebraOfGraphics.density() * mapping(color=:treatment)
-	draw!(f[1, 1], plt)
-	f
-end
+In above cell, as density() is exported by both CairoMakie and AlgebraOfGraphics, it needs to be qualified."
 
 # ╔═╡ 093c1e47-00be-407e-83a4-0ac96be3262c
 let
@@ -244,7 +267,7 @@ median(peace[peace.peacekeepers .== 0 .&& peace.censored .== 0, :delay])
 
 # ╔═╡ 1182e0db-b7da-4233-a24a-27fa16e5c49b
 let
-	f = Figure(resolution = default_figure_resolution)
+	f = Figure(; size=default_figure_resolution)
 	pks = peace[peace.peacekeepers .== 1 .&& peace.censored .== 0, :]
 	nopks = peace[peace.peacekeepers .== 0 .&& peace.censored .== 0,:]
 	
@@ -294,7 +317,7 @@ end;
 
 # ╔═╡ 2ec2b2b1-f1d2-4cd5-a23f-2b80abc5d4cd
 begin
-	f = Figure(resolution = default_figure_resolution)
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1], title = "With UN peacekeepers",
 		xlabel = "Pre-treatment measure of problems in country", 
 		ylabel = "Delay [yrs] before return to conflict")
@@ -411,7 +434,7 @@ ms1_4_1s["b.2", "mad_sd"]
 md" ###### Nested dataframes are handy to obtain a matrix of say the b values:"
 
 # ╔═╡ a76df572-cf7f-451a-84b0-5023b146da0e
-array(nd1_4_1s, :b)
+nd1_4_1s.b
 
 # ╔═╡ 55405cd5-9727-4d64-9994-170007f9ad1b
 Array(post1_4_1s[:, ["b.1", "b.2"]])
@@ -419,7 +442,7 @@ Array(post1_4_1s[:, ["b.1", "b.2"]])
 # ╔═╡ e5f22961-b531-4519-bfb0-a8196d77ba6c
 let
 	x1 = 1.0:0.01:5.0
-	f = Figure(resolution = default_figure_resolution)
+	f = Figure(; size=default_figure_resolution)
 	medians = ms1_4_1s[:, "median"]
 	ax = Axis(f[1, 2], title = "Regression on continuous treatment",
 		xlabel = "Treatment level", ylabel = "Outcome")
@@ -501,7 +524,7 @@ let
 	x1 = LinRange(1, 6, 50)
 	y1 = [rand(Normal(5 + 30exp(-x1[i]), 2), 1)[1] for i in 1:length(x1)]
 	
-	f = Figure(resolution = default_figure_resolution)
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1], title = "Linear regression",
 		xlabel = "Treatments", ylabel = "Outcomes")
 	scatter!(x1, y1)
@@ -541,7 +564,7 @@ let
 	â₂, b̂₂ = coef(lm1_8_1)
 	x = LinRange(0, maximum(df1_8.xx), 40)
 	
-	f = Figure(resolution = default_figure_resolution)
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Figure 1.8")
 	scatter!(df1_8.xx[df1_8.z .== 0], df1_8.yy[df1_8.z .== 0])
 	scatter!(df1_8.xx[df1_8.z .== 1], df1_8.yy[df1_8.z .== 1])
@@ -631,7 +654,7 @@ let
 	l_range = LinRange(6.0, 15.0, 100)
 	l_times = mean.(link(post1_5s, (r, l) -> r.a + r.b + r.c * l, l_range))
 	
-	f = Figure(resolution = default_figure_resolution)
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1], title = "Time in the air on width and length",
 		xlabel = "Width/Length", ylabel = "Time in the air")
 	
@@ -662,9 +685,9 @@ read_samples(m1_5s, :nesteddataframe)
 # ╟─eb7ea04a-da52-4e69-ac3e-87dc7f014652
 # ╟─cf39df58-3371-4535-88e4-f3f6c0404500
 # ╠═0616ece8-ccf8-4281-bfed-9c1192edf88e
-# ╠═3d46979f-8d7e-4e05-8db5-7aa2d674c8c7
 # ╟─4755dab0-d228-41d3-934a-56f2863a5652
 # ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
+# ╠═d7753cf6-7452-421a-a3ec-76e07646f808
 # ╠═550371ad-d411-4e66-9d63-7329322c6ea1
 # ╟─87902f0e-5919-45b3-89a6-b88a7dab9363
 # ╟─56aa0b49-1e8a-4390-904d-6f7551f849ea
@@ -685,9 +708,9 @@ read_samples(m1_5s, :nesteddataframe)
 # ╠═82c83206-d5d7-4cc2-b4cd-d43e9c84c68a
 # ╟─420b8920-5f2a-4e3b-a32e-622252b84444
 # ╠═54e3c7b6-c2b0-47d0-890a-5c55a19e42d9
-# ╠═3c03311f-bdb8-4c06-a870-3e70a628f684
+# ╠═63020f0b-ff5e-453b-ba70-98340c3d5265
+# ╠═308b5a5d-991e-4fe7-8ceb-c8e3f4f269e1
 # ╟─fb1e8fd3-7217-4955-83bd-551693f1507b
-# ╠═30b7e449-bcc7-4dbe-aef3-a50b85048f03
 # ╠═093c1e47-00be-407e-83a4-0ac96be3262c
 # ╟─35307905-cee1-4f35-a149-cdaaf7fc1294
 # ╠═f4b870c6-240d-4a46-98c8-1a0dbe7dfc6b

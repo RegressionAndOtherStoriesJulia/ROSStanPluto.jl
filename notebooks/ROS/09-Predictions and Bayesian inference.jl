@@ -1,11 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.19.10
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 5084b8f0-65ac-4704-b1fc-2a9008132bd7
 using Pkg
+
+# ╔═╡ 7ea36871-e64e-43f4-8d8c-b4a197986a31
+Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
 
 # ╔═╡ f71640c9-3918-475e-b32b-c85424bbcf5e
 begin
@@ -15,7 +18,7 @@ begin
 	using StanSample
 	
 	# Graphics related
-    using GLMakie
+    using CairoMakie
 
 	# Common data files and functions
 	using RegressionAndOtherStories
@@ -48,7 +51,7 @@ hibbs_lm = lm(@formula(vote ~ growth), hibbs)
 
 # ╔═╡ 376493a4-9dc2-4867-8de5-ce852b07905e
 let
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 	hibbs.label = string.(hibbs.year)
 	xlabel = "Average growth personal income [%]"
 	ylabel = "Incumbent's party vote share"
@@ -56,7 +59,7 @@ let
 		title = "Forecasting the election from the economy"
 		ax = Axis(fig[1, 1]; title, xlabel, ylabel)
 		for (ind, yr) in enumerate(hibbs.year)
-			annotations!("$(yr)"; position=(hibbs.growth[ind], hibbs.vote[ind]), textsize=10)
+			annotations!("$(yr)"; position=(hibbs.growth[ind], hibbs.vote[ind]), fontsize=10)
 		end
 	end
 	let
@@ -136,7 +139,7 @@ median(sims; dims=1)
 
 # ╔═╡ f89d5f4b-2648-480b-99ee-0807eb5c07a5
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Density :a", subtitle="+/- 1 std err = blue, +/- 2 std err = yellow")
 	hist!(post7_1s.a; bins=15, color = :lightgrey, strokewidth = 1, strokecolor = :grey)
 	one = vlines!([ms7_1s[:a, :median] - ms7_1s[:a, :mad_sd], ms7_1s[:a, :median] + ms7_1s[:a, :mad_sd]]; linewidth=3)
@@ -158,7 +161,7 @@ let
 	xlabel = "Average growth personal income [%]"
 	ylabel = "Incumbent's party vote share"
 
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 
 	ax = Axis(fig[1, 1]; title="Plot the mcmc draws for :a and :b", xlabel=":a", ylabel=":b")
 	scatter!(post7_1s.a, post7_1s.b; markersize=4)
@@ -234,7 +237,7 @@ let
 	xlabel = "x"
 	ylabel = "y"
 
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 
 	ax = Axis(fig[1, 1]; title="Posterior simulation under default prior", xlabel="Intercept, a", ylabel="Slope, b")
 	scatter!(post9_1s.a, post9_1s.b; markersize=4)
@@ -298,7 +301,7 @@ let
 	xlabel = "x"
 	ylabel = "y"
 
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 
 	ax = Axis(fig[1, 1]; title="Posterior simulation under informative prior", xlabel="Intercept, a", ylabel="Slope, b")
 	ylims!(ax, -8, 8)
@@ -358,7 +361,7 @@ se_bayes = sqrt(1/(1/se_prior^2 + 1/se_data^2))
 # ╔═╡ 46a4817a-1587-4b26-98d0-b1da5e9f4673
 let
 	x = 0.3:0.001:0.7
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1], title="Prior, likelihood & posterior")
 	prior = lines!(f[1, 1], x, pdf.(Normal(theta_hat_prior, se_prior), x), color=:gray)
 	data = lines!(x, pdf.(Normal(theta_hat_data, se_data), x),color=:darkred)
@@ -370,7 +373,7 @@ end
 
 # ╔═╡ 883e8535-0b1e-491c-91ff-4cc21025de50
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1], title="Prior, likelihood & posterior (using `density()`)")
 	density!(rand(Normal(theta_hat_prior, se_prior), Int(1e6)), lab="prior")
 	density!(rand(Normal(theta_hat_data, se_data), Int(1e6)), lab="likelihood")
@@ -385,6 +388,7 @@ md" ### 9.4 Example of Bayesian inference: beauty and sex ratio."
 # ╟─17034ac2-d8da-40a4-a899-5c4e10877945
 # ╠═262d5b57-4322-4e66-918f-edc0727e190e
 # ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
+# ╠═7ea36871-e64e-43f4-8d8c-b4a197986a31
 # ╠═f71640c9-3918-475e-b32b-c85424bbcf5e
 # ╟─09298360-8bbe-4274-a0be-b7ad89f8f767
 # ╠═2fb45a4e-33ad-461a-a973-54598c2154fb

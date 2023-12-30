@@ -27,20 +27,25 @@ html"""
 
 # ╔═╡ d98a3a0a-947e-11ed-13a2-61b5b69b4df5
 notebook_files = [
-    "~/.julia/dev/ROSStanPluto/notebooks/01-Introduction.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/02-Data and Measurement.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/03-Probability.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/04-Statistical inference.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/05-Simulation.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/06-Background on regression.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/07-Linear regression with single predictor.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/08-Fitting regression models.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/09-Predictions and Bayesian inference.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/10-Linear regression with multiple predictors.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/11-Assumptions, diagnostics and model evaluation.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/12-Transformations and regression.jl",
-    "~/.julia/dev/ROSStanPluto/notebooks/Appendix A.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ARM/01-Introduction.jl",
+
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/01-Introduction.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/02-Data and Measurement.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/03-Probability.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/04-Statistical inference.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/05-Simulation.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/06-Background on regression.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/07-Linear regression with single predictor.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/08-Fitting regression models.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/09-Predictions and Bayesian inference.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/10-Linear regression with multiple predictors.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/10-NES.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/11-Assumptions, diagnostics and model evaluation.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/12-Transformations and regression.jl",
+    "~/.julia/dev/ROSStanPluto/notebooks/ROS/Appendix A.jl",
     "~/.julia/dev/ROSStanPluto/notebooks/Maintenance/Notebook-to-reset-ROSStanPluto-jl-notebooks.jl"
+
+    "~/.julia/dev/ROSStanPluto/notebooks/ARMM/01-Introduction.jl",
 ];
 
 # ╔═╡ 0f10a758-e442-4cd8-88bc-d82d8de97ede

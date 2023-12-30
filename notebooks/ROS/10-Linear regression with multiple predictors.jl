@@ -13,7 +13,7 @@ begin
     using StanSample
 	
 	# Graphics related
-    using GLMakie
+    using CairoMakie
 
 	# Common data files and functions
 	using RegressionAndOtherStories
@@ -43,7 +43,7 @@ kidiq = CSV.read(ros_datadir("KidIQ", "kidiq.csv"), DataFrame)
 
 # ╔═╡ 4a4605a4-084a-4d64-a444-fa0fcf41ef91
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="KidIQ data: kid_score ~ mom_hs")
 	scatter!(kidiq[kidiq.mom_hs .== 0, :mom_hs], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	scatter!(kidiq[kidiq.mom_hs .== 1, :mom_hs], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)
@@ -90,7 +90,7 @@ end
 
 # ╔═╡ b77b121b-38d3-485c-a9a2-c9ae87fe3423
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="KidIQ data: kid_score ~ mom_hs")
 	scatter!(kidiq[kidiq.mom_hs .== 0, :mom_hs], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	scatter!(kidiq[kidiq.mom_hs .== 1, :mom_hs], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)
@@ -137,7 +137,7 @@ ms10_2s = success(rc10_2s) && model_summary(post10_2s, [:a, :b, :sigma])
 
 # ╔═╡ 90f0236a-2c5b-4ea8-83cf-490037bf8c15
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="KidIQ data: kid_score ~ mom_iq")
 	scatter!(kidiq[kidiq.mom_hs .== 0, :mom_iq], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	scatter!(kidiq[kidiq.mom_hs .== 1, :mom_iq], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)
@@ -192,7 +192,7 @@ let
 	momhs(x) = x == 1
 	hs = findall(momhs, kidiq.mom_hs)
 	
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="KidIQ data: kid_score ~ mom_hs + mom_iq")
 	sca1 = scatter!(kidiq[kidiq.mom_hs .== 0, :mom_iq], kidiq[kidiq.mom_hs .== 0, :kid_score]; color=:red, markersize = 3)
 	sca2 = scatter!(kidiq[kidiq.mom_hs .== 1, :mom_iq], kidiq[kidiq.mom_hs .== 1, :kid_score]; color=:blue, markersize = 3)

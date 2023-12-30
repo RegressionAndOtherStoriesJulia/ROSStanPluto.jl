@@ -1,11 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.19.10
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ a7e8b8f4-e5c6-4203-8b10-db83c49f14fd
 using Pkg
+
+# ╔═╡ 117bce29-5156-434a-9cfd-400e27703682
+Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
 
 # ╔═╡ 670da67b-fa90-41b9-99c1-e1aa403cb49e
 begin
@@ -18,7 +21,7 @@ begin
 	using StanOptimize	
 
 	# Graphics related
-    using GLMakie
+    using CairoMakie
 
 	# Common data files and functions
 	using RegressionAndOtherStories
@@ -26,7 +29,7 @@ end
 
 # ╔═╡ 3d06f09a-c972-474b-8e57-c396cefb5e22
 let
-	using StatsAPI
+	using Statistics
 	Random.seed!(123)
 	a = 46.2
 	b = 3.0
@@ -131,7 +134,7 @@ end
 
 # ╔═╡ 2393509b-bcae-4b6b-a552-ac5fba8fba3c
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Regression line and simulated values", xlabel="x", ylabel="y")
 	x_range = LinRange(minimum(sim.x), maximum(sim.x), 200)
 	y_res = mean.(link(post8_1s, (r,x) -> r.a + x * r.b, x_range))
@@ -152,17 +155,17 @@ let
 	â = ms8_1s[:a, :mean]
 	b̂ = ms8_1s[:b, :mean]
 
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="RSS as a function of a", xlabel="a", ylabel="RSS")
 	a_range = LinRange(43, 48, 100)
 	r = [sum((sim.y .- (k .+ b̂ .* sim.x)) .^ 2) for k in a_range]
 	lines!(a_range, r)
-	annotations!("$((â = â, b̂ = b̂))", position=(44.5, 4500), textsize=15)
+	annotations!("$((â = â, b̂ = b̂))", position=(44.5, 4500), fontsize=15)
 	ax = Axis(f[1, 2]; title="RSS as a function of b", xlabel="b", ylabel="RSS")
 	b_range = LinRange(2.1, 4.4, 100)
 	r = [sum((sim.y .- (â .+ k .* sim.x)) .^ 2) for k in b_range]
 	lines!(b_range, r)
-	annotations!("$((â = â, b̂ = b̂))", position=(2.58, 4800), textsize=15)
+	annotations!("$((â = â, b̂ = b̂))", position=(2.58, 4800), fontsize=15)
 	f
 end
 
@@ -263,7 +266,7 @@ loglik([45.6, 3.25, 4.4])
 
 # ╔═╡ 6034ad40-242d-4b6b-8f9f-1941572ed079
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1])
 	lines!(30:0.1:60, [-loglik([a, 3.25, 4.4]) for a in 30:0.1:60])
 	ax = Axis(f[1, 2])
@@ -302,7 +305,7 @@ my_Σ = cov([post8_1s.a post8_1s.b])
 
 # ╔═╡ f5a8786b-1d88-4070-9ea1-abf2c4506523
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="(â, b̂) and covariance matrix derivative")
 	lines!(getellipsepoints(my_μ, my_Σ)..., label="95% confidence interval of derivative", color=:black)
 	lines!(getellipsepoints(my_μ, my_Σ, 0.5)..., label="50% confidence interval of derivative", color=:darkred)
@@ -313,7 +316,7 @@ end
 
 # ╔═╡ 09b4223c-ef55-4255-bd9b-91683ce3c3cb
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="(â, b̂) and covariance matrix derivative")
 	poly!(Point2f.(zip(getellipsepoints(my_μ, my_Σ)...)); color=(:yellow, 0.5))
 	poly!(Point2f.(zip(getellipsepoints(my_μ, my_Σ, 0.50)...)); color=(:lightgrey, 0.5))
@@ -329,7 +332,7 @@ md" ### 8.2 Influence of individual points in a fitted regression."
 
 # ╔═╡ ff062913-8600-476a-a87d-3ea953364240
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Regression line and influence of 20 selected observations", xlabel="x", ylabel="y")
 	x_range = LinRange(minimum(sim.x), maximum(sim.x), 200)
 	y_res = mean.(link(post8_1s, (r,x) -> r.a + x * r.b, x_range))
@@ -414,6 +417,7 @@ fake_lm = lm(@formula(y ~ x), fake)
 # ╟─80654ee5-415a-4d0f-a3e9-7aba64dbdaed
 # ╠═8dec7b41-6a63-40c4-8e85-2e57b10f418c
 # ╠═a7e8b8f4-e5c6-4203-8b10-db83c49f14fd
+# ╠═117bce29-5156-434a-9cfd-400e27703682
 # ╟─9553193f-f338-470c-892c-2745ccac23a9
 # ╠═670da67b-fa90-41b9-99c1-e1aa403cb49e
 # ╟─5c1dee90-d13a-4069-83b2-b6939ae98862

@@ -14,7 +14,7 @@ begin
 	using StanSample
 	using StanOptimize
 
-	using GLMakie
+	using CairoMakie
 	
 	using RegressionAndOtherStories
 end
@@ -65,14 +65,14 @@ Optim.minimizer(res)
 
 # ╔═╡ 884a3c1f-e1b3-4110-b4ca-8194f5d7b17d
 begin
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Apendix A.7 optimization")
 	x = collect(LinRange(-2.0, 5.0, 100))
 	lines!(x, [fun(v) for v in x])
 	vlines!(ax, [optim["x"][1]]; color=:red)
 	hlines!(ax, [optim["lp__"][1]]; color=:grey, xmin=[0.50], xmax=[0.8])
-	annotations!("x̄ = $(optim["x"])", position=(-2,24), textsize=15)
-	annotations!("fun(x̄) = $(optim["lp__"])", position=(-2, 22), textsize=15)
+	annotations!("x̄ = $(optim["x"])", position=(-2,24), fontsize=15)
+	annotations!("fun(x̄) = $(optim["lp__"])", position=(-2, 22), fontsize=15)
 	f
 end
 

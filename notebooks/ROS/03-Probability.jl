@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.19
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
@@ -7,14 +7,18 @@ using InteractiveUtils
 # ╔═╡ 3ec83660-c767-49a4-ab27-923ea3443c98
 using Pkg
 
+# ╔═╡ 2eccffe9-7993-473a-b421-94d0860c9925
+Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
+
 # ╔═╡ 44233635-6129-4ccd-8bad-bbafa5287112
 # ╠═╡ show_logs = false
 begin
 	# Specific to this notebook
     using GLM
+	using Statistics
 	
 	# Graphics related
-    using GLMakie
+    using CairoMakie
 
 	# Specific to ROSStanPluto
     using StanSample
@@ -49,10 +53,10 @@ pop = DataFrame(stratum=1:3, country=["United States", "Mexico", "Canada"],
 	population=Int[310e6, 112e6, 34e6], average_age=[36.8, 26.7, 40.7])
 
 # ╔═╡ 900d5990-a4a6-4213-8965-86bf723050b6
-mean(pop.average_age, weights(pop.population))
+mean(pop.average_age, Weights(pop.population))
 
 # ╔═╡ bed5f962-d1c0-4ce0-a158-665227846c0b
-weights(pop.population)/sum(pop.population)
+Weights(pop.population)/sum(pop.population)
 
 # ╔═╡ 2696411e-44fe-4fd9-8235-60c90ff61abf
 describe(pop)
@@ -63,7 +67,7 @@ md" ### 3.3 - Graphing a line"
 # ╔═╡ a2533602-96ea-4e2a-824b-9ae6443cf718
 let
 	data = LinRange(0.01, 0.99, 200)
-	f = Figure(resolution = (800, 800))
+	f = Figure(; size=default_figure_resolution)
 	
 	for (i, scale) in enumerate([identity, log10, log2, log, sqrt, Makie.logit])
 	
@@ -81,7 +85,7 @@ end
 # ╔═╡ 3de3d4b5-a946-415b-9a0d-ef6d115d695f
 let
 	data = 10 .^ LinRange(0.01, 5.0, 200)
-	f = Figure(resolution = (800, 300))
+	f = Figure(; size=default_figure_resolution)
 	
 	for (i, scale) in enumerate([log10, log2, log])
 	    row, col = fldmod1(i, 2)
@@ -96,7 +100,7 @@ end
 
 # ╔═╡ acde5683-93e7-43b5-b5bc-1d5c8b10f3b7
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title = "Mile record", subtitle = "(from 1900 to 2000)", xlabel = "Year", ylabel = "Time [sec]")
 	xlims!(ax, 1900, 2000)
 	ax.xticks = 1900:25:2000
@@ -160,7 +164,7 @@ end
 let
 	x = LinRange(1, 10000, 1000)
 	y = 4.1 * x.^0.74
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Metabolic rate (linear scale)", xlabel="Body mass [kg]", ylabel="Metobolic rate [W]")
 	scatter!(exp.(metabolic.body_mass), exp.(metabolic.rate))
 	lines!(x, y; color=:darkred)
@@ -205,7 +209,7 @@ end
 
 # ╔═╡ 65d3b481-8c53-4bb2-a9b8-12d9afdfe6c4
 let
-		f = Figure()
+		f = Figure(; size=default_figure_resolution)
 		ax = Axis(f[1, 1]; title="Density heights")
 		density!(womenHeights; color=color = (:lightgreen, 0.4), label="Women")
 		density!(menHeights; color=color = (:lightblue, 0.4), label="Men")
@@ -256,15 +260,15 @@ let
 		color = (:blue, 0.55), label = "Label")
 
 	text!("68%", position = (63.65, 0.05), align = (:center,  :center),
-    	textsize = 30)
+    	fontsize = 30)
 	text!("13.5%", position = (67.5, 0.02), align = (:center,  :center),
-    	textsize = 20)
+    	fontsize = 20)
 	text!("13.5%", position = (59.6, 0.02), align = (:center,  :center),
-    	textsize = 20)
+    	fontsize = 20)
 	text!("2.5%", position = (69.75, 0.0045), align = (:center,  :center),
-    	textsize = 15)
+    	fontsize = 15)
 	text!("2.5%", position = (57.7, 0.0045), align = (:center,  :center),
-    	textsize = 15)
+    	fontsize = 15)
 	current_figure()
 end
 
@@ -289,7 +293,7 @@ md" #### LogNormal"
 let
 	menw = rand(LogNormal(5.13, 0.17), 10000)
 	menwl = log.(menw)
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Log weights of men\n(Normal distribution)", xlabel="Logarithm of weight [lb]", ylabel="Density")
 	density!(menwl)
 	ax = Axis(f[1, 2]; title="Weights of men\n(LogNormal distribution", xlabel="Weight of men [lb]", ylabel="Density")
@@ -333,6 +337,7 @@ md" ### 3.6 - Probability modeling"
 # ╟─1b86b8b4-6892-4f41-ab89-fa3d1b3b7c0a
 # ╠═e6974166-80e9-4903-b4bd-3f4cc3651823
 # ╠═3ec83660-c767-49a4-ab27-923ea3443c98
+# ╠═2eccffe9-7993-473a-b421-94d0860c9925
 # ╠═44233635-6129-4ccd-8bad-bbafa5287112
 # ╟─d09f8d14-7c72-11ec-1481-976ff33e65af
 # ╠═af4f1bd4-ad6c-4f9f-a719-29ab5579b001

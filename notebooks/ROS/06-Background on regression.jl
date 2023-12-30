@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.10
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
@@ -7,16 +7,20 @@ using InteractiveUtils
 # ╔═╡ 1271ba57-93ff-4ef7-bfff-15c39a034b2c
 using Pkg
 
+# ╔═╡ 53728a51-46ed-4449-8392-366f7a96569f
+Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
+
 # ╔═╡ 71cd8293-8c62-42b3-a33e-def5f7192160
 begin
 	# Specific to this notebook
     using GLM
+	using Statistics
 
 	# Specific to ROSStanPluto
     using StanSample
 	
 	# Graphics related
-    using GLMakie
+    using CairoMakie
 
 	# Common data files and functions
 	using RegressionAndOtherStories
@@ -97,7 +101,7 @@ end
 
 # ╔═╡ 08be202b-f618-4a7f-a48a-5618b19495f5
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	
 	ax = Axis(f[1, 1]; title="Regression of fake data.", xlabel="fake.x", ylabel="fake.y")
 	scatter!(fake.x, fake.y)
@@ -173,7 +177,7 @@ end
 let
 	â, b̂, ĉ = round.(ms6_2s[:, :mean]; digits=2)
 
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 	
 	ax = Axis(fig[1, 1]; title="Earnings for males", subtitle="earnk = $(round(ĉ + â; digits=2)) + $(b̂) * mheight + ϵ")
 	m = sort(earnings[earnings.male .== 1, [:height, :earnk]])
@@ -238,7 +242,7 @@ end
 
 # ╔═╡ 1e38322c-821f-45a5-aad9-d4c114ae37b7
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Mothers' and daugthers' heights")
 	xlims!(ax, 51, 74)
 	scatter!(jitter.(heights.mother_height), jitter.(heights.daughter_height); markersize=3)
@@ -250,7 +254,7 @@ end
 
 # ╔═╡ 444766e8-86b9-496b-8b11-979b08fa842e
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Mothers` and daughters' heights,\naverage of data, and fitted regression line",
 		xlabel="Mother's height [in]", ylabel="Adult daugther's height [in]")
 	scatter!(heights.mother_height, heights.daughter_height; markersize=5)
@@ -262,14 +266,14 @@ let
 	lines!(xrange, y)
 	vlines!(ax, m̄; ymax=0.55, color=:grey)
 	hlines!(ax, d̄; xmax=0.58, color=:grey)
-	annotations!("y = 30 + 0.54 * mother's height", position=(49, 55), textsize=15)
-	annotations!("or: y = 63.9 + 0.54 * (mother's height - 62.5)", position=(49, 54), textsize=15)
+	annotations!("y = 30 + 0.54 * mother's height", position=(49, 55), fontsize=15)
+	annotations!("or: y = 63.9 + 0.54 * (mother's height - 62.5)", position=(49, 54), fontsize=15)
 	f
 end
 
 # ╔═╡ ae86b798-1d42-4bf0-8bde-7d4c922a48fd
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Mothers` and daughters' heights,\naverage of data, and fitted regression line",
 		xlabel="Mother's height [in]", ylabel="Adult daugther's height [in]")
 	scatter!(heights.mother_height, heights.daughter_height; markersize=5)
@@ -279,8 +283,8 @@ let
 	d̄ = mean(heights.daughter_height)
 	scatter!([m̄], [d̄]; markersize=20, color=:gray)
 	lines!(xrange, y)
-	annotations!("y = 30 + 0.54 * mother's height", position=(20, 35), textsize=15)
-	annotations!("or: y = 63.9 + 0.54 * (mother's height - 62.5)", position=(20, 33), textsize=15)
+	annotations!("y = 30 + 0.54 * mother's height", position=(20, 35), fontsize=15)
+	annotations!("or: y = 63.9 + 0.54 * (mother's height - 62.5)", position=(20, 33), fontsize=15)
 	f
 end
 
@@ -380,7 +384,7 @@ df_poll = CSV.read(ros_datadir("Death", "polls.csv"), DataFrame)
 
 # ╔═╡ d3ae1909-f6a3-437a-9d19-5b4a6e6baab3
 begin
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Death penalty opinions", xlabel="Year", ylabel="Percentage support for the death penalty")
 	scatter!(df_poll.year, df_poll.support .* 100)
 	err_lims = [100(sqrt(df_poll.support[i]*(1-df_poll.support[i])/1000)) for i in 1:nrow(df_poll)]
@@ -417,6 +421,7 @@ end;
 # ╟─5a68738d-8f8f-44b1-af3c-f3ceed14d82b
 # ╠═f96ef9cd-c3e2-4796-af8c-e5d94198fd6b
 # ╠═1271ba57-93ff-4ef7-bfff-15c39a034b2c
+# ╠═53728a51-46ed-4449-8392-366f7a96569f
 # ╟─5356fcee-dada-48dd-b422-bed4b5595470
 # ╠═71cd8293-8c62-42b3-a33e-def5f7192160
 # ╟─8dba464a-3eb7-43e5-8324-85b938be6d51

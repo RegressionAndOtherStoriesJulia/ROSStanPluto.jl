@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.10
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
@@ -7,16 +7,20 @@ using InteractiveUtils
 # ╔═╡ 2b08cf3d-a148-4981-a389-2abfdc622bf7
 using Pkg
 
+# ╔═╡ 8bc74cd1-8b1c-4d02-94cf-105dab72a6f0
+Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
+
 # ╔═╡ a28841db-e3f9-4c90-8b7b-144814616800
 begin
 	# Specific to this notebook
     using GLM
+	using Statistics
 
 	# Specific to ROSStanPluto
     using StanSample
 	
 	# Graphics related
-    using GLMakie
+    using CairoMakie
 
 	# Common data files and functions
 	using RegressionAndOtherStories
@@ -69,7 +73,7 @@ coef(hibbs_lm)
 
 # ╔═╡ 480baf32-0f8b-4fd3-9712-99fa31456f78
 let
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 	hibbs.label = string.(hibbs.year)
 	xlabel = "Average growth personal income [%]"
 	ylabel = "Incumbent's party vote share"
@@ -77,7 +81,7 @@ let
 		title = "Forecasting the election from the economy"
 		ax = Axis(fig[1, 1]; title, xlabel, ylabel)
 		for (ind, yr) in enumerate(hibbs.year)
-			annotations!("$(yr)"; position=(hibbs.growth[ind], hibbs.vote[ind]), textsize=10)
+			annotations!("$(yr)"; position=(hibbs.growth[ind], hibbs.vote[ind]), fontsize=10)
 		end
 	end
 	let
@@ -146,7 +150,7 @@ let
 	growth_range = LinRange(minimum(hibbs.growth), maximum(hibbs.growth), 200)
 	votes = mean.(link(post7_1s, (r,x) -> r.a + x * r.b, growth_range))
 
-	fig = Figure()
+	fig = Figure(; size=default_figure_resolution)
 	xlabel = "Average growth personal income [%]"
 	ylabel="Incumbent's party vote share"
 	ax = Axis(fig[1, 1]; title="Regression line based on 4000 posterior samples", 
@@ -168,7 +172,7 @@ end
 
 # ╔═╡ cae9dea3-010e-48f9-b45f-1230b4456031
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title = "")
 	x_range = LinRange(30, 70, 100)
 	y = pdf.(Normal(52.3, 3.6), x_range)
@@ -178,7 +182,7 @@ let
 	band!(x1, fill(0, length(x1)), pdf.(Normal(52.3, 3.6), x1);
 		color = (:grey, 0.75), label = "Label")
 
-	annotations!("Predicted\n74% change\nof Clinton victory", position=(51, 0.02), textsize=13)
+	annotations!("Predicted\n74% change\nof Clinton victory", position=(51, 0.02), fontsize=13)
 	f
 end
 
@@ -411,7 +415,7 @@ end
 
 # ╔═╡ a4ffdd25-d2f7-43e4-83a7-176d813f9d48
 let
-	f = Figure()
+	f = Figure(; size=default_figure_resolution)
 	ax = Axis(f[1, 1]; title="Least-squares regression on an indicator is\nthe same as computing a difference in means",
 	xlabel="Indicator, x", ylabel="y")
 	x_range = LinRange(0, 1, 100)
@@ -424,9 +428,9 @@ let
 	ȳ₀ = mean(y₀)
 	ȳ₁ = mean(y₁)
 	hlines!(ax, [ȳ₀, ȳ₁]; color=:lightgrey)
-	annotations!("ȳ₀ = $(round(ȳ₀, digits=1))", position=(0.05, 2.4), textsize=15)
-	annotations!("ȳ₁ = $(round(ȳ₁, digits=1))", position=(0.9, 8.2), textsize=15)
-	annotations!("y = $(round(â, digits=1)) + $(round(b̂, digits=1)) * x", position=(0.43, 4.4), textsize=15)
+	annotations!("ȳ₀ = $(round(ȳ₀, digits=1))", position=(0.05, 2.4), fontsize=15)
+	annotations!("ȳ₁ = $(round(ȳ₁, digits=1))", position=(0.9, 8.2), fontsize=15)
+	annotations!("y = $(round(â, digits=1)) + $(round(b̂, digits=1)) * x", position=(0.43, 4.4), fontsize=15)
 	f
 end
 
@@ -435,6 +439,7 @@ end
 # ╟─92ce35e9-ac0a-4f56-a4f8-0649545f4fcf
 # ╠═ac149089-83e8-45f3-9f64-e55fcab01c5f
 # ╠═2b08cf3d-a148-4981-a389-2abfdc622bf7
+# ╠═8bc74cd1-8b1c-4d02-94cf-105dab72a6f0
 # ╟─7cb5adb7-fefd-44b5-b60e-37eafdd1e6a0
 # ╠═a28841db-e3f9-4c90-8b7b-144814616800
 # ╟─a8d7b228-2f7a-434b-b56d-630ae574e233

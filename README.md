@@ -9,15 +9,15 @@
 
 ## Purpose
 
-This project will ultimately contain three sets of Pluto notebooks that contain selected Julia examples used in the books:
+This project will ultimately contain three sets of Pluto notebooks with Julia versions of selected examples explained in the books:
 
-1. ["ARM" book](http://www.stat.columbia.edu/~gelman/arm/)
-2. ["Regression and Other Stories" by A Gelman, J Hill and A Vehtari](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
-3. ["Advanced Regression and Multilevel Models," by Gelman, Hill, Goodrich, Gabry, Simpson, and Vehtari (in progress, expected late 2024?)](http://www.stat.columbia.edu/~gelman/armm/)
+1. ["Data Analysis Using Regression and Multilevel/Hierarchical Models" (`ARM`)](http://www.stat.columbia.edu/~gelman/arm/)
+2. ["Regression and Other Stories" (`ROS`)](https://www.cambridge.org/highereducation/books/regression-and-other-stories/DD20DD6C9057118581076E54E40C372C#overview).
+3. ["Advanced Regression and Multilevel Models" (`ARMM`)](http://www.stat.columbia.edu/~gelman/armm/)
 
 These notebooks are intended to be used in conjunction with above books. Each notebook contains a chapter. It is not the intention to cover each example in all books, just to get the reader going.
 
-I consider both projects `ROSStanPluto` and `SR2StanPluto` as "work in progress projects", no guarantees all notebooks will always work without hickups.
+Both projects `ROSStanPluto` and `SR2StanPluto` are "work in progress projects", no guarantees all notebooks will always work without hickups. Please file an issue or a PR if you find a problem.
 
 ## Prerequisites
 

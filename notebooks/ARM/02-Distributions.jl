@@ -14,6 +14,7 @@ Pkg.activate(expanduser("~/.julia/dev/SR2StanPluto"))
 begin
     # Specific to this notebook
     using GLM
+	using Statistics
 
 	# Specific to ROSStanPluto
 	using StanSample
@@ -27,7 +28,7 @@ begin
 end
 
 # ╔═╡ eb7ea04a-da52-4e69-ac3e-87dc7f014652
-md"## See chapter 1 in Regression and Other Stories."
+md"## See chapter 2 of ARM."
 
 # ╔═╡ cf39df58-3371-4535-88e4-f3f6c0404500
 md" ###### Widen the cells."
@@ -50,36 +51,35 @@ md"###### A typical set of Julia packages to include in notebooks."
 # ╔═╡ 87902f0e-5919-45b3-89a6-b88a7dab9363
 md" ### 1.1 The three challenges of statistics."
 
-# ╔═╡ 56aa0b49-1e8a-4390-904d-6f7551f849ea
-md"
-!!! note
-
-It is not common for me to copy from the book but this particular section deserves an exception!"
-
-# ╔═╡ 47a6a5f3-0a54-46fe-a581-7414c0d9294a
-md"
-
-The three challenges of statistical inference are:
-1. Generalizing from sample to population, a problem that is associated with survey sampling but actually arises in nearly every application of statistical inference;
-2. Generalizing from treatment to control group, a problem that is associated with causal inference, which is implicitly or explicitly part of the interpretation of most regressions we have seen; and
-3. Generalizing from observed measurements to the underlying constructs of interest, as most of the time our data do not record exactly what we would ideally like to study.
-All three of these challenges can be framed as problems of prediction (for new people or new items that are not in the sample, future outcomes under different potentially assigned treatments, and underlying constructs of interest, if they could be measured exactly).
-"
-
 # ╔═╡ 0391fc17-09b7-47d7-b799-6dc6de13e82b
 md"### 1.2 Why learn regression?"
 
+# ╔═╡ 5b82824f-80e6-448f-8c74-0392320fcd24
+rand(Poisson(0.3), 10)
+
+# ╔═╡ 7720cd7e-1c8b-4611-8599-3d0d5bb6e386
+rand(Binomial(20, 0.6), 10)
+
+# ╔═╡ a460a1e2-3e9e-407b-b1c3-31fa899fbfe6
+rand(LogNormal(69, 15), 10)
+
+# ╔═╡ 430d0fb1-0f36-4875-9b28-c26aa8d3328b
+let
+	f = Figure(; size=default_figure_resolution)
+	ax = Axis(f[1, 1])
+	c = Float64[]
+	for i in 1:10000
+		x = rand(Normal(170, 10), 10000)
+		y = rand(Normal(150, 10), 10000) + 0.25 * x
+		append!(c, cor(x, y))
+	end
+	CairoMakie.density!(c; strokecolor = :blue, strokewidth = 3, strokearound = true, color=:white)
+	vlines!(mean(c))
+	f
+end
+
 # ╔═╡ d830f41c-0fb6-4bff-9fe0-0bd51f444779
 hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
-
-# ╔═╡ 1a468606-361d-4f22-8c06-107ef789401d
-ros_datadir()
-
-# ╔═╡ 23d26498-9ef8-4698-b4fc-d7a586b118fb
-arm_datadir()
-
-# ╔═╡ 583ef308-a202-43d7-9fd2-cfbc1d1dcbb0
-armm_datadir()
 
 # ╔═╡ 35bee056-5cd8-48ee-b9c0-74a8b53229bd
 hibbs_lm = lm(@formula(vote ~ growth), hibbs)
@@ -161,17 +161,19 @@ end
 let
 	f = Figure(; size=default_figure_resolution)
 	axis = Axis(f[1, 1])
+	xlims!(40, 130)
 	for i in unique(electric.grade)
 		for j in unique(electric.treatment)
 			tmp = electric[electric.grade .== i .&& electric.treatment .== 0, :]
-			CairoMakie.density!(tmp.post_test)
+			CairoMakie.hist!(tmp.post_test)
 		end
 	end
 	axis = Axis(f[2, 1])
+	xlims!(40, 130)
 	for i in unique(electric.grade)
 		for j in unique(electric.treatment)
 			tmp = electric[electric.grade .== i .&& electric.treatment .== 1, :]
-			CairoMakie.density!(tmp.post_test)
+			CairoMakie.hist!(tmp.post_test)
 		end
 	end
 	f
@@ -183,17 +185,17 @@ let
 	for i in unique(electric.grade)
 		for j in unique(electric.treatment)
 			axis = Axis(f[1, i]; title="Grade=$i. Treatment=0")
-			xlims!(25, 140)
+			xlims!(40, 130)
 			tmp = electric[electric.grade .== i .&& electric.treatment .== 0, :]
-			CairoMakie.density!(tmp.post_test)
+			CairoMakie.hist!(tmp.post_test)
 		end
 	end
 	for i in unique(electric.grade)
 		for j in unique(electric.treatment)
 			axis = Axis(f[2, i]; title="Grade=$i. Treatment=1")
-			xlims!(25, 140)
+			xlims!(40, 130)
 			tmp = electric[electric.grade .== i .&& electric.treatment .== 1, :]
-			CairoMakie.density!(tmp.post_test)
+			CairoMakie.hist!(tmp.post_test)
 		end
 	end
 	f
@@ -698,14 +700,13 @@ read_samples(m1_5s, :nesteddataframe)
 # ╠═5084b8f0-65ac-4704-b1fc-2a9008132bd7
 # ╠═d7753cf6-7452-421a-a3ec-76e07646f808
 # ╠═550371ad-d411-4e66-9d63-7329322c6ea1
-# ╟─87902f0e-5919-45b3-89a6-b88a7dab9363
-# ╟─56aa0b49-1e8a-4390-904d-6f7551f849ea
-# ╟─47a6a5f3-0a54-46fe-a581-7414c0d9294a
-# ╟─0391fc17-09b7-47d7-b799-6dc6de13e82b
+# ╠═87902f0e-5919-45b3-89a6-b88a7dab9363
+# ╠═0391fc17-09b7-47d7-b799-6dc6de13e82b
+# ╠═5b82824f-80e6-448f-8c74-0392320fcd24
+# ╠═7720cd7e-1c8b-4611-8599-3d0d5bb6e386
+# ╠═a460a1e2-3e9e-407b-b1c3-31fa899fbfe6
+# ╠═430d0fb1-0f36-4875-9b28-c26aa8d3328b
 # ╠═d830f41c-0fb6-4bff-9fe0-0bd51f444779
-# ╠═23d26498-9ef8-4698-b4fc-d7a586b118fb
-# ╠═1a468606-361d-4f22-8c06-107ef789401d
-# ╠═583ef308-a202-43d7-9fd2-cfbc1d1dcbb0
 # ╠═35bee056-5cd8-48ee-b9c0-74a8b53229bd
 # ╠═3c4672aa-d17e-4681-9863-9ee026fefee6
 # ╠═a9970ef7-1e0e-4976-b8c9-1db4dd3a222b

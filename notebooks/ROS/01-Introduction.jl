@@ -72,11 +72,11 @@ md"### 1.2 Why learn regression?"
 # ╔═╡ d830f41c-0fb6-4bff-9fe0-0bd51f444779
 hibbs = CSV.read(ros_datadir("ElectionsEconomy", "hibbs.csv"), DataFrame)
 
-# ╔═╡ 1a468606-361d-4f22-8c06-107ef789401d
-ros_datadir()
-
 # ╔═╡ 23d26498-9ef8-4698-b4fc-d7a586b118fb
 arm_datadir()
+
+# ╔═╡ 1a468606-361d-4f22-8c06-107ef789401d
+ros_datadir()
 
 # ╔═╡ 583ef308-a202-43d7-9fd2-cfbc1d1dcbb0
 armm_datadir()

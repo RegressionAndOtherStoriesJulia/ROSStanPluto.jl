@@ -7,6 +7,14 @@
 ![Lifecycle](https://img.shields.io/badge/lifecycle-archived-red.svg)
 ![Lifecycle](https://img.shields.io/badge/lifecycle-dormant-blue.svg) -->
 
+## Note
+
+After many years I have decided to step away from my work with Stan and Julia. My plan is to be around until the end of 2024 for support if someone decides to step in and take over further development and maintenance work.
+
+At the end of 2024 I'll archive the different packages and projects included in the Github organisations StanJulia, StatisticalRethingJulia and RegressionAndOtherStoriesJulia if no one is interested (and time-wise able!) to take on this work.
+
+I have thoroughly enjoyed working on both Stan and Julia and see both mature during the last 15 years.
+
 ## Purpose
 
 This project will ultimately contain three sets of Pluto notebooks with Julia versions of selected examples explained in the books:
